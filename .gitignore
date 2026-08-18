@@ -1,0 +1,7 @@
+# Codex projectless-task scratch and deliverable directories
+/work/
+/outputs/
+
+# Local OS/editor noise
+.DS_Store
+*.swp
