@@ -34,7 +34,10 @@ src/
     commands/           # tap, start, restart, pause/resume
     events/             # typed domain events for presentation/audio/analytics
   presentation/
-    scene/              # Pixi stage, layer composition, responsive camera
+    scene/              # Pixi stage, layer containers, stage visual state mapper, responsive camera
+      flame/            # independent multi-layer flame rig and emitters
+      characters/       # servant, demoness and observer presentation state machines
+      environment/      # chamber, ritual plane, gates, runes, chains and reveal masks
     ui/                 # DOM HUD, dialogs, accessibility labels
     input/              # pointer normalization and anti-duplicate gate
     audio/              # Web Audio mixer and adaptive layers
@@ -48,7 +51,7 @@ src/
   telemetry/            # domain-event mapping; no gameplay decisions
 ```
 
-Dependency direction: `app → presentation/platform adapters → core`; `core` depends only on TypeScript types and injected clock/random interfaces. Platform callbacks dispatch commands, never mutate game state directly.
+Dependency direction: `app → presentation/platform adapters → core`; `core` depends only on TypeScript types and injected monotonic clock. Gameplay RNG в MVP отсутствует; session seed принадлежит только presentation/audio variations. Platform callbacks dispatch commands, never mutate game state directly.
 
 ## Boot sequence
 
@@ -68,7 +71,7 @@ Adapter init failure falls back to `web` capabilities without blocking the game;
 type GameState = {
   phase: 'LOADING' | 'READY' | 'PLAYING' | 'PAUSED' | 'AD_BREAK' | 'RESULTS' | 'ERROR';
   heat: number;                 // 0..1000
-  scoreAcc: number;             // non-negative, capped at Number.MAX_SAFE_INTEGER
+  scoreAcc: number;             // non-negative, capped at 2_147_483_647
   score: number;                // floor(scoreAcc), safe non-negative integer
   bestScore: number;
   multiplier: number;
@@ -92,16 +95,49 @@ type GameState = {
 
 Все thresholds и coefficients находятся в versioned immutable config. Core работает fixed simulation step `50 ms`; renderer интерполирует визуал. После frame gap входной frame delta ограничивается `100 ms`, а pause/background gap не догоняется. Во время `PAUSED` и `AD_BREAK` simulation clock и rewarded timer не идут, поэтому background tab и реклама не сжигают heat.
 
-Random events используют injected seeded PRNG. Это позволяет воспроизводить encounter/surge sequence в тестах. Серверного authoritative anti-cheat в MVP нет; leaderboard submission проходит sanity checks и rate limit adapter, а риск client-side manipulation фиксируется как известное ограничение.
+Gameplay schedules в MVP детерминированы активным временем и versioned config; core PRNG для progression/encounters не используется. Только несмысловые visual/audio variations получают отдельный injected session seed и не меняют state/score. Серверного authoritative anti-cheat в MVP нет; leaderboard submission проходит sanity checks и rate limit adapter, а риск client-side manipulation фиксируется как известное ограничение.
 
 ## Rendering
 
 - Logical portrait canvas: `1080 × 1920`; responsive contain/crop policy сохраняет центральный flame и HUD safe areas.
-- Сцена разделена на background darkness, environment layers, characters, flame, particles/FX и HUD overlay.
+- Сцена разделена на независимые Pixi containers в фиксированном порядке: far chamber/vignette → midground architecture/gates → ritual plane/runes/cracks → observers/characters → flame rig → local light/particles/smoke/distortion → foreground chains/ash → DOM HUD.
 - Darkness — маска/тональный слой, управляемый normalized heat; stage reveal не требует загрузки цельного экрана на каждую стадию.
 - Texture atlases — максимум `2048 × 2048`; крупные backgrounds — отдельные WebP/AVIF layers с WebP fallback.
 - Heat distortion и bloom имеют `high/low/off` quality tiers; auto downgrade при p95 frame time выше `24 ms` на протяжении 5 s.
 - `prefers-reduced-motion` или ручной Reduced FX отключает distortion/camera shake и ограничивает particles, не скрывая gameplay cues.
+
+### Stage presentation contract
+
+Core является единственным владельцем `stage` и `stageProgress`. Pure `SceneVisualStateMapper` преобразует их вместе с rhythm/encounter/boost states в целевые opacity, tint, light radius, emitter limits и animation state каждого container. Presentation не изменяет heat, thresholds или timers.
+
+- `stageChanged` немедленно меняет semantic visual state; environment layers выполняют обратимый fade `0.8–1.5 s`, поэтому колебание около порога не создаёт резкого мигания и не вводит gameplay hysteresis.
+- Новый `stageChanged` во время fade меняет target существующего tween, а не запускает второй tween/particle system. Stage cue дедуплицируется согласно audio/QA contract.
+- `stageProgress` непрерывно управляет reveal mask, rune emissive gain и light radius только внутри текущего stage; он не подменяет дискретные character/event states.
+- Far/mid/ritual/character/flame/FX containers обновляются независимо. Пауза замораживает animation clocks и emitters через общий application clock; renderer не использует wall-clock catch-up.
+- Visual reference PNG используются только для mood, perspective, reveal density и composition targets. Они не входят в runtime manifest и не могут быть полноэкранным background; production scene собирается из элементов `ASSET_PLAN.md`.
+
+### Multi-layer flame rig
+
+Пламя — самостоятельный `FlameRig`, а не один raster sprite/loop. Оно содержит:
+
+1. `flame-core` — непрерывно видимое бело-золотое/угольное ядро и static SVG fallback;
+2. `flame-outer` — 3–5 procedural bezier/SDF lobes и stage-dependent ribbon overlay;
+3. `flame-glow` — отдельный low-resolution additive light buffer, который не меняет alpha художественных слоёв;
+4. `flame-embers` — pooled sparks/embers emitters с quality caps;
+5. `flame-smoke-haze` — независимые smoke particles и quarter-resolution heat distortion;
+6. `flame-tap-burst` — pooled one-shot ripple/spark feedback на accepted tap;
+7. `flame-stage-fx` — конфигурации stage-up, cold suppression shell, Heat Window ring, rewarded seal и stage-7 vertical beam/lightning.
+
+Размер, цвет и интенсивность каждого подслоя выводятся из `SceneVisualState`; character animation и environment reveal не зависят от flame animation timeline. При `low/off` качестве или потере WebGL filters остаются core, outer fallback, progress ring и state icons.
+
+### Presentation events and automated verification
+
+Core публикует typed domain events `tapAccepted`, `tapRejected`, `stageChanged`, `rhythmChanged`, `encounterChanged`, `boostChanged`, `runEnded` и `pauseReasonsChanged`. Scene, DOM HUD, audio и telemetry подписываются независимо; ни один consumer не вызывает gameplay mutations напрямую.
+
+- Headless core и deterministic clock позволяют unit/property simulations без DOM, PixiJS, audio или SDK; отдельный seeded harness проверяет только несмысловые presentation/audio variations и не входит в gameplay state.
+- `SceneVisualStateMapper` проверяется table-driven snapshot tests для семи stages и всех rhythm/encounter/boost combinations без запуска WebGL.
+- Renderer integration tests проверяют layer order, unique container/emitters, reversible transitions и cleanup; Playwright выполняет visual rubric/screenshot tests на production build.
+- Character state machines используют domain events и asset states из `ASSET_PLAN.md`; hit testing остаётся только у центральной gameplay zone и DOM controls.
 
 ## Input
 
@@ -155,7 +191,7 @@ interface PlatformService {
 | Initial compressed transfer | ≤3.0 MB | Browser network log | JS/CSS + critical assets |
 | Total production package | ≤15 MB | dist manifest | без source maps/tests |
 | Main JS gzip | ≤350 KB | bundle analyzer | production build |
-| Frame rate | 60 FPS target; ≥30 FPS p95 floor | 10-minute performance run | target mobile/desktop |
+| Frame delivery | median ≥55 FPS on ENV-D1, ≥30 FPS on ENV-M1; frames >50 ms ≤1% | 10-minute performance run | documented desktop + mid-tier Android profiles |
 | Frame time | p95 ≤20 ms high tier; ≤33 ms low tier | PerformanceObserver/profiler | active stage 7 |
 | Input visual feedback | ≤100 ms p95 | pointer timestamp → first changed frame | touch/mouse |
 | JS heap | ≤150 MB after 10 min | browser memory sample | stage 7 stress |
@@ -175,11 +211,11 @@ npm run test:e2e
 npm run package
 ```
 
-`npm run build` создаёт `dist/`; `npm run package` валидирует manifest и создаёт ZIP по `RELEASE_PLAN.md`. Runtime задаётся `.nvmrc` на актуальный Node LTS в момент реализации; `package-lock.json` обязателен. Build не обращается к сети после `npm ci` и не встраивает secrets.
+`npm run build` создаёт `dist/`; `npm run package` валидирует manifest и создаёт ZIP по `RELEASE_PLAN.md`. Runtime задаётся `.nvmrc` на актуальный Node LTS в момент реализации; `package-lock.json` обязателен. Build не обращается к сети после `npm ci` и не встраивает secrets. Runtime assets загружаются только из archive root; внешняя сеть допустима лишь внутри platform adapters для SDK/ads/cloud/leaderboard, а её отсутствие сохраняет playable Web fallback.
 
 ## Testing strategy
 
-- Unit/property tests: heat clamp, decay integration, scoring, combo, thresholds, encounters, boost timer, pause clock, corrupted save migration.
+- Unit/property tests: heat clamp, decay integration, scoring, rhythm, thresholds, encounters, boost timer, pause clock, corrupted save migration.
 - Deterministic simulations: scripted tap timelines на 60/30/15 FPS дают одинаковое core state в допустимой погрешности `≤0.01 heat`, `≤1 score` и `≤10 ms` для hold time.
 - Adapter contract suite: web и Yandex mock проходят одинаковые success/closed/unavailable/error cases.
 - E2E: boot, touch emulation, mouse, seven stages, restart, persistence, rewarded lifecycle, offline/no-SDK fallback.
@@ -197,3 +233,5 @@ npm run package
 | Client-side leaderboard manipulation | Принят для MVP | Sanity checks; серверная валидация — post-MVP decision | Product + Platform |
 | SDK/API drift | Риск | SDK только в adapters; official docs recheck перед integration/release | Platform Agent |
 | Package budgets vs layered audio/art | Риск | Critical/optional groups и budgets из `ASSET_PLAN.md` | Architect + Art + Audio |
+| Stage-threshold visual chatter | Риск | Core остаётся без hysteresis; reversible target-based fades, event deduplication и mapper tests предотвращают flicker/duplicate emitters | Developer + QA |
+| Reference-to-runtime flattening | Запрещено | Concept PNG не входят в runtime; каждый background/character/flame/FX/UI элемент имеет отдельный registry entry и layer owner | Architect + Art |

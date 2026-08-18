@@ -35,7 +35,7 @@ Public leaderboard остаётся один — **Best Score**. UI не мар�
 
 - Нет auto-open, red notification badges, ложной close-кнопки, placement поверх flame или наказания за отказ.
 - Компактная CTA скрывается во время encounter, stage transition, любого pause и active boost; в явно открытом pause/boost sheet используется отдельный confirm control, а не эта CTA.
-- Heat, combo и encounter timers заморожены на рекламе; игрок возвращается в идентичное pre-ad состояние.
+- Heat, Resonance/rhythm phase и encounter timers заморожены на рекламе; игрок возвращается в идентичное pre-ad состояние.
 - Double callback/повторный resume не выдаёт reward дважды.
 - Ошибка сети не запускает cooldown и не ухудшает run.
 - Boost не требуется для tutorial, restart, сохранения, leaderboard view или достижения Inferno.

@@ -7,8 +7,8 @@
 ## Термины и инварианты
 
 - `heat` — текущий жар, вещественное число в диапазоне `[0, 1000]`; старт нового run: `30`.
-- `scoreAcc` — внутреннее неотрицательное число очков; отображаемый `score = floor(scoreAcc)`.
-- `bestScore` — максимальный завершённый или текущий `score` за все run; целое число `≥0`.
+- `scoreAcc` — внутреннее число очков в диапазоне `[0, 2 147 483 647]`; отображаемый `score = floor(scoreAcc)`.
+- `bestScore` — максимальный завершённый или текущий `score` за все run; целое число в диапазоне `[0, 2 147 483 647]`.
 - `stage` — стадия 1–7, однозначно определяемая текущим `heat` по таблице прогрессии.
 - `runHighestStage` — максимальная stage, достигнутая в текущем run; старт `1`, не уменьшается при decay и сбрасывается на restart.
 - `stageProgress` — нормализованный прогресс внутри текущего диапазона: `clamp((heat-L)/(U-L), 0, 1)`, где `[L,U)` — границы стадии; для стадии 7 используются `L=900`, `U=1000`.
@@ -32,13 +32,14 @@ tap/click
 → после входа в Инферно игрок удерживает heat ради score и рекорда времени
 ```
 
-Первый tap должен дать видимый и слышимый отклик в том же кадре обработки ввода. Длинный tutorial отсутствует: до первого ввода пульсирует уголёк и показана строка «Жми, чтобы разжечь»; она исчезает после первого принятого tap.
+Первый tap должен изменить visual state в том же кадре обработки ввода и поставить tap SFX в очередь из того же input handler; фактический audio onset на target device соответствует бюджету `≤50 ms p95` из `AUDIO_DIRECTION.md`/QA. Длинный tutorial отсутствует: до первого ввода пульсирует уголёк и показана строка «Жми, чтобы разжечь»; она исчезает после первого принятого tap.
 
 ## Ввод и допустимые действия
 
 - Gameplay input — один логический `tap`: primary pointer/touch либо primary mouse button внутри центральной интерактивной области. Одно физическое касание не может породить одновременно touch и synthetic click.
 - Принимается не более одного gameplay tap с одного `pointerId` до нового `pointerdown`; secondary mouse button, multitouch-дубликаты, удержание, drag за пределами области и synthetic repeat игнорируются.
-- Game logic принимает максимум 8 taps за любое скользящее окно 1,0 с. Ввод сверх лимита не меняет heat, score, combo или исход события; UI может показать мягкий feedback «слишком быстро».
+- После дедупликации в одном simulation step `50 ms` принимается не более одного gameplay tap; дополнительные inputs этого step отклоняются до расчёта Resonance, событий, heat и score.
+- Game logic принимает максимум 8 taps за любое скользящее окно 1,0 с. Ввод сверх лимита не меняет heat, score, Resonance или исход события; UI может показать мягкий feedback «слишком быстро».
 - UI-кнопки pause, mute, reduced motion, rewarded offer, restart и leaderboard не считаются gameplay taps.
 - Во время `PAUSED`, `AD_BREAK`, `RESULTS` и `LOADING` gameplay taps не принимаются.
 - Вся базовая прогрессия рассчитана на устойчивые 3–5 taps/с; достижение стадии 7 и продолжение run возможно без rewarded boost.
@@ -63,11 +64,12 @@ tap/click
 
 `tapPower = baseTapPower × cadenceFactor × surgeFactor × enemyTapFactor × rewardedFactor`
 
-- `cadenceFactor` задаёт убывающую отдачу для taps в скользящем окне 1,0 с: taps №1–5 имеют `1,00`; №6 — `0,70`; №7 — `0,45`; №8 — `0,25`. Номер пересчитывается для каждого принятого tap по числу предыдущих принятых taps за последние 1,0 с.
+- `cadenceFactor` задаёт убывающую отдачу для taps в скользящем окне 1,0 с: taps №1–3 имеют `1,00`; №4 — `0,70`; №5 — `0,45`; №6 — `0,25`; №7 — `0,15`; №8 — `0,10`. Номер текущего tap равен `1 +` число более ранних accepted timestamps в интервале `(tapTime−1,0 с; tapTime)`, поэтому tap ровно через 1,0 с после старого не делит с ним одно окно.
 - `surgeFactor = 2,00` только во время собственной Вспышки или мирового Окна жара; если оба совпали, остаётся `2,00`, они не перемножаются.
 - `enemyTapFactor = 0,55` только во время активного debuff от незломанного Холодного клейма Демонессы; иначе `1,00`.
 - `rewardedFactor = 2,00` только во время «Печати Инферно ×2»; иначе `1,00`.
 - Все факторы, кроме двух surge-источников, перемножаются. Финальный `tapPower` не округляется; `heat = min(1000, heat + tapPower)`.
+- Сила tap-feedback масштабируется по `cadenceFactor`; при factor ниже 1 вокруг точки ввода появляется короткое нейтральное кольцо пепла. Это без текста показывает убывающую отдачу и не выглядит как ошибка или штраф.
 
 Для scoring используется `scoreTapPower = tapPower / rewardedFactor`: добавочный heat от рекламы не даёт прямых tap-score points, но может косвенно помочь быстрее войти в высокую stage или дольше её удерживать.
 
@@ -83,7 +85,7 @@ tap/click
 
 Механика создаёт простой рисунок «размеренно → быстро → пауза», не делая обычный tap бесполезным.
 
-1. В `NORMAL` четыре последовательных accepted taps с интервалом между соседними taps `0,20–0,65 с` дают по одному заряду Resonance. Интервал <0,20 с сбрасывает заряды в 0; интервал >0,65 с начинает новую последовательность с 1 заряда. Вражеское событие и пауза замораживают, но не сбрасывают таймер до resume.
+1. В `NORMAL` четыре последовательных accepted taps с интервалом между соседними taps `0,20–0,65 с` дают по одному заряду Resonance. Интервал <0,20 с сбрасывает заряды в 0; интервал >0,65 с начинает новую последовательность с 1 заряда. Accepted taps во время enemy telegraph одновременно считаются для Resonance и counter; enemy event само по себе cadence не замораживает. Только `PAUSED`/`AD_BREAK` замораживают время между taps до resume.
 2. При 4 зарядах сразу начинается `SURGE` продолжительностью `1,50 с`: `surgeFactor=2`, `rhythmMultiplier=2`, `rhythmDecayFactor=0,5`. Новые cadence taps в это время не заряжают следующий Resonance.
 3. После SURGE начинается `BREATH` на `1,00 с`: `rhythmMultiplier=1`, `rhythmDecayFactor=0,75`. Gameplay taps разрешены, но дают cadenceFactor не более `0,50` и не заряжают Resonance. Ясный contracting-ring сигнал предлагает паузу.
 4. После BREATH возвращается `NORMAL` с 0 зарядов.
@@ -115,7 +117,7 @@ Stage bonus начисляется один раз за run при первом 
 | 6 | 3,25 | 10 000 |
 | 7 | 5,00 | 20 000 |
 
-`multiplier = min(10, stageMultiplier × rhythmMultiplier)`. Отображается с максимум двумя значащими знаками после запятой (`×1`, `×1,25`, `×3,25`, `×6,5`, `×10`). `score` и `bestScore` отображаются как целые с разделителями разрядов. Внутренняя числовая модель должна безопасно хранить как минимум до `9 007 199 254 740 991`; при достижении лимита дальнейшее начисление прекращается и UI показывает `MAX`.
+`multiplier = min(10, stageMultiplier × rhythmMultiplier)`. Отображается с максимум двумя значащими знаками после запятой (`×1`, `×1,25`, `×3,25`, `×6,5`, `×10`). `score` и `bestScore` отображаются как целые с разделителями разрядов. При достижении единого локального/leaderboard лимита `2 147 483 647` дальнейшее начисление прекращается, UI показывает `MAX`, а adapter отправляет это же значение без дополнительного clamp.
 
 ## Семь стадий
 
@@ -135,7 +137,7 @@ Stage пересчитывается без гистерезиса по теку
 
 ## Вражеские события и изменение ритма
 
-События используют только активное время нахождения в текущей или более высокой stage. Одновременно может быть активно не более одного enemy event; если сроки совпали, приоритет `Холодное клеймо > Порыв слуги > Окно жара`, а событие меньшего приоритета переносится до завершения текущего +1,0 с.
+События используют только активное время нахождения в текущей или более высокой stage. Одновременно может быть активно не более одного события; если сроки совпали, приоритет `Холодное клеймо > Порыв слуги > Окно жара`. Countdown события идёт только пока его stage eligible, нет другого события и нет stage transition; иначе он заморожен без накопления очереди. Повторный интервал конкретного события отсчитывается от завершения его предыдущего telegraph/effect либо counter-success; после любого события выдерживается общий gap `1,0 с` до продолжения остальных countdown.
 
 ### Порыв слуги — stage 3+
 
@@ -168,7 +170,7 @@ Stage пересчитывается без гистерезиса по теку
 - Визуальный power mode: отличимый знак печати, более светлое ядро/оттенок огня, усиленный glow и particles в пределах performance/reduced-motion budget; отдельный sound cue, не обязательный для понимания.
 - Boost не меняет stage thresholds, stage multiplier, decay или event schedule. Он усиливает heat tapPower; добавочная рекламная половина tapPower исключается из прямого tap-score через `scoreTapPower`.
 - Лимит `1` подтверждённый boost за run; offer исчезает после успеха. Следующий показ в новом run разрешён не раньше чем через `90 с` активного времени текущей app session после успешного reward; session cooldown не сохраняется после полного перезапуска приложения.
-- Cancel/error/unavailable даёт 0 награды, не расходует единственную попытку и не запускает cooldown; возвращает в прежнее paused state. Повторный добровольный запрос разрешён. Игра, таймеры и звук не идут во время рекламы.
+- Cancel/error/unavailable даёт 0 награды, не расходует единственную попытку и не запускает cooldown. Terminal callback снимает только pause reason `ad`: при отсутствии других reasons игра ровно один раз возвращается в `PLAYING`, иначе остаётся `PAUSED`. Повторный добровольный запрос разрешён. Игра, таймеры и звук не идут во время рекламы.
 - Offer необязателен; run, все стадии, локальные рекорды и restart доступны без него. Для аналитики/результата сохраняется `boostUsed`, но публичный `Best Score` по требованиям 1.0 принимает оба типа run.
 
 ## Прогрессия, leaderboard и persistence
@@ -237,8 +239,8 @@ Stage пересчитывается без гистерезиса по теку
 | `LOADING` | запуск приложения | mute/reduced motion, если UI готов | успешный init → READY; recoverable platform failure → READY web fallback; fatal asset/core failure → ERROR | таймеров gameplay нет |
 | `READY` | загрузка или onboarding reset до stage 2 | gameplay tap, settings | первый tap → PLAYING | decay, score и события не идут |
 | `PLAYING` | первый tap/restart/resume | gameplay tap, pause, settings, открыть eligible pause/boost sheet | user/system/sheet pause → PAUSED; fail → RESULTS; fatal → ERROR | активное время идёт |
-| `PAUSED` | user pause, visibility hidden, platform pause или открытый confirm sheet | resume, settings, confirmed restart; dedicated rewarded confirm только если sheet открыт из eligible safe PLAYING и других pause reasons нет | resume → PLAYING; rewarded confirm → AD_BREAK; restart → READY | все gameplay/audio/timers заморожены; opener CTA скрыта |
-| `AD_BREAK` | запуск rewarded рекламы | только platform-controlled UI | close/error → PAUSED; confirmed reward → PAUSED с queued boost | полная заморозка, audio muted/paused |
+| `PAUSED` | user pause, visibility hidden, platform pause или открытый confirm sheet | resume, settings, confirmed restart; dedicated rewarded confirm только если sheet открыт из eligible safe PLAYING и других pause reasons нет | resume → PLAYING; rewarded confirm → AD_BREAK; confirmed restart → RESULTS с `abandoned=true` | все gameplay/audio/timers заморожены; opener CTA скрыта |
+| `AD_BREAK` | запуск rewarded рекламы | только platform-controlled UI | terminal callback снимает только `ad`: при оставшихся reasons → PAUSED, иначе → PLAYING; confirmed reward дополнительно ставит queued boost, который стартует после valid resume | полная заморозка, audio muted/paused |
 | `RESULTS` | условие угасания или confirmed restart | restart, leaderboard, settings | restart → READY | gameplay заморожен; persistence завершается |
 | `ERROR` | невосстановимая ошибка core/assets | retry/reload | успешный retry → LOADING | gameplay/audio остановлены; понятное сообщение без stack trace |
 
@@ -248,14 +250,20 @@ Stage пересчитывается без гистерезиса по теку
 2. При heat 78 обычный tap сначала даёт heat 81 и stage 2; tap points рассчитываются с новым stage multiplier: `3×1,25×10=37,5`, плюс stage bonus 500, итоговое приращение `537,5` в scoreAcc и `537` на экране.
 3. В stage 7 во время SURGE обычный по cadence tap: tapPower `3×2=6`, multiplier `5×2=10`, tap score `600`; Вспышка также вдвое снижает decay `18→9 heat/с`.
 4. Тот же tap при активной Печати: heat tapPower `3×2×2=12`, но `scoreTapPower=6`, поэтому tap score остаётся `600`; рекламная добавка помогает удержанию, а не даёт прямых очков.
-5. Шестой tap за скользящую секунду в обычном stage 4: tapPower `3×0,70=2,1`, multiplier 2, tap score `42` до floor общего score.
+5. Четвёртый tap за скользящую секунду в обычном stage 4: tapPower `3×0,70=2,1`, multiplier 2, tap score `42` до floor общего score. Шестой при тех же условиях имеет factor 0,25, tapPower 0,75 и tap score 15.
 6. Неотменённое Холодное клеймо в stage 5: decay `9×1,5=13,5 heat/с`, обычный tapPower `3×0,55=1,65`; эффект заканчивается ровно через 4 активные секунды.
 7. При heat 905 и 1 активной секунде без taps Inferno hold заканчивается при пересечении 900 примерно через `0,278 с`; оставшиеся `0,722 с` действуют с decay stage 6, поэтому итоговый heat около `890,61`, stage 6. Hold score начисляется только за первые 0,278 с.
+
+### Canonical no-ad trace v1
+
+Обязательный pacing fixture `canonicalNoAdTraceV1` задаётся алгоритмом, а не ручным списком сотен timestamps: новый профиль/start defaults; первый gameplay tap в `t=0 ms`. Пока `runHighestStage<3`, следующий primary tap планируется через `500 ms` после предыдущего scheduled tap. Tap, впервые поднявший `runHighestStage` до 3, переключает шаг: следующий и все дальнейшие taps планируются через `280 ms` после предыдущего scheduled tap. Trace заканчивается при первом входе в stage 7 либо в `t=300 000 ms`. Pause, rewarded, restart, secondary/multitouch input и wall-clock jumps отсутствуют; все enemy counters и Resonance используют эти же taps, schedules — versioned config этого документа. Один и тот же generator/config записывается в test fixture и исполняется на 60/30/15 FPS.
+
+Trace является проверкой достижимости/ритма, а не обещанием точного score: stage 2 должен быть достигнут за 5–15 s, stage 3 за 25–50 s, stage 5 за 75–150 s и первый Inferno за 150–300 s. Design-review расчёт для текущего config даёт ориентиры около `6,5 / 30,0 / 80,9 / 222,6 s`; исполняемый test является источником фактического результата. Изменение шагов `500/280 ms`, switch condition, стартового timestamp или внешних действий является новой fixture version и требует обновления `GAME_DESIGN.md`, `QA_PLAN.md` и acceptance.
 
 ## Edge cases
 
 - Background/visibility/platform pause/ad: активное время и все gameplay таймеры замораживаются; после resume запрещён catch-up decay или пачка пропущенных событий.
-- Rapid/multitouch input: дедупликация pointer/click и лимит 8 taps/с применяются до scoring/combo; rejected taps не помогают counter events.
+- Rapid/multitouch input: дедупликация pointer/click и лимит 8 taps/с применяются до scoring/Resonance; rejected taps не помогают counter events.
 - Low FPS: accumulator обрабатывает fixed steps 50 ms по monotonic active clock; threshold crossing интерполируется. Результат одного timestamped input trace одинаков в пределах tolerance `±0,01 heat`, `±1 score`, `±10 ms hold`.
 - Clock change: wall clock не влияет на run/boost; используется только для «Ритуала дня» с защитой от повторной выдачи.
 - Heat at max: taps продолжают начислять tap score, но heat остаётся 1000; particle/audio feedback не создаётся сверх performance caps.
@@ -266,7 +274,7 @@ Stage пересчитывается без гистерезиса по теку
 - Reload во время active run: run намеренно не восстанавливается; records/settings сохраняются, новое состояние — READY с heat 30.
 - Leaderboard unavailable/auth denied: локальный bestScore остаётся источником UI; submit retry не блокирует results/restart.
 - Audio disabled/reduced motion: все telegraph/counter/surge сигналы сохраняют статичную форму/иконку/текст и timing.
-- Numeric safety: NaN/Infinity в расчёте считается recoverable logic error, значение восстанавливается к последнему валидному snapshot и событие попадает в telemetry; score никогда не уменьшается.
+- Numeric safety: NaN/Infinity в расчёте считается recoverable logic error, значение восстанавливается к последнему валидному snapshot и событие попадает в telemetry; score никогда не уменьшается и не превышает `2 147 483 647`.
 
 ## Требования для downstream-документов
 

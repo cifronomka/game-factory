@@ -4,7 +4,7 @@ Browser-first HTML5 clicker для Yandex Games о разгоне маленьк
 
 ## Текущий статус
 
-**Planning stage. Implementation не начат.** В проекте нет игровой механики, production HTML/JS, SDK Yandex, финальных assets, release build или ZIP. Переход к реализации допускается только после cross-review документов и отдельной команды пользователя.
+**Pre-implementation review завершён; Implementation не начат.** В проекте нет игровой механики, production HTML/JS, SDK Yandex, финальных assets, release build или ZIP. Документация согласована для старта M1; начало реализации требует отдельной команды пользователя.
 
 ## Source of truth
 
@@ -14,6 +14,7 @@ Browser-first HTML5 clicker для Yandex Games о разгоне маленьк
 - `docs/ART_DIRECTION.md`, `AUDIO_DIRECTION.md`, `ASSET_PLAN.md` — production briefs.
 - `docs/MONETIZATION.md`, `PLATFORM_REQUIREMENTS.md` — rewarded и Yandex/Web contracts.
 - `docs/QA_PLAN.md`, `ACCEPTANCE_CRITERIA.md`, `RELEASE_PLAN.md` — verification и будущий stop condition.
+- `docs/IMPLEMENTATION_PLAN.md` — порядок M1–M15, зависимости, parallel work и gates.
 
 Глобальные правила: корневые `AGENTS.md` и `FACTORY_WORKFLOW.md`.
 
@@ -28,4 +29,4 @@ Browser-first HTML5 clicker для Yandex Games о разгоне маленьк
 
 ## Следующий gate
 
-После отдельного разрешения Implementation Agent создаёт code/tooling строго по утверждённым документам. Любое изменение числового баланса или platform lifecycle сначала обновляет связанные specs и acceptance criteria.
+После отдельного разрешения Implementation Agent начинает с M1 (playable headless core и минимальный shell), затем идёт по `docs/IMPLEMENTATION_PLAN.md`. Любое изменение числового баланса или platform lifecycle сначала обновляет связанные specs и acceptance criteria.

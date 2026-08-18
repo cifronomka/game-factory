@@ -1,5 +1,7 @@
 # QA Plan — «Зажги»
 
+Case IDs этого документа квалифицируются как `QA:<ID>`; acceptance IDs — как `AC:<ID>`. Совпадающие короткие номера (например `QA:F-08` и `AC:F-08`) не являются одной проверкой; traceability report всегда хранит оба квалифицированных ID.
+
 ## Назначение и статус
 
 Этот документ задаёт риско-ориентированную стратегию проверки `inferno-clicker`. Сейчас проект находится на planning stage: исполняемой сборки нет, тесты не запускались, результаты не заявлены. Единственный итоговый stop contract находится в `ACCEPTANCE_CRITERIA.md`.
@@ -37,7 +39,7 @@ QA проверяет идентифицированную сборку. Для 
 
 ## Test data and instrumentation
 
-- Deterministic test seam: fixed random seed, injectable monotonic clock and scripted input timeline.
+- Deterministic test seam: injectable monotonic clock and scripted input timeline. Gameplay schedules use no RNG; fixed `visualSessionSeed` applies only to non-semantic presentation/audio variations.
 - Fixtures: new profile; each stage boundary minus/at/plus one heat unit; active surge; servant debuff; demoness debuff; active «Печать Инферно»; valid current save; legacy save; malformed JSON; semantically invalid save.
 - Observability: build ID, adapter name, state transitions, ad lifecycle and persistence errors may be logged in test/dev mode; secrets and personal data may not be logged.
 - Required artifacts: `tests/reports/<build-id>/qa-report.md`, automated reports, console logs, performance traces and screenshots grouped by case ID.
@@ -48,12 +50,12 @@ QA проверяет идентифицированную сборку. Для 
 | ID | Scenario | Expected result |
 |---|---|---|
 | F-01 | Launch a new profile and perform the first primary input | Interactive scene appears; one tap/click produces one heat gain and immediate visual/audio feedback; no tutorial blocks input |
-| F-02 | Send the same scripted input/clock sequence twice with a fixed seed | `heat`, `score`, `multiplier`, `stage`, `stageProgress`, `decayRate` and `tapPower` match the formulas and expected snapshots in `GAME_DESIGN.md` |
+| F-02 | Send the same scripted input/clock sequence twice; presentation may use the same fixed `visualSessionSeed` but gameplay RNG is disabled | `heat`, `score`, `multiplier`, `stage`, `stageProgress`, `decayRate` and `tapPower` match the formulas and expected snapshots in `GAME_DESIGN.md` |
 | F-03 | Reach every threshold from below | Exactly seven stages occur in order: Тьма → Искра → Пепельный слуга → Алый порог → Демонесса угасания → Круг Инферно → Инферно; a boundary fires once |
 | F-04 | Stop input for ten seconds in fixtures for stages 1–7 | Heat decreases at the stage/effect-specific rate from `GAME_DESIGN.md`, never becomes negative, and measured base decay is strictly higher at each later stage |
 | F-05 | Let heat fall through one or more lower thresholds | Stage immediately follows the documented range without hysteresis; stage bonus does not repeat; transition event is emitted once per actual crossing |
 | F-06 | Compare score delta at controlled heat/multiplier states | Score is integer, never decreases during a session, uses the documented formula/rounding, and maximum multiplier is capped at the documented value |
-| F-07 | Replay cadence taps №1–8 and overflow in a rolling 1.0 s window | Factors equal `1/1/1/1/1/0.70/0.45/0.25`; tap №9+ is rejected and cannot affect heat, score, Resonance or counters |
+| F-07 | Replay cadence taps №1–8 and overflow in a rolling 1.0 s window | Factors equal `1/1/1/0.70/0.45/0.25/0.15/0.10`; tap №9+ is rejected and cannot affect heat, score, Resonance or counters; exact `t−1.0 s` boundary is excluded per design |
 | F-08 | Exercise Resonance intervals below 0.20 s, from 0.20–0.65 s and above 0.65 s | Four accepted taps with all three adjacent intervals in `0.20–0.65 s` start 1.50 s SURGE (`tap×2`, `multiplier×2`, `decay×0.5`), then 1.00 s BREATH (`cadence≤0.5`, `decay×0.75`); shorter/longer interval rules and final modifier reset match `GAME_DESIGN.md` |
 | F-08a | Stay at stage 6+ through the full deterministic Heat Window schedule | First telegraph starts at 6.0 s, then after 9/11/8/10 s cycle; telegraph is 0.75 s, active is 1.50 s, `tap×2` but multiplier unchanged; it does not stack with own SURGE |
 | F-09 | Trigger Порыв слуги, cancel once and fail once | First trigger at 8.0 s then every 14.0 s; 1.0 s telegraph; 4 accepted taps cancel and award `250×stageMultiplier`; fail applies `decay×1.8` for 2.5 s |
@@ -63,7 +65,7 @@ QA проверяет идентифицированную сборку. Для 
 | F-13 | Pause via UI, visibility loss and platform lifecycle | Clock, decay, score, timers and input stop while paused; one resume continues without elapsed-background catch-up |
 | F-14 | Run 10 minutes through stages, debuffs, pause, boost and restart | No invalid state (`NaN`, negative heat, out-of-range stage/progress, uncapped multiplier), freeze or duplicate listener occurs |
 | F-15 | Let heat remain 0 around the fail boundary before and after ever reaching stage 2 | Before stage 2, state returns to READY without results; after stage 2, 2.0 s continuous zero enters RESULTS; a valid positive-power tap before 2.0 s cancels failure |
-| F-16 | Execute the canonical no-ad 3–5 taps/s learning trace | Without reward: stage 2 at 5–15 s, stage 3 at 25–50 s, stage 5 at 75–150 s and first Inferno at 150–300 s |
+| F-16 | Execute `canonicalNoAdTraceV1`: first tap at `0 ms`; schedule +`500 ms` while `runHighestStage<3`, then +`280 ms` from the tap that first reaches stage 3; no pause/reward/restart, until Inferno or `300 000 ms`; run identical fixture at 60/30/15 FPS | Without reward: stage 2 at 5–15 s, stage 3 at 25–50 s, stage 5 at 75–150 s and first Inferno at 150–300 s; fixture config/generator/hash is committed and snapshots satisfy deterministic tolerance |
 
 ### Input equivalence
 
@@ -122,7 +124,7 @@ Measure a production build with DevTools closed except while recording. Ready-to
 | PERF-02 | Initial compressed transfer | ≤ 3.0 MB for JS/CSS and critical assets |
 | PERF-03 | Total production package | ≤ 15 MB; source maps/tests excluded |
 | PERF-04 | Main JavaScript bundle | gzip size ≤ 350 KB |
-| PERF-05 | Frame rate during 10-minute stage-7 run | target 60 FPS; p95 floor ≥ 30 FPS on target mobile and desktop |
+| PERF-05 | Frame delivery during 10-minute stage-7 run | median ≥55 FPS on ENV-D1 and ≥30 FPS on ENV-M1; frames slower than 50 ms ≤1% on both profiles |
 | PERF-06 | Frame time during stage-7 stress | p95 ≤ 20 ms high-tier; p95 ≤ 33 ms low-tier |
 | PERF-07 | Pointer-to-first-changed-frame latency | p95 ≤ 100 ms on touch and mouse |
 | PERF-08 | JavaScript heap after 10 minutes stage-7 stress | ≤ 150 MB and no monotonically growing listeners/audio nodes/particles |
@@ -176,7 +178,7 @@ QA FAIL → issue → owning role → fix → targeted retest → neighboring su
 - Low: cosmetic issue with no impact on understanding, input or compliance.
 - A fix author does not mark their own issue verified. QA records new-build evidence.
 - Neighbor suites: input fix → scoring/decay; stage fix → visuals/audio/debuffs; platform fix → pause/audio/persistence; render fix → all reference viewports/performance.
-- Release candidate receives full F-01–F-14 smoke, all P/R/A cases, ENV-D1/ENV-M1/ENV-M2/ENV-Y1/ENV-Y2 launch/input smoke and all acceptance checks.
+- Release candidate receives `QA:F-01–F-16` including `QA:F-08a`, `QA:I-01–I-06` including `QA:I-02a`, all `QA:P/R/A` cases, ENV-D1/D2/D3/M1/M2/M3/L1/Y1/Y2 assigned smoke and all applicable `AC:*` checks.
 
 ## Planned QA report / issue log
 

@@ -14,7 +14,23 @@
 - Не допускаются gore, кровь, расчленение, натуралистичные повреждения, шок-контент, эротизация, откровенная одежда или позы, фотореалистичный оккультизм и мелкие пугающие детали.
 - Пламя, UI и критически важные сигналы не полагаются только на красно-зелёное различие; форма, яркость и движение дублируют смысл.
 
-До появления разрешённых референсов style source считается оригинальным production brief этого документа. Любой поздний concept art анализируется на настроение, композицию, отдельные элементы и provenance, затем декомпозируется; его нельзя помещать в игру как единый плоский экран.
+Семь PNG из `visual-references/stage-references/` являются главным mood/composition reference для постепенного раскрытия камеры, но не production assets. Их provenance/licensing пока не подтверждены отдельной записью, поэтому допустимо только reference use; все runtime exports создаются заново, декомпозируются и получают provenance в asset manifest.
+
+### Разбор текущих visual references
+
+Все семь изображений имеют portrait-композицию `941×1672` и показывают одну камеру с нарастающим светом. Они задают value hierarchy, перспективу, плотность reveal и масштаб кульминации, но не точные runtime pixels.
+
+| Reference stage | Что берём как ориентир | Что реализуется отдельно / адаптируется |
+|---|---|---|
+| 1. Тьма | Почти чёрная камера, крошечный ember на центральном ритуальном круге | Far chamber, ritual plane, darkness mask, flame core и onboarding pulse — отдельные layers |
+| 2. Искра | Тёплый локальный свет раскрывает ближний камень и часть круга | Cracks/runes emissive masks, outer flame, glow, embers и floor overlays |
+| 3. Пепельный слуга | Слуга слева от пламени, направленный выдох, более читаемая арка | Character atlas/state machine отдельно от flame; ash stream и counter ring процедурные |
+| 4. Алый порог | Врата, цепи, дальний силуэт и красный bounce light | Gate, pylons, chains, distant silhouette, crack light и transition burst — независимые assets |
+| 5. Демонесса угасания | Центральный властный персонаж и огненные tendrils | Полностью новый stylized non-sexualized closed-armor design; исходную фотореалистичность, декольте/открытую ногу и статичный full-screen pose не переносить |
+| 6. Круг Инферно | Полный круг/руны, высокое широкое пламя, цепи и плотная камера | Rune sets, pylons, observers, flame ribbons, smoke/haze и controlled particles по отдельности |
+| 7. Инферно | Бело-золотой вертикальный столб, lightning, силуэты и максимальное раскрытие | Stage-7 beam, arcs, silhouettes, glow/distortion и environment overlays с жёсткими caps; сохранить тёмную HUD/periphery zone |
+
+Верхняя декоративная плашка с названием стадии — только композиционный пример. Production HUD остаётся DOM/CSS, использует scalable panel/typography и показывает score/multiplier/progress без запекания текста в raster. Concept PNG запрещено добавлять в runtime как flat portrait/landscape background или crossfade между семью полными экранами.
 
 ## Палитра
 
@@ -69,6 +85,7 @@ Portrait reference canvas — `1080×1920`. Центральная action-zone �
 - **Холодное клеймо:** за `2,0 s` шесть участков холодного кольца должны разрушаться по одному на accepted tap. Неразбитые участки замыкаются в static debuff ring с countdown `4,0 s`.
 - **Окно жара:** отдельное золотое кольцо собирается `0,75 s`, затем расширяется и остаётся активным `1,50 s`. Оно не похоже ни на холодный debuff, ни на фиолетовые дуги рекламы.
 - **Слишком быстрый ввод:** ignored tap может дать малый серый ripple/короткую подпись, но не flame burst, progress segment или score pop-up; feedback ограничен одним разом в `500 ms`.
+- **Убывающая отдача:** принятый tap с `cadenceFactor<1` сохраняет обычный feedback, но дополнительно даёт короткое нейтральное ash-ring с интенсивностью, обратной factor. Это объясняет soft fatigue curve без красного наказания; rejected tap №9+ по-прежнему использует отдельный throttled too-fast cue.
 
 ## Characters
 
@@ -129,7 +146,7 @@ Rewarded-режим «Печать Инферно x2» даёт `tapPower×2` р
 ## Handoff и риски
 
 - Решено: единая layered-сцена, семь проверяемых visual states, процедурное пламя/FX, отдельные non-sexualized characters, portrait-first с полноценным landscape fallback.
-- Открытый внешний вход: actual concept art отсутствует. После добавления Art Agent обязан записать provenance и провести decomposition review до производства.
+- Текущие seven-stage concepts разобраны и используются как reference-only; внешний блокер перед производством — подтверждённый provenance/licensing и отдельные оригинальные exports по `ASSET_PLAN.md`.
 - Главный риск — GPU overdraw от света, дыма и distortion. Митигация: малые FX buffers, particle caps, quality tiers `high/low/off` и hard decoded-memory cap.
 - Риск визуального шума на стадиях 6–7 снижается сохранением тёмной периферии и неизменной HUD-zone.
 - Проверка готовности направления: все visual assets из `ASSET_PLAN.md` должны пройти mobile silhouette/contrast/crop/reduced-motion review до статуса READY.
