@@ -6,37 +6,74 @@
 
 **Статус planning stage:** финальные ассеты не созданы. Все строки ниже имеют статус `PLANNED`; смена на `IN REVIEW`/`READY` возможна только после provenance, optimization и QA. Пути указаны относительно корня игры. Source masters (`.kra`, `.psd`, `.blend`, `.wav`, DAW projects) не входят в runtime bundle и должны храниться в согласованном source-artifact storage, а не в `dist/`.
 
+## Visual-reference audit и decomposition
+
+Проверено `2026-08-18`:
+
+- В локальной рабочей копии `games/inferno-clicker/visual-references/` находятся только `README.md` и `.gitkeep`.
+- В remote `cifronomka/game-factory`, branch `main`, GitHub Contents API показывает семь PNG `941×1672` в `stage-references/`: файлы `22_45_07`, `22_45_14`, `22_45_23`, `22_45_28`, `22_45_33`, `22_45_40`, `22_45_46`. `characters/`, `concepts/` и `ui-mockups/` содержат только `.gitkeep`.
+- Семь PNG прочитаны как concept-art последовательность стадий 1–7. Это композиционные/mood references, не production screens. Встроенные верхние плашки и надписи не экспортируются: stage title — DOM HUD, а масштабируемая рамка — отдельный 9-slice asset.
+- Точный provenance в репозитории отсутствует: filenames указывают на Codex generation, но model/version, prompts, input references и подтверждение прав не записаны. Это **BLOCKER для присвоения производным изображениям статуса READY**, но не блокирует planning и procedural/placeholder implementation. До производства нужно заполнить provenance по правилам ниже.
+- Локальный pipeline, которому нужны сами PNG, **BLOCKED до синхронизации remote `main` в рабочую копию**. В этом review изображения не копировались, production assets не создавались.
+
+Reference → decomposition mapping:
+
+| Reference | Используемое направление | Разделение на production layers | Что нельзя переносить напрямую |
+|---|---|---|---|
+| Stage 1 — tiny ember, почти чёрный зал | black-value hierarchy, центральный очаг, скрытая круговая площадка | far chamber; midground columns; ritual plane; foreground; flame core; glow/reveal mask | Цельный PNG, baked title, чрезмерно чёрный ember на low-brightness display |
+| Stage 2 — малое пламя, проявленный круг | постепенное раскрытие камня/круга, тёплый центральный свет | те же environment layers; rune decals; flame overlay; embers; smoke | Новая несогласованная камера вместо reveal тех же слоёв |
+| Stage 3 — слуга слева дует на пламя | читаемый левый character lane и направленный blow | servant sprite atlas; breath cone; ash particles; flame bend; background gate silhouette | Персонаж, запечённый в background; натуралистичный/страшный redesign |
+| Stage 4 — алые врата, цепи, дальний силуэт | крупная арка, диагонали цепей, distant threat | gate layer; chain atlas; rune/crack atlas; demoness silhouette; red bounce light | Полная замена окружения, запечённый silhouette или flame |
+| Stage 5 — центральная демонесса и огненные дуги | crown silhouette, властная поза, магические дуги | закрытый non-sexualized demoness sprite atlas; tendril overlay; suppression ring; flame remains independent | Исходная фотореалистичная/сексуализированная одежда и анатомия; цельная character+FX картинка |
+| Stage 6 — высокий огонь, полный круг, пилоны/цепи | масштаб камеры, полный ritual circle, density peak до climax | pylon/observer atlas; chains; runes; taller flame layers; heat haze | Перегруженный единый raster; потеря тёмной HUD-периферии |
+| Stage 7 — white-hot beam, lightning, winged silhouettes | power climax, вертикальный beam, дальние silhouettes | beam core/overlay; lightning/stage FX; winged silhouettes; active circle; smoke/heat haze | Бесконтрольная полноэкранная вспышка, baked text, существа/архитектура в одном фоне |
+
+Камера и ritual-circle anchor должны быть едиными между стадиями. Различия семи concept PNG адаптируются как reveal/activation независимых layers; нельзя делать семь полноэкранных stage backgrounds, иначе появятся визуальные скачки, дублированная память и невозможность анимации.
+
 ## Visual asset registry
 
-| ID | Назначение | Path | Тип/формат | Размер | Прозрачность | States / загрузка | Источник | Владелец | Статус |
-|---|---|---|---|---|---|---|---|---|---|
-| BG-001 | Дальняя камера, portrait | `assets/backgrounds/bg-infernal-chamber-portrait.webp` | WebP lossy | `1024×2048`, ≤ 420 KB | Нет | Все стадии; critical preload | Original manual или generated-assisted + paintover | Art Agent | PLANNED |
-| BG-002 | Дальняя камера, landscape | `assets/backgrounds/bg-infernal-chamber-landscape.webp` | WebP lossy | `1920×1080`, ≤ 430 KB | Нет | Landscape only; responsive alternate | Original manual или generated-assisted + paintover | Art Agent | PLANNED |
-| BG-003 | Камни/арки среднего плана | `assets/backgrounds/bg-architecture-midground.webp` | WebP alpha | `896×1344`, ≤ 340 KB | Да | Reveal 1–7; critical preload | Original manual / decomposed | Art Agent | PLANNED |
-| BG-004 | Ритуальная плоскость, круг/трещины | `assets/backgrounds/bg-ritual-plane.webp` | WebP alpha | `1024×1024`, ≤ 300 KB | Да | Reveal mask 1–7; critical preload | Original manual | Art Agent | PLANNED |
-| BG-005 | Инфернальные врата и опоры | `assets/backgrounds/bg-scarlet-gate.webp` | WebP alpha | `1024×1024`, ≤ 280 KB | Да | Silhouette at 4, full at 5–7; preload near stage 3 | Original manual / decomposed | Art Agent | PLANNED |
-| BG-006 | Передний каменный край и зола | `assets/backgrounds/bg-foreground-frame.webp` | WebP alpha | `896×1344`, ≤ 270 KB | Да | All stages; lazy after interactive | Original manual | Art Agent | PLANNED |
-| BG-007 | Цепи: короткие/длинные/звенья | `assets/backgrounds/bg-chains-atlas.webp` | WebP alpha atlas | `512×768`, ≤ 140 KB | Да | 6 static pieces; stage 4–7 | Original manual | Art Agent | PLANNED |
-| BG-008 | Оригинальные руны и crack decals | `assets/backgrounds/bg-runes-atlas.webp` | WebP alpha atlas | `768×768`, ≤ 180 KB | Да | 16 glyphs, dim/lit via tint; stage 2–7 | Original manual; no real symbols | Art Agent | PLANNED |
-| CH-001 | Пепельный слуга | `assets/characters/character-ash-servant-atlas.webp` | WebP alpha atlas + JSON frames | `1024×1024`, ≤ 420 KB | Да | emerge, idle, inhale, blow, retreat; preload near stage 2 | Original manual или generated-assisted + full redraw | Art Agent | PLANNED |
-| CH-002 | Демонесса угасания | `assets/characters/character-fading-demoness-atlas.webp` | WebP alpha atlas + JSON frames | `1536×1536`, ≤ 720 KB | Да | silhouette, reveal, idle, cast, hold, release; preload near stage 4 | Original manual или generated-assisted + full redraw | Art Agent | PLANNED |
-| CH-003 | Наблюдатели в арках | `assets/characters/character-watchers-atlas.webp` | WebP alpha atlas | `1024×768`, ≤ 220 KB | Да | 5 silhouettes; stage 6–7 | Original manual | Art Agent | PLANNED |
-| CH-004 | Глаза наблюдателей | `assets/characters/character-watcher-eyes-atlas.webp` | WebP alpha atlas | `256×128`, ≤ 28 KB | Да | open, half, closed; stage 6–7 | Original manual | Art Agent | PLANNED |
-| UI-001 | Логотип/wordmark «Зажги» | `assets/ui/ui-logo-zazhgi.svg` | Optimized SVG | `viewBox 0 0 1024 420`, ≤ 35 KB | Да | Loading/title state | Original lettering, outlined | Art Agent | PLANNED |
-| UI-002 | Масштабируемая panel/button skin | `assets/ui/ui-stone-panel.9.webp` | WebP alpha, 9-slice metadata | `384×384`, ≤ 55 KB | Да | default/pressed via tint/scale | Original manual | Art Agent | PLANNED |
-| UI-003 | HUD/gameplay glyphs | `assets/ui/ui-hud-icons.svg` | SVG symbol sprite | `viewBox 0 0 512 512`, ≤ 32 KB | Да | heat, score, multiplier, stage, time, resonance, surge, breath, heat-window, too-fast | Original manual | Art Agent | PLANNED |
-| UI-004 | System glyphs | `assets/ui/ui-system-icons.svg` | SVG symbol sprite | `viewBox 0 0 512 512`, ≤ 24 KB | Да | sound on/off, info, retry, close | Original manual | Art Agent | PLANNED |
-| UI-005 | Debuff states | `assets/ui/ui-debuff-icons.svg` | SVG symbol sprite | `viewBox 0 0 512 256`, ≤ 20 KB | Да | decay-up, tap-down, suppression | Original manual | Art Agent | PLANNED |
-| UI-006 | «Печать Инферно x2» icon | `assets/ui/ui-inferno-seal.svg` | Optimized SVG | `viewBox 0 0 512 512`, ≤ 22 KB | Да | CTA/active/ending by CSS tint | Original abstract glyph | Art Agent | PLANNED |
-| UI-007 | Focus-visible high-contrast ring | `assets/ui/ui-focus-ring.svg` | Optimized SVG | `viewBox 0 0 128 128`, ≤ 4 KB | Да | focus-visible | Original manual | Art Agent | PLANNED |
-| FX-001 | Низкочастотный noise для flame/smoke | `assets/effects/fx-noise-tile.webp` | WebP lossless | `256×256`, ≤ 36 KB | Нет | Tiled procedural sampling; critical preload | Procedurally authored; fixed seed | Art Agent | PLANNED |
-| FX-002 | Soft particle shape atlas | `assets/effects/fx-particles-atlas.webp` | WebP alpha atlas | `256×256`, ≤ 28 KB | Да | ember, spark, smoke, ash, glow | Original procedural bake | Art Agent | PLANNED |
-| FX-003 | Flame fallback core | `assets/effects/fx-flame-fallback.svg` | Optimized SVG | `viewBox 0 0 256 512`, ≤ 12 KB | Да | Reduced quality / no-filter fallback | Original manual | Art Agent | PLANNED |
-| FX-004 | Cold suppression mask | `assets/effects/fx-suppression-ring.svg` | Optimized SVG | `viewBox 0 0 512 512`, ≤ 16 KB | Да | enter/active/exit via runtime transform | Original abstract glyph | Art Agent | PLANNED |
-| FX-005 | Rewarded seal arc segments | `assets/effects/fx-boost-seal-arcs.svg` | SVG symbol sprite | `viewBox 0 0 512 512`, ≤ 18 KB | Да | 3 independent arcs | Original abstract glyph | Art Agent | PLANNED |
-| MAN-001 | Runtime metadata, sizes, hashes, stage groups | `assets/assets-manifest.json` | JSON UTF-8 | ≤ 20 KB | N/A | Critical/lazy groups, content hashes | Manual/generated by build | Developer + Art/Audio | PLANNED |
+Path указан как ожидаемый runtime URL `/assets/...`; в репозитории это тот же путь без начального `/`. `Generated image` означает новый оригинальный output по этому brief с обязательным paintover/decomposition и provenance, а не crop из concept PNG.
 
-`*.json` frame metadata для `CH-001` и `CH-002` располагается рядом с atlas (`character-…-atlas.json`), входит в budget MAN-001 и проверяется на отсутствие overlap/bleed. Для WebP alpha требуется padding `4 px`, extrusion `2 px`; координаты atlas — integer pixels.
+| ID | Asset name | Назначение | Stage | Примерный path | Формат / размер | Transparency | Animation / states | Метод производства | Статус |
+|---|---|---|---|---|---|---|---|---|---|
+| BG-001 | Infernal chamber — portrait | Дальний цельный тон/архитектурная масса при portrait crop | 1–7 | `/assets/backgrounds/bg-infernal-chamber-portrait.webp` | WebP lossy, `1024×2048`, ≤420 KB | Нет | Static; darkness/reveal только внешней маской | Generated image → manual paintover | PLANNED |
+| BG-002 | Infernal chamber — landscape | Расширение той же камеры без stretch | 1–7 | `/assets/backgrounds/bg-infernal-chamber-landscape.webp` | WebP lossy, `1920×1080`, ≤430 KB | Нет | Static responsive alternate | Generated image → manual paintover/outpaint | PLANNED |
+| BG-003 | Architecture midground | Колонны, арки и стены, раскрываемые светом | 1–7 | `/assets/backgrounds/bg-architecture-midground.webp` | WebP alpha, `896×1344`, ≤340 KB | Да | `dim/revealed`; subtle parallax | Generated image → layer extraction/paintover | PLANNED |
+| BG-004 | Ritual plane | Единая площадка, круг и базовые трещины | 1–7 | `/assets/backgrounds/bg-ritual-plane.webp` | WebP alpha, `1024×1024`, ≤300 KB | Да | `hidden/dim/revealed`; fixed camera anchor | Generated image → corrected perspective paintover | PLANNED |
+| BG-005 | Scarlet gate | Арка/врата и опоры стадии 4 | 4–7 | `/assets/backgrounds/bg-scarlet-gate.webp` | WebP alpha, `1024×1024`, ≤280 KB | Да | `silhouette/ember-lit/open`; light animated procedurally | Generated image → layer extraction/paintover | PLANNED |
+| BG-006 | Foreground frame | Каменный край, пепел, depth framing | 1–7 | `/assets/backgrounds/bg-foreground-frame.webp` | WebP alpha, `896×1344`, ≤270 KB | Да | Static; minor parallax high/low only | Generated image → manual paintover | PLANNED |
+| BG-007 | Chain atlas | Независимые диагонали/вертикали цепей | 4–7 | `/assets/backgrounds/bg-chains-atlas.webp` | WebP alpha atlas, `512×768`, ≤140 KB | Да | 6 pieces; idle sway/impact | Sprite animation from manual layers | PLANNED |
+| BG-008 | Rune/crack atlas | Оригинальные glyphs и огненные трещины | 2–7 | `/assets/backgrounds/bg-runes-atlas.webp` | WebP alpha atlas, `768×768`, ≤180 KB | Да | 16 glyphs; `dim/lit/pulse`; cracks tint by heat | Manual layer atlas + procedural animation | PLANNED |
+| BG-009 | Inferno pylons atlas | Пилоны/обелиски полного круга | 6–7 | `/assets/backgrounds/bg-inferno-pylons-atlas.webp` | WebP alpha atlas, `768×768`, ≤170 KB | Да | 6 pieces; `dim/lit`; reveal by stage | Generated image → layer extraction/paintover | PLANNED |
+| CH-001 | Ash servant | Харизматичный слуга и телеграф порыва | 3–7, event-driven | `/assets/characters/character-ash-servant-atlas.webp` + `.json` | WebP alpha atlas, `1024×1024`, ≤420 KB | Да | `emerge/idle/inhale/blow/cancelled/retreat` | Sprite animation; generated-assisted exploration → full redraw | PLANNED |
+| CH-002 | Fading demoness | Крупная угроза и Холодное клеймо | 4 silhouette; 5–7 events | `/assets/characters/character-fading-demoness-atlas.webp` + `.json` | WebP alpha atlas, `1536×1536`, ≤720 KB | Да | `silhouette/reveal/idle/cast/hold/seal-break/release` | Sprite animation; mandatory closed, non-sexualized manual redesign | PLANNED |
+| CH-003 | Watchers | Дальние наблюдатели в арках | 6–7 | `/assets/characters/character-watchers-atlas.webp` | WebP alpha atlas, `1024×768`, ≤220 KB | Да | 5 silhouettes; slow idle/parallax | Generated image → silhouette extraction/manual cleanup | PLANNED |
+| CH-004 | Watcher eyes | Дополнительный читаемый life signal | 6–7 | `/assets/characters/character-watcher-eyes-atlas.webp` | WebP alpha atlas, `256×128`, ≤28 KB | Да | `open/half/closed`; blink ≥4 s | Sprite animation, manual | PLANNED |
+| CH-005 | Inferno winged silhouettes | Дальние крылатые формы из climax reference | 7 | `/assets/characters/character-inferno-wings-atlas.webp` | WebP alpha atlas, `768×512`, ≤120 KB | Да | 3 silhouettes; `idle/wing-shift`; no attack close-up | Generated image → silhouette extraction/manual cleanup | PLANNED |
+| UI-001 | «Зажги» wordmark | Loading/title identity, не stage label | Boot/title | `/assets/ui/ui-logo-zazhgi.svg` | Optimized SVG, ≤35 KB | Да | Static / glow by CSS | Manual vector | PLANNED |
+| UI-002 | Stone HUD panel/plate | Масштабируемая рамка верхней stage-плашки и кнопок | UI, 1–7 | `/assets/ui/ui-stone-panel.9.webp` | WebP alpha 9-slice, `384×384`, ≤55 KB | Да | `default/pressed/disabled`; DOM text separate | Manual/generated-assisted frame → manual 9-slice | PLANNED |
+| UI-003 | HUD/gameplay glyphs | Heat, score, multiplier, time, resonance, surge, breath, heat-window, too-fast | UI, 1–7 | `/assets/ui/ui-hud-icons.svg` | SVG symbol sprite, ≤32 KB | Да | Icon states via DOM/CSS; no baked text | Manual vector sprite | PLANNED |
+| UI-004 | System glyphs | Sound, info, retry, close | UI, all | `/assets/ui/ui-system-icons.svg` | SVG symbol sprite, ≤24 KB | Да | `default/focus/pressed/disabled` | Manual vector sprite | PLANNED |
+| UI-005 | Debuff glyphs | Decay-up, tap-down, suppression | 3–7 events | `/assets/ui/ui-debuff-icons.svg` | SVG symbol sprite, ≤20 KB | Да | `telegraph/active/ending`; countdown in DOM | Manual vector sprite | PLANNED |
+| UI-006 | Inferno seal icon | Rewarded CTA/active mode | Eligible stage 3–7 | `/assets/ui/ui-inferno-seal.svg` | Optimized SVG, ≤22 KB | Да | `cta/active/ending/unavailable`; purple-gold tint | Manual vector | PLANNED |
+| UI-007 | Focus ring | Keyboard/focus-visible accessibility | UI, all | `/assets/ui/ui-focus-ring.svg` | Optimized SVG, ≤4 KB | Да | `focus-visible` | Manual vector | PLANNED |
+| FX-001 | Shared noise tile | Flame warp, smoke drift, heat haze | 1–7 | `/assets/effects/fx-noise-tile.webp` | WebP lossless, `256×256`, ≤36 KB | Нет | Tiled; moving UV | Procedural generated texture, fixed seed | PLANNED |
+| FX-002 | Particle shape atlas | Ember, spark, ash, smoke, soft glow primitives | 1–7/events | `/assets/effects/fx-particles-atlas.webp` | WebP alpha atlas, `256×256`, ≤28 KB | Да | Runtime transform/color/lifetime | Procedural bake + sprite particles | PLANNED |
+| FX-003 | Flame fallback silhouette | Static low/off-quality readable core | 1–7 | `/assets/effects/fx-flame-fallback.svg` | Optimized SVG, ≤12 KB | Да | 7 size/color presets, no loop | Manual vector fallback | PLANNED |
+| FX-004 | Suppression ring source | Холодное клеймо и debuff outline | 5–7 events | `/assets/effects/fx-suppression-ring.svg` | Optimized SVG, ≤16 KB | Да | 6 segments; `telegraph/broken/active/end` | Manual vector + procedural transform | PLANNED |
+| FX-005 | Reward seal arc source | Фиолетово-золотой rewarded mode | Eligible stage 3–7 | `/assets/effects/fx-boost-seal-arcs.svg` | SVG symbol sprite, ≤18 KB | Да | 3 arcs; `start/active/last-3s/end` | Manual vector + procedural transform | PLANNED |
+| FL-001 | Flame core | Бело-жёлтое ядро: основной scale/heat indicator | 1–7 | `/assets/effects/flame-core.json` | JSON params + PixiJS Graphics/SDF, ≤4 KB | Runtime alpha | Continuous heat; 7 stage presets; `normal/surge/rewarded/suppressed` | Procedural | PLANNED |
+| FL-002 | Flame overlay/tongues | Оранжево-алые языки, живость поверх ядра | 2–7 | `/assets/effects/flame-overlay.json` | JSON params + FX-001 noise, ≤4 KB | Runtime alpha | 3–5 lobes; heat/decay bend; high/low/off | Procedural | PLANNED |
+| FL-003 | Embers | Рост энергии, trails и rewarded tint | 1–7 | `/assets/effects/flame-embers.json` | JSON params + FX-002 sprites, ≤4 KB | Да | 1–80 particles; `normal/surge/rewarded/stage-burst` | Procedural sprite particles | PLANNED |
+| FL-004 | Glow/reveal light | Освещение и постепенное открытие environment layers | 1–7 | `/assets/effects/flame-glow.json` | JSON params + render texture/CSS fallback, ≤4 KB | Да | Radius/intensity from heat; `warm/cold/rewarded` | Procedural render mask | PLANNED |
+| FL-005 | Smoke + heat haze | Дым, пепел и distortion без изменения gameplay | 2–7 | `/assets/effects/flame-smoke-heat-haze.json` | JSON params + FX-001/002, ≤5 KB | Да | `smoke/ash/haze`; haze 6–7; high/low/off | Procedural particles + shader | PLANNED |
+| FL-006 | Tap burst / cadence feedback | Мгновенный принятый tap; нейтрально отличает reduced cadence и reject | 1–7 | `/assets/effects/flame-tap-burst.json` | JSON params + FX-002, ≤5 KB | Да | `full`: flame flash+1–3 sparks; `reduced`: neutral ash ring при cadenceFactor<1; `rejected`: small gray ripple, throttled | Procedural particles/rings | PLANNED |
+| FL-007 | Stage transition FX | Не запечённые вспышки/руны для каждой стадии | 2–7 entries/down | `/assets/effects/flame-stage-fx.json` | JSON params + FX-002/BG-008, ≤6 KB | Да | `stage-up-2…7/stage-down/inferno-enter`; max flash 3 Hz | Procedural particles/light | PLANNED |
+| FL-008 | Inferno beam/lightning | White-hot vertical climax из stage-7 reference | 7 | `/assets/effects/flame-inferno-beam.json` | JSON params + procedural SDF/lines, ≤5 KB | Да | `enter/hold/fall`; reduced-motion static beam | Procedural | PLANNED |
+| FL-009 | Gameplay rings | Resonance, surge, breath, enemy counters, heat window | 3–7 events | `/assets/effects/gameplay-rings.json` | JSON params + SVG sources, ≤8 KB | Да | `resonance-1…4/surge/breath/servant-4/demoness-6/heat-window` | Procedural vector animation | PLANNED |
+| MAN-001 | Asset manifest | Paths, hashes, bytes, dimensions, provenance and stage groups | Build/runtime | `/assets/assets-manifest.json` | JSON UTF-8, ≤24 KB | N/A | Critical/lazy groups; content hashes | Build-generated metadata | PLANNED |
+
+`*.json` frame metadata для `CH-001` и `CH-002` располагается рядом с atlas, входит в budget MAN-001 и проверяется на overlap/bleed. Для WebP alpha: padding `4 px`, extrusion `2 px`, integer pixel coordinates. Runtime JSON assets FL-001…009 описывают параметры и не содержат gameplay constants: duration/count/timing получает presentation из core events.
 
 ## Audio asset registry
 
@@ -80,27 +117,30 @@ Audio bank cues имеют `40 ms` silence pad между regions, individual st
 
 Следующие элементы не имеют отдельного финального изображения и создаются runtime. Их параметры живут в data/config, а не в gameplay RNG:
 
-| ID | Элемент | Алгоритм / параметры | Seed policy | High / low quality budget |
+| ID | Registry link / элемент | Алгоритм / параметры | Seed policy | High / low quality budget |
 |---|---|---|---|---|
-| PROC-01 | Flame body | 3–5 layered bezier/SDF lobes, noise-warp из FX-001, gradient core→edge | `hash(sessionVisualSeed, "flame", frameBucket)`; deterministic QA override | High: ≤5 lobes/0.75×; low: 3/0.5×; off: SVG fallback |
-| PROC-02 | Embers/sparks | Object pool, ballistic motion, drag, age-based alpha/size; shapes из FX-002 | `hash(sessionVisualSeed, emitterId, spawnIndex)` | High/low/off: 80/28/0 live particles |
-| PROC-03 | Smoke/ash | Pooled quads, curl-like drift from tiled noise, no full-res blur | То же, отдельный emitter stream | High/low/off: 24/8/0 live particles |
-| PROC-04 | Dynamic light reveal | Radial/elliptic mask driven by heat and stageProgress; multiply/screen compositing | N/A, deterministic formula | High: 0.75× mask; low: 0.5×; off: CSS gradient |
+| PROC-01 | FL-001/002 — flame core + overlay | 3–5 layered bezier/SDF lobes, noise-warp из FX-001, gradient core→edge | `hash(sessionVisualSeed, "flame", frameBucket)`; deterministic QA override | High: ≤5 lobes/0.75×; low: 3/0.5×; off: SVG fallback |
+| PROC-02 | FL-003 — embers/sparks | Object pool, ballistic motion, drag, age-based alpha/size; shapes из FX-002 | `hash(sessionVisualSeed, emitterId, spawnIndex)` | High/low/off: 80/28/0 live particles |
+| PROC-03 | FL-005 — smoke/ash | Pooled quads, curl-like drift from tiled noise, no full-res blur | То же, отдельный emitter stream | High/low/off: 24/8/0 live particles |
+| PROC-04 | FL-004 — dynamic light reveal | Radial/elliptic mask driven by heat and stageProgress; multiply/screen compositing | N/A, deterministic formula | High: 0.75× mask; low: 0.5×; off: CSS gradient |
 | PROC-05 | Rune pulse | Per-glyph sine opacity/scale with stage offsets | Fixed glyph index offsets | High/low/off: 16/8/8 glyphs; off uses static opacity |
 | PROC-06 | Servant blow | Directed ash cone + flame bend scalar | Event id + spawn index | High/low/off: 24/10/0 particles; off uses static ring |
 | PROC-07 | Suppression ring | SVG FX-004 transform + cold radial mask | N/A | High: ring+mask; low/off: static ring |
 | PROC-08 | Rewarded seal | Three SVG arcs rotating at distinct bounded speeds + golden ember tint | N/A | High: 3 arcs+particles; low: 3 arcs; off: static seal |
-| PROC-09 | Heat distortion | Quarter-resolution displacement from FX-001, stage 6–7 only | Fixed time function; no RNG | High: 0.25× buffer; low/off: disabled |
-| PROC-10 | Stage burst | Short radial sparks/rune brightness impulse | Stage transition id | High/low/off: 32/12/0 particles; off uses DOM label pulse |
-| PROC-11 | Resonance/surge/breath ring | Four segments, expansion and contraction driven by exact core state/time | N/A | High/low: transformed SVG segments; off: DOM icon/state text |
-| PROC-12 | Enemy tap counters | 4/6 breakable ring segments driven only by accepted tap events | Encounter id + segment index | All tiers: fixed segments; particles only high/low |
-| PROC-13 | Heat-window ring | `0.75 s` gather → `1.50 s` expansion from core event clock | Event id | High: glow+particles; low: ring; off: DOM icon/countdown |
+| PROC-09 | FL-005 — heat distortion | Quarter-resolution displacement from FX-001, stage 6–7 only | Fixed time function; no RNG | High: 0.25× buffer; low/off: disabled |
+| PROC-10 | FL-007/008 — stage burst, beam, lightning | Short radial sparks/rune impulse; SDF beam and bounded line arcs | Stage transition id | High/low/off: 32/12/0 particles; off uses DOM label + static beam |
+| PROC-11 | FL-009 — resonance/surge/breath ring | Four segments, expansion and contraction driven by exact core state/time | N/A | High/low: transformed vector segments; off: DOM icon/state text |
+| PROC-12 | FL-009 — enemy tap counters | 4/6 breakable ring segments driven only by accepted tap events | Encounter id + segment index | All tiers: fixed segments; particles only high/low |
+| PROC-13 | FL-009 — heat-window ring | `0.75 s` gather → `1.50 s` expansion from core event clock | Event id | High: glow+particles; low: ring; off: DOM icon/countdown |
+| PROC-14 | FL-006 — cadence/tap feedback | Accepted tap with factor `1` uses full flame burst; factor `<1` uses neutral ash ring scaled by factor; rejected 9th+ input uses small gray ripple at most once per `500 ms` | Accepted/rejected input event id; no local rate calculation | Full/reduced/rejected states remain distinct on high/low/off; off uses DOM/CSS ring |
 
-Cosmetic seeds никогда не читают и не изменяют core gameplay RNG. Simulation должна быть frame-rate independent; automated visual tests фиксируют `sessionVisualSeed` и animation time. При `prefers-reduced-motion: reduce` PROC-02/03 сокращаются минимум на 60%, PROC-09 отключается, PROC-04/07/08 остаются статическими indicators.
+FL-006 не пересчитывает cadence самостоятельно: presentation получает итоговый `cadenceFactor` из core. Зафиксированная curve для скользящего окна — `1 / 1 / 1 / 0.70 / 0.45 / 0.25 / 0.15 / 0.10`; input 9+ rejected. Neutral ash ring подтверждает принятие reduced tap, но не имитирует полный heat/score burst.
+
+Cosmetic seeds никогда не читают и не изменяют core gameplay state и не вводят gameplay PRNG. Simulation должна быть frame-rate independent; automated visual tests фиксируют `sessionVisualSeed` и animation time. При `prefers-reduced-motion: reduce` PROC-02/03 сокращаются минимум на 60%, PROC-09 отключается, PROC-04/07/08 остаются статическими indicators.
 
 ## Generated-assisted assets и provenance
 
-Generated-assisted разрешён только для BG-001/002/003/005 и ранних silhouette explorations CH-001/002. Финальные characters обязаны пройти полный manual redraw/paintover, anatomy/content review и atlas decomposition; модельный output нельзя использовать как цельный экран.
+Generated-assisted разрешён только для BG-001/002/003/004/005/006/009 и ранних silhouette explorations CH-001/002/003/005. Финальные characters обязаны пройти полный manual redraw/paintover, anatomy/content review и atlas decomposition; модельный output и семь stage-reference PNG нельзя использовать как цельный экран.
 
 До статуса `IN REVIEW` для каждого asset в `assets/assets-manifest.json` фиксируются:
 
@@ -125,12 +165,13 @@ Generated-assisted разрешён только для BG-001/002/003/005 и р
 
 | Группа | Состав | Когда загружать | Failure fallback |
 |---|---|---|---|
-| `critical-visual` | BG-001 или BG-002, BG-003, BG-004, UI-002…007, FX-001…003 | До interactive; responsive background только один | CSS dark gradient, SVG flame fallback, system text/icons |
+| `critical-visual` | BG-001 или BG-002, BG-003/004/008, UI-002…007, FX-001…003, FL-001…009 configs | До interactive; responsive background только один | CSS dark gradient, SVG flame fallback, system text/icons |
 | `critical-audio` | SF-001, SF-003, AM-002 и MU-001 выбранного codec pack | SF-001/SF-003 network preload до interactive и decode после gesture; AM-002/MU-001 грузятся после gesture, не блокируя interactive | Silent play; audio-locked/mute state, retry on next gesture |
 | `stage-3` | CH-001, SF-006 | При progress текущей stage 2 ≥ 60% | Силуэт/простая procedural ash cue |
 | `stage-4` | BG-005, BG-007, AM-003/004, MU-003 | При progress текущей stage 3 ≥ 60% | Existing architecture + procedural chains cue |
 | `stage-5` | CH-002, MU-004, SF-007/008/009 | При progress текущей stage 4 ≥ 60% | Demoness silhouette + cold ring, no mechanic loss |
-| `stage-6` | CH-003/004, MU-005, AM-005, SF-017 | При progress текущей stage 5 ≥ 60% | Static dark silhouettes; music remains previous layers |
+| `stage-6` | BG-009, CH-003/004, MU-005, AM-005, SF-017 | При progress текущей stage 5 ≥ 60% | Static dark silhouettes; music remains previous layers |
+| `stage-7` | CH-005 | При progress текущей stage 6 ≥ 60% | Existing watchers silhouettes; FL-008 static beam remains available |
 | `rewarded` | UI-006, FX-005, MU-006, SF-011…014 | Когда rewarded capability и CTA доступны | Text/icon-only CTA; reward mechanics still exact |
 
 Asset failure не меняет heat, score, decay, reward или enemy timing. Loader логирует один structured warning на asset ID, применяет fallback и не делает retry-loop чаще двух попыток за сессию.
@@ -166,7 +207,11 @@ Asset failure не меняет heat, score, decay, reward или enemy timing. 
 ## Ownership, handoff и риски
 
 - Art Agent владеет BG/CH/UI/FX production и visual provenance; Audio Agent — MU/AM/SF, loop/loudness и audio provenance; Developer владеет manifest loader/audit; QA независимо присваивает READY evidence.
-- Риск: одновременная резидентность всех крупных слоёв превышает target decoded memory. Loader обязан выгружать alternate orientation и невидимые character atlases, сохраняя fallback silhouette.
+- **Pre-implementation blocker:** семь remote stage PNG отсутствуют локально; перед любым reference-driven production шагом нужно синхронизировать `visual-references/stage-references/` из `main` и проверить SHA. Planning не блокируется этим расхождением.
+- **M4–M7/READY blocker:** для семи reference PNG нет полного provenance record. Это не блокирует headless M1–M3, но до устранения они используются только как mood/composition reference, не как source pixels и не как основание для production exports.
+- Cross-doc correction: stage-5 concept полезен по crown silhouette и магическим дугам, но конфликтует с `PRODUCT_SPEC.md`/`ART_DIRECTION.md` по 12+, фотореализму и сексуализации. CH-002 требует закрытого non-sexualized redesign; reference не переопределяет content rules.
+- Риск: одновременная резидентность всех крупных слоёв превышает target decoded memory. Loader обязан выгружать alternate orientation и dormant character atlases, подгружать их до предсказуемого telegraph либо использовать fallback silhouette, не меняя event timing.
+- Риск: семь concepts меняют архитектуру/камеру сильнее, чем допустимо для плавного reveal. BG-001…009 должны быть сведены в одну перспективу и один ritual anchor; seven-screen implementation запрещена.
 - Риск: MP3 fallback может иметь encoder delay. Обязательны manifest loop samples и browser loop test; при дефекте используется decoded-buffer scheduling.
-- Риск: поздний concept art может не укладываться в composition/content/budget. Он адаптируется под этот контракт, а конфликт фиксируется; требования не меняются молча.
+- Риск: detailed stage-6/7 composition может потерять HUD/flame readability. Тёмная периферия, independent masks и density caps обязательны; full-screen orange raster не используется.
 - Никакой `PLANNED` asset не является готовым. Implementation может начинаться с процедурных/fallback placeholders, но release требует READY или документированного одобренного fallback для каждой manifest entry.

@@ -34,10 +34,10 @@ Build contract:
 - повторная сборка того же clean commit с теми же зафиксированными tools даёт эквивалентный manifest файлов; допустимые nondeterministic metadata (например timestamp) перечисляются в report;
 - production build содержит build ID и не требует dev server;
 - runtime не запрашивает assets за пределами archive root и не зависит от absolute URL;
-- bundle/package budgets проходят PERF-02–PERF-04 и соответствующие лимиты `TECHNICAL_ARCHITECTURE.md` / `ASSET_PLAN.md`.
+- bundle/package budgets проходят `AC:PERF-02` и asset budgets — `AC:PERF-08`; frame budgets отдельно проходят `AC:PERF-03`/`AC:PERF-04` по `TECHNICAL_ARCHITECTURE.md` / `ASSET_PLAN.md`.
 - `npm run assets:audit` или согласованный эквивалент проверяет manifests, пути с учётом регистра, dimensions, codec pairs, forbidden extensions, external SVG references и hard limits с non-zero exit при нарушении.
 
-Если итоговая архитектура утвердит другой package manager или названия scripts, Game Architect обязан атомарно обновить build contract здесь, в `TECHNICAL_ARCHITECTURE.md` и AC-01 до начала implementation.
+Если итоговая архитектура утвердит другой package manager или названия scripts, Game Architect обязан атомарно обновить build contract здесь, в `TECHNICAL_ARCHITECTURE.md` и `AC:RLS-01` до начала implementation.
 
 ## Pre-release sequence
 
@@ -57,7 +57,7 @@ Build contract:
 
 - `src/`, `tests/`, `docs/`, `visual-references/`, source art/audio masters и internal reports;
 - `.env`, `.env.*`, credentials, tokens, cookies, signing data и local platform configuration;
-- source maps (`*.map`), если отдельное security/release решение не разрешило их;
+- source maps (`*.map`); их включение потребует отдельного change review и одновременного изменения `AC:RLS-03` до сборки candidate;
 - `node_modules/`, package-manager cache, coverage, screenshots, traces, temp files и logs;
 - editor/OS metadata (`.DS_Store`, `.idea/`, `.vscode/`), Git files и GitHub workflow files;
 - mock/fake SDK, test fixtures, debug overlays, development analytics endpoints и hot-reload client;
@@ -136,5 +136,5 @@ archive-root/
 - Release readiness: `NOT READY — planning only`.
 - Art/audio payload may threaten startup and stage-7 memory budgets; mitigation — manifest budgets, staged loading and PERF-01–PERF-09 gate.
 - Yandex APIs/policies may change before integration; mitigation — source/date revalidation immediately before adapter work and again before upload.
-- Reward callback race may duplicate a boost or leave audio paused; mitigation — idempotent lifecycle contract and R/AC-P tests.
+- Reward callback race may duplicate a boost or leave audio paused; mitigation — idempotent lifecycle contract and `QA:R-01…R-07` / `AC:Y-09` / `AC:Y-10` / `AC:A-07` / `AC:A-08` tests.
 - No production ZIP, tag, report or upload is authorized by this document at the current stage.
