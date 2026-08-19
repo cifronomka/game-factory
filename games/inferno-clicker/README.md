@@ -4,7 +4,7 @@ Browser-first HTML5 clicker для Yandex Games о разгоне маленьк
 
 ## Текущий статус
 
-**Pre-implementation review завершён; Implementation не начат.** В проекте нет игровой механики, production HTML/JS, SDK Yandex, финальных assets, release build или ZIP. Документация согласована для старта M1; начало реализации требует отдельной команды пользователя.
+**Candidate 0.1.0 реализован и находится в regression QA.** Headless core, layered Canvas 2D presentation, attributed authored fire ambience through Web Audio, Web/Yandex adapters, persistence, leaderboard и rewarded flow собраны в `dist/`. Автоматические проверки проходят; ZIP и публикация закрыты до browser/device matrix и проверки в Yandex test console.
 
 ## Source of truth
 
@@ -29,4 +29,4 @@ Browser-first HTML5 clicker для Yandex Games о разгоне маленьк
 
 ## Следующий gate
 
-После отдельного разрешения Implementation Agent начинает с M1 (playable headless core и минимальный shell), затем идёт по `docs/IMPLEMENTATION_PLAN.md`. Любое изменение числового баланса или platform lifecycle сначала обновляет связанные specs и acceptance criteria.
+M11–M14: browser/device, visual/audio и Yandex regression на идентифицированной production build. После PASS всех применимых критериев M15 создаёт ZIP и release report; публикация требует отдельного разрешения. Любое изменение числового баланса или platform lifecycle сначала обновляет связанные specs и acceptance criteria.

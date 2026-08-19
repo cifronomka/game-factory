@@ -1,0 +1,21 @@
+{
+  "name": "inferno-clicker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "node scripts/serve.mjs --root . --port 4173",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/serve.mjs --root dist --port 4174",
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "node scripts/typecheck.mjs",
+    "test": "node scripts/test.mjs",
+    "test:e2e": "node scripts/e2e-smoke.mjs",
+    "assets:audit": "node scripts/assets-audit.mjs",
+    "release:audit": "node scripts/release-audit.mjs",
+    "package": "node scripts/package.mjs"
+  }
+}

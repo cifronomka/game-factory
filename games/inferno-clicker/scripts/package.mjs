@@ -1,0 +1,22 @@
+import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { gameRoot } from './lib.mjs';
+
+const releaseDir = join(gameRoot, 'releases');
+await mkdir(releaseDir, { recursive: true });
+const gate = JSON.parse(await readFile(join(gameRoot, 'reports/release-gate.json'), 'utf8'));
+const manifest = JSON.parse(await readFile(join(gameRoot, 'dist/build-manifest.json'), 'utf8'));
+if (gate.buildId !== manifest.buildId || gate.approved !== true) throw new Error(`Release gate is not approved for ${manifest.buildId}`);
+const version = String(manifest.version);
+const archiveName = `inferno-clicker-${version}.zip`;
+const archive = join(releaseDir, archiveName);
+await rm(archive, { force: true });
+await rm(`${archive}.sha256`, { force: true });
+const zip = spawnSync('/usr/bin/zip', ['-q', '-r', archive, '.'], { cwd: join(gameRoot, 'dist'), encoding: 'utf8' });
+if (zip.status !== 0) throw new Error(zip.stderr || 'zip failed');
+const bytes = await readFile(archive);
+const digest = createHash('sha256').update(bytes).digest('hex');
+await writeFile(`${archive}.sha256`, `${digest}  ${archiveName}\n`);
+console.log(`package PASS (${bytes.length} bytes, sha256 ${digest})`);

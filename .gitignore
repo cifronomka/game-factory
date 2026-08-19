@@ -1,6 +1,7 @@
 # Codex projectless-task scratch and deliverable directories
 /work/
 /outputs/
+/.pnpm-store/
 
 # Local OS/editor noise
 .DS_Store

@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "game": "inferno-clicker",
+  "generatedAt": "2026-08-20T00:00:00.000Z",
+  "assets": [
+    {
+      "id": "BG-001", "path": "assets/backgrounds/bg-infernal-chamber-production.webp",
+      "kind": "background", "stages": [1, 2, 3, 4, 5, 6, 7], "width": 768, "height": 1365,
+      "bytes": 206882, "transparent": false, "critical": true, "preload": "startup",
+      "animation": "regional light reveal and restrained parallax",
+      "sha256": "d6f4dbfb4680ab2502a0855122d8bee51b8731c3c3bcfb9c1a8c54711ac4a60c"
+    },
+    {
+      "id": "FL-LOW-CORE", "path": "assets/flame/atlases/core-low-v2.webp",
+      "metadata": "assets/flame/atlases/core-low-v2.json", "kind": "flame-core-atlas", "stages": [1, 2],
+      "width": 1024, "height": 1024, "bytes": 291384, "transparent": true, "critical": true, "preload": "startup",
+      "animation": "8 frames at 10 fps, loop, pivot [0.5,0.965]",
+      "sha256": "355a1490ed676236a7359fc6c90d2cbe00e31cb397d2ec808cf4aa7b419a63aa"
+    },
+    {
+      "id": "FL-LOW-OUTER", "path": "assets/flame/atlases/outer-low-v2.webp",
+      "metadata": "assets/flame/atlases/outer-low-v2.json", "kind": "flame-overlay-atlas", "stages": [1, 2],
+      "width": 1024, "height": 1024, "bytes": 320300, "transparent": true, "critical": true, "preload": "startup",
+      "animation": "8 frames at 10 fps, loop, phase offset 2, pivot [0.5,0.965]",
+      "sha256": "ebe2a039f57f5f40b6f8f4b817f8420085ade9c3d128e91e254389e0bb0da87a"
+    },
+    {
+      "id": "FL-MID-CORE", "path": "assets/flame/atlases/core-mid-v2.webp",
+      "metadata": "assets/flame/atlases/core-mid-v2.json", "kind": "flame-core-atlas", "stages": [3, 4, 5],
+      "width": 1600, "height": 1280, "bytes": 770040, "transparent": true, "critical": false, "preload": "stage 2 progress >= 0.6",
+      "animation": "10 frames at 10 fps, loop, pivot [0.5,0.965]",
+      "sha256": "1ff494f788f0a6b5c8e162136ad2f637796127728752641c1b763c290d1874c6"
+    },
+    {
+      "id": "FL-MID-OUTER", "path": "assets/flame/atlases/outer-mid-v2.webp",
+      "metadata": "assets/flame/atlases/outer-mid-v2.json", "kind": "flame-overlay-atlas", "stages": [3, 4, 5],
+      "width": 1600, "height": 1280, "bytes": 832556, "transparent": true, "critical": false, "preload": "stage 2 progress >= 0.6",
+      "animation": "10 frames at 10 fps, loop, phase offset 3, pivot [0.5,0.965]",
+      "sha256": "06a05a785d7249630eb5143261abc1fc13aa155d39e1e00136d98f70ba968583"
+    },
+    {
+      "id": "FL-HIGH-CORE", "path": "assets/flame/atlases/core-high-v2.webp",
+      "metadata": "assets/flame/atlases/core-high-v2.json", "kind": "flame-core-atlas", "stages": [6, 7],
+      "width": 1536, "height": 1280, "bytes": 919606, "transparent": true, "critical": false, "preload": "stage 5 progress >= 0.6",
+      "animation": "12 frames at 11 fps, loop, pivot [0.5,0.965]",
+      "sha256": "6f6d5d6c7359d83f5a9aaf872fb907b8e81609c0b896c5658f899963efa22821"
+    },
+    {
+      "id": "FL-HIGH-OUTER", "path": "assets/flame/atlases/outer-high-v2.webp",
+      "metadata": "assets/flame/atlases/outer-high-v2.json", "kind": "flame-overlay-atlas", "stages": [6, 7],
+      "width": 1536, "height": 1280, "bytes": 1394522, "transparent": true, "critical": false, "preload": "stage 5 progress >= 0.6",
+      "animation": "12 frames at 11 fps, loop, phase offset 4, pivot [0.5,0.965]",
+      "sha256": "84cf4f98f67880a739439e56129f9ca9367102b7c90dbc7b139ea81401b18187"
+    },
+    {
+      "id": "FX-STAGE-FLARE", "path": "assets/flame/transitions/stage-flare-v2.webp",
+      "metadata": "assets/flame/transitions/stage-flare-v2.json", "kind": "stage-transition-atlas", "stages": [1, 2, 3, 4, 5, 6, 7],
+      "width": 1024, "height": 1024, "bytes": 533852, "transparent": true, "critical": false, "preload": "stage 1 progress >= 0.6",
+      "animation": "8 frames at 8 fps; forward upward, reverse/cool-tint downward",
+      "sha256": "3b2b549ffca0ea40a8a4904e2af63e5e4eadfd2524599df305152d2e1a530ffe"
+    },
+    {
+      "id": "CH-ASH-SERVANT", "path": "assets/characters/ash-servant/ash-servant-states-v2.webp",
+      "metadata": "assets/characters/ash-servant/ash-servant-states-v2.json", "kind": "character-state-atlas", "stages": [3, 4, 5, 6, 7],
+      "width": 1536, "height": 1024, "bytes": 328162, "transparent": true, "critical": false, "preload": "stage 2 progress >= 0.6",
+      "animation": "appearance 6f/10fps once; idle 6f/8fps loop; inhale 6f/10fps once; blow 6f/10fps loop",
+      "sha256": "4590cbae779a51aeb2412d4f47d05ce1c0c85c6185f9ebebffe1aabd2f1653c6"
+    },
+    {
+      "id": "CH-DEMONESS", "path": "assets/characters/demoness/demoness-states-v2.webp",
+      "metadata": "assets/characters/demoness/demoness-states-v2.json", "kind": "character-state-atlas", "stages": [4, 5, 6, 7],
+      "width": 1536, "height": 1024, "bytes": 375884, "transparent": true, "critical": false, "preload": "stage 3 progress >= 0.6",
+      "animation": "appearance 6f/10fps once; idle 6f/8fps loop; cast 6f/10fps once; hold 6f/10fps loop",
+      "sha256": "747e6d6e09fca3e2b25ad753c0fff3ba55d43c4cbec358c46ac13871e3cad2d0"
+    },
+    {
+      "id": "CH-INFERNO-HOST", "path": "assets/characters/character-inferno-host.webp",
+      "kind": "character-group-cutout", "stages": [6, 7], "width": 1024, "height": 683,
+      "bytes": 282120, "transparent": true, "critical": false, "preload": "stage 5 progress >= 0.6",
+      "animation": "dim host reveal at stage 6 and full reveal at stage 7",
+      "sha256": "51e613143ca5b66921c08df366989a030ccfa70a9734fbe23ec1c1355b095b0e"
+    }
+  ],
+  "audioAssets": [
+    {
+      "id": "AU-WOOD-OGG", "path": "assets/audio/fire/embers-wood-bed.ogg", "kind": "wood-ember-loop",
+      "codec": "Vorbis in Ogg", "durationSeconds": 29.26, "bytes": 274734,
+      "sha256": "8601c75de85b8af55a420e679852a21672fcb35a7609918630fe0fe615fe4460",
+      "license": "CC0 1.0", "credit": "Fireplace Sound Loop by PagDev"
+    },
+    {
+      "id": "AU-WOOD-MP3", "path": "assets/audio/fire/embers-wood-bed.mp3", "kind": "wood-ember-loop-fallback",
+      "codec": "MP3", "durationSeconds": 29.31, "bytes": 293488,
+      "sha256": "2e5edfaabc41c4c8a2c8b55e040696ab430bb89fd5df45818c9c405f849dd58d",
+      "license": "CC0 1.0", "credit": "Fireplace Sound Loop by PagDev"
+    },
+    {
+      "id": "AU-CRACKLE-OGG", "path": "assets/audio/fire/charcoal-crackle.ogg", "kind": "charcoal-crackle-loop",
+      "codec": "Vorbis in Ogg", "durationSeconds": 3.59, "bytes": 29601,
+      "sha256": "efbbea65c524b2d7122cc9b50b53ddc9a08cff6cfa9c5836277c8bd8c7f2d6a0",
+      "license": "CC0 1.0", "credit": "Fire Crackling by AntumDeluge"
+    },
+    {
+      "id": "AU-CRACKLE-MP3", "path": "assets/audio/fire/charcoal-crackle.mp3", "kind": "charcoal-crackle-loop-fallback",
+      "codec": "MP3", "durationSeconds": 3.63, "bytes": 29300,
+      "sha256": "bd436808160c0c77ee938e677be4e0df5d7aa854b79eecdbb891029a28910ff0",
+      "license": "CC0 1.0", "credit": "Fire Crackling by AntumDeluge"
+    },
+    {
+      "id": "AU-FAN-A-OGG", "path": "assets/audio/fan/fan-soft-a.ogg", "kind": "fanning-response",
+      "codec": "Vorbis in Ogg", "durationSeconds": 0.75, "bytes": 8947,
+      "sha256": "c4caf33579d5adc6dbe16721c7ed5ee82fcaa35d8d900169cc92ceb56ca70207",
+      "license": "CC0 1.0", "credit": "Soft fan source by remaxim"
+    },
+    {
+      "id": "AU-FAN-A-MP3", "path": "assets/audio/fan/fan-soft-a.mp3", "kind": "fanning-response-fallback",
+      "codec": "MP3", "durationSeconds": 0.78, "bytes": 6521,
+      "sha256": "8419b7c46d810797dd92af6784c706e722b0cc0188f264a5aaf1aef405660c07",
+      "license": "CC0 1.0", "credit": "Soft fan source by remaxim"
+    },
+    {
+      "id": "AU-FAN-B-OGG", "path": "assets/audio/fan/fan-soft-b.ogg", "kind": "fanning-response",
+      "codec": "Vorbis in Ogg", "durationSeconds": 0.75, "bytes": 9924,
+      "sha256": "0626cbda0cc21d362a66fa8725e4c3bd2b059e15b0af0c728653115e9dfe1a09",
+      "license": "CC0 1.0", "credit": "Soft fan source by pyranostudios"
+    },
+    {
+      "id": "AU-FAN-B-MP3", "path": "assets/audio/fan/fan-soft-b.mp3", "kind": "fanning-response-fallback",
+      "codec": "MP3", "durationSeconds": 0.78, "bytes": 6565,
+      "sha256": "32b44d3aed1664df686a2b5a08d0d1088f22c85054d04dd0c80fb3ac7ca02057",
+      "license": "CC0 1.0", "credit": "Soft fan source by pyranostudios"
+    },
+    {
+      "id": "AU-FAN-C-OGG", "path": "assets/audio/fan/fan-soft-c.ogg", "kind": "fanning-response",
+      "codec": "Vorbis in Ogg", "durationSeconds": 0.75, "bytes": 9842,
+      "sha256": "4b5ac3bd96fd7185d93a59be922ff625a0380652f704ac79e73ee36b28453a16",
+      "license": "CC0 1.0", "credit": "Air Woosh Move by Almitory"
+    },
+    {
+      "id": "AU-FAN-C-MP3", "path": "assets/audio/fan/fan-soft-c.mp3", "kind": "fanning-response-fallback",
+      "codec": "MP3", "durationSeconds": 0.78, "bytes": 6618,
+      "sha256": "fe08c75e5398ed52f310a5222d18cd9c4942e281de3de6abc7094931eb38e98d",
+      "license": "CC0 1.0", "credit": "Air Woosh Move by Almitory"
+    }
+  ],
+  "clipRegistry": {
+    "flame.low": ["core:8f@10fps loop", "outer:8f@10fps loop phase+2"],
+    "flame.mid": ["core:10f@10fps loop", "outer:10f@10fps loop phase+3"],
+    "flame.high": ["core:12f@11fps loop", "outer:12f@11fps loop phase+4"],
+    "flame.stage-transition": "8f@8fps once; reverse on downward boundary",
+    "ash-servant": ["appearance:6f@10fps once", "idle:6f@8fps loop", "inhale:6f@10fps once", "blow:6f@10fps loop"],
+    "demoness": ["appearance:6f@10fps once", "idle:6f@8fps loop", "cast:6f@10fps once", "hold:6f@10fps loop"]
+  },
+  "proceduralPresentation": [
+    "darkness-and-light-reveal-masks",
+    "bounded-embers-and-smoke-motion",
+    "tap-and-seal-light-flares",
+    "servant-ash-flow",
+    "demoness-cold-ribbon"
+  ],
+  "provenance": "assets/PROVENANCE.md",
+  "reviewOwner": "Main Agent + visual/audio QA reviewers"
+}

@@ -11,7 +11,7 @@
 
 ## Общий контракт и capability policy
 
-Core использует только `PlatformService`: `init`, `saveData`, `loadData`, `submitScore`, `getLeaderboard`, `showRewardedAd`, `showInterstitial`, `pauseGame`, `resumeGame`. Adapters расположены в `src/platforms/yandex`, `vk`, `web`, `android`.
+Application layer использует только `PlatformService`: `init`, `markReady`, `saveData`, `loadData`, `submitScore`, `getLeaderboard`, `showRewardedAd`, `showInterstitial`, `pauseGame`, `resumeGame`, `subscribePauseChanges`, `getPauseSnapshot`, `dispose`. Core остаётся headless и не импортирует adapter. Реализованные adapters расположены в `src/platforms/yandex`, `web`, `dev`; `vk` и `android` являются future scope.
 
 Любой метод возвращает typed result, а не бросает platform exception в core. Отсутствующая capability скрывает соответствующую CTA или использует явно описанный local fallback. Инициализация платформы ограничена 5 s; после timeout игра продолжает запуск с web adapter.
 
@@ -22,7 +22,7 @@ Core использует только `PlatformService`: `init`, `saveData`, `l
 | Init/ready | `YaGames.init`, затем `LoadingAPI.ready` в точный interactive момент | Bridge init после актуальной проверки | immediate local init | native bridge init | продолжить local mode |
 | Save/load | local-first + Player data, если доступно | bridge storage/cloud после проверки | versioned localStorage | local/native storage | records остаются локальными |
 | Best Score leaderboard | Yandex leaderboard adapter | VK leaderboard/service после проверки | local best only | provider-specific/disabled | CTA leaderboard скрыта |
-| Rewarded | Yandex SDK, explicit voluntary CTA | provider ad API после проверки | `unavailable`, без симуляции reward в production | provider SDK после проверки | bonus не выдаётся, игра продолжается |
+| Rewarded | Yandex SDK, explicit voluntary CTA | provider ad API после проверки | до Yandex integration: явно маркированный `test` provider; Yandex release: unavailable | provider SDK после проверки | locked run остаётся на Stage 4; score-run/restart доступны |
 | Interstitial | MVP: не вызывается игрой | N/A в MVP | unavailable | N/A в MVP | ничего не происходит |
 | Pause/resume | SDK events + ad callbacks + visibility | bridge lifecycle + visibility | Page Visibility/blur | native lifecycle | idempotent local lifecycle |
 
@@ -30,14 +30,14 @@ Core использует только `PlatformService`: `init`, `saveData`, `l
 
 ### Initialization и ready
 
-SDK загружается текущим официальным loader и инициализируется через `YaGames.init()`. `ysdk.features.LoadingAPI?.ready()` вызывается ровно один раз, только когда critical assets загружены, HUD видим, loading overlay снят и первый tap/click может быть принят. Ошибка SDK не блокирует web fallback.
+SDK загружается текущим официальным loader `/sdk.js` только на Yandex host и инициализируется через `YaGames.init()`. Generic Web не делает заведомо ошибочный SDK request. `ysdk.features.LoadingAPI?.ready()` вызывается ровно один раз, только когда critical assets загружены (либо после явного retry включён documented procedural fallback), HUD видим, loading overlay снят и первый tap/click может быть принят. Ошибка SDK не блокирует web fallback.
 
 ### Gameplay lifecycle
 
 - При фактическом начале/возобновлении active run adapter вызывает `GameplayAPI.start()`.
 - При menu pause, hidden tab, окончании run и перед fullscreen/rewarded ad вызывает `GameplayAPI.stop()`.
-- `game_api_pause` добавляет pause reason и немедленно останавливает simulation/audio.
-- `game_api_resume` снимает только platform reason; resume происходит лишь при отсутствии `ad`, `visibility`, `menu` и других reasons.
+- `game_api_pause` добавляет pause reason и немедленно останавливает simulation/audio. SDK уже согласует этот event с Gameplay API, поэтому adapter не дублирует `stop()` для самого platform-event.
+- `game_api_resume` снимает только platform reason; resume происходит лишь при отсутствии `ad`, `visibility`, `menu` и других reasons. Если local reason остаётся, adapter повторно фиксирует `stop()`, но не делает ложный `start()`.
 - Startup ad учитывается через platform pause/resume events; до первого valid resume audio/game clock не стартуют.
 
 ### Player data и leaderboard
@@ -45,17 +45,17 @@ SDK загружается текущим официальным loader и ин�
 - Сначала загружается local save, затем при доступном `ysdk.getPlayer()` — cloud data.
 - Отказ пользователя от profile data не блокирует игру; неавторизованный пользователь получает local records.
 - Merge: максимум для `bestScore`, all-time `highestStageReached`, `longestInfernoHoldMs`, `maxMultiplier` и `runsPlayed`; daily-ritual status объединяется только для совпадающей календарной даты без повторной награды, настройки — более новый `updatedAt`.
-- Публичный leaderboard: одно понятное значение **Best Score**, integer `0..2_147_483_647`. Submission только при завершении run и только если новый local best прошёл sanity checks.
+- Публичный leaderboard: одно понятное значение **Best Score**, technical name в Yandex Console и adapter — строго `best-score`, integer `0..2_147_483_647`. Submission только при завершении run и только если новый local best прошёл sanity checks. Несовпадение console name является внешним configuration blocker и даёт nonblocking local fallback.
 - Leaderboard unavailable/auth-required отображается нейтрально и не открывает login dialog без явного действия игрока.
 
 ### Rewarded ads
 
-CTA до запуска явно сообщает: «Посмотреть рекламу — Печать Инферно: x2 сила тапа на 20 секунд». Gameplay и весь audio паузятся до вызова SDK и остаются paused до terminal callback/platform resume. Reward выдаётся ровно один раз только по rewarded callback. Close/error/unavailable не меняют heat, score, cooldown или использованный лимит; отображается короткое ненавязчивое сообщение.
+CTA до запуска явно сообщает: «Посмотреть рекламу — сломать Печать Инферно и получить x2 силу тапа на 20 секунд». Gameplay и весь audio паузятся до вызова SDK и остаются paused до terminal callback/platform resume. Reward выдаётся ровно один раз только по rewarded callback: `sealBroken=true` устанавливается атомарно до queued boost. Close/error/unavailable не меняют seal, heat, score, cooldown или использованный лимит; отображается короткое ненавязчивое сообщение.
 
 ### Submission и content
 
 - Только SDK Yandex используется для рекламы; third-party ad code отсутствует.
-- Rewarded добровольна и является дополнительным boost, а не условием продолжения.
+- Rewarded добровольна, не нужна для stages 1–4, score-run, restart или local records, но является явно показанным progression gate для stages 5–7. Modal никогда не открывается автоматически.
 - Реклама не вызывается неожиданно на tap target или во время активного gameplay.
 - Sound/gameplay полностью paused на fullscreen ads.
 - Русский интерфейс обязателен; архитектура допускает locale bundles и platform locale.
@@ -82,7 +82,8 @@ Acceptance для будущего adapter добавляется отдельн
 - Никаких внешних SDK; init немедленный.
 - `localStorage` с versioned schema; corrupt data → defaults с сохранением диагностического события.
 - Leaderboard скрыт, отображается local Best Score.
-- Rewarded/interstitial возвращают `unavailable`; никаких dev mocks в production.
+- До подключения Yandex current Generic Web/dev review build сообщает `rewardedProvider='test'`: CTA называется строго `Получить ×2 (тест)`, confirm — `Активировать тестовый ×2 и сломать печать`, а provider асинхронно возвращает тот же idempotent terminal `rewarded` contract без слов «реклама/просмотр».
+- Test provider взаимоисключается с Yandex adapter, передаёт `provider=test` в telemetry и не входит в Yandex release configuration. Если test provider явно выключен, rewarded/interstitial возвращают `unavailable`, seal остаётся locked и игра продолжает Stage-4 score-run.
 - `visibilitychange`, `pagehide`, `blur/focus` управляют reason-set pause; hidden time не уменьшает heat и rewarded duration.
 - Web adapter является обязательным dev/E2E fallback и должен проходить contract suite.
 
@@ -100,10 +101,10 @@ Native bridge обязан передавать lifecycle/back button/storage/ad
 | PL-02 | Yandex debug panel | start/menu/ad/hidden/resume | gameplay indicator соответствует active/paused; heat/audio не идут в pause |
 | PL-03 | Yandex authorized player | save → reload → cloud merge | все record/settings fields восстановлены по schema и merge rules; active run не восстановлен |
 | PL-04 | Yandex guest/denied data | полный run | game playable; local record сохраняется; uncaught errors = 0 |
-| PL-05 | Yandex rewarded success | accepted reward | один 20 s boost начинается после resume; повторной выдачи нет |
-| PL-06 | Yandex rewarded close/error | terminal callback | boost/heat/score не меняются; gameplay безопасно resumes |
+| PL-05 | Yandex rewarded success | accepted reward | один seal break устанавливается до resume; один 20 s boost начинается после resume; повторной выдачи нет |
+| PL-06 | Yandex rewarded close/error | terminal callback | seal/boost/heat/score не меняются; gameplay безопасно resumes |
 | PL-07 | Yandex leaderboard | new best | ровно integer Best Score отправлен один раз после end state |
-| PL-08 | Generic Web | no SDK/offline | игра запускается; local save работает; ad/leaderboard CTA корректно скрыты |
+| PL-08 | Generic Web/dev | no SDK/offline | игра запускается; local save работает; явно тестовая CTA ломает seal через общий idempotent contract; ad/leaderboard UI не имитируется |
 | PL-09 | Any current target | rapid duplicate pause/resume | reason-set не допускает double resume или tick в pause |
 
 ## Перед integration и release

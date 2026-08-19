@@ -2,7 +2,7 @@
 
 ## Назначение и gate
 
-Документ описывает будущую воспроизводимую production-сборку и упаковку `inferno-clicker` для Yandex Games. Сейчас planning stage: сборка, ZIP, upload и release report не создавались. Release Agent начинает исполнение только после implementation, platform integration, QA, fix cycle и regression QA.
+Документ описывает воспроизводимую production-сборку и упаковку `inferno-clicker` для Yandex Games. Implementation candidate `0.1.0` собирается локально; ZIP и upload остаются закрыты release gate до завершения QA, regression и применимых acceptance checks.
 
 Release запрещён, пока каждый применимый пункт `ACCEPTANCE_CRITERIA.md` не имеет `PASS` с evidence, открытые Critical/High не равны нулю либо QA report не завершён. Код и assets внутри `dist/` вручную не исправляются: после любого изменения выполняется полная пересборка из source.
 
@@ -16,15 +16,14 @@ Release запрещён, пока каждый применимый пункт 
 
 ## Toolchain lock и production build
 
-На implementation stage должны быть зафиксированы exact Node.js major/minor в репозитории, package-manager version и lockfile. Release Agent записывает фактические версии в report и выполняет из clean checkout:
+Runtime зафиксирован в `.nvmrc`: Node.js 24. External dependencies и package manager отсутствуют; поэтому lockfile не создаётся, а воспроизводимость задаётся Node major, source commit и hashes build scripts. Release Agent записывает фактическую Node version в report и выполняет из clean checkout:
 
 ```text
-npm ci
-npm run lint
-npm run typecheck
-npm test
-npm run build
-npm run test:e2e
+node scripts/lint.mjs
+node scripts/typecheck.mjs
+node scripts/test.mjs
+node scripts/build.mjs
+node scripts/e2e-smoke.mjs
 ```
 
 Build contract:
@@ -33,9 +32,9 @@ Build contract:
 - output создаётся только в `games/inferno-clicker/dist/`;
 - повторная сборка того же clean commit с теми же зафиксированными tools даёт эквивалентный manifest файлов; допустимые nondeterministic metadata (например timestamp) перечисляются в report;
 - production build содержит build ID и не требует dev server;
-- runtime не запрашивает assets за пределами archive root и не зависит от absolute URL;
+- runtime не запрашивает local assets за пределами archive root и не зависит от absolute asset URL; официальный Yandex loader `/sdk.js` является единственным root-relative exception;
 - bundle/package budgets проходят `AC:PERF-02` и asset budgets — `AC:PERF-08`; frame budgets отдельно проходят `AC:PERF-03`/`AC:PERF-04` по `TECHNICAL_ARCHITECTURE.md` / `ASSET_PLAN.md`.
-- `npm run assets:audit` или согласованный эквивалент проверяет manifests, пути с учётом регистра, dimensions, codec pairs, forbidden extensions, external SVG references и hard limits с non-zero exit при нарушении.
+- `node scripts/assets-audit.mjs` проверяет manifests, пути с учётом регистра, dimensions, codec pairs, forbidden extensions, external SVG references и hard limits с non-zero exit при нарушении.
 
 Если итоговая архитектура утвердит другой package manager или названия scripts, Game Architect обязан атомарно обновить build contract здесь, в `TECHNICAL_ARCHITECTURE.md` и `AC:RLS-01` до начала implementation.
 
@@ -47,7 +46,7 @@ Build contract:
 4. Запустить полный QA plan на точной production build, оформить issues.
 5. Для каждого fix создать новую build, выполнить targeted retest и neighboring regression; старый candidate считается отозванным.
 6. После полного regression обновить все acceptance statuses и evidence. Reviewer подтверждает отсутствие скрытой смены требований.
-7. Только когда QA-критерии имеют PASS и остаются лишь package criteria, выполнить `npm run package`, затем создать checksum и release report.
+7. Только когда QA-критерии имеют PASS и остаются лишь package criteria, выполнить `node scripts/package.mjs`, затем создать checksum и release report.
 8. Распаковать ZIP в новый temp-каталог, запустить через простой static HTTP server и повторить launch/input/audio/fallback smoke.
 9. Загрузить в Yandex test environment, выполнить ENV-Y1/ENV-Y2 smoke; production publish выполняется отдельно после platform acceptance.
 
@@ -105,17 +104,17 @@ archive-root/
 - [ ] Entry point, relative paths, MIME expectations и platform package rules проверены.
 - [ ] Версия внутри build, ZIP filename, tag, manifest и report согласованы.
 - [ ] Размер ZIP и SHA-256 записаны и перепроверены.
-- [ ] `npm run package` завершился с exit code 0 и создал ZIP только после QA gate.
+- [ ] `node scripts/package.mjs` завершился с exit code 0 и создал ZIP только после QA gate.
 - [ ] Reviewer и Release Agent подписали release decision.
 
-На planning stage все пункты checklist не отмечены и считаются `NOT RUN`.
+На текущем candidate автоматические build/audit пункты выполнены, но checklist остаётся неотмеченным до exact source commit, browser/device/Yandex regression и формального обновления acceptance evidence.
 
 ## Release report contract
 
 Сохранить как `games/inferno-clicker/releases/inferno-clicker-<version>-report.md`:
 
 - title, version, Build ID, full commit SHA, tag, build date/timezone и owners;
-- OS, exact Node.js/package-manager versions, lockfile hash и executed commands with exit codes;
+- OS, exact Node.js version, `N/A — zero external dependencies` для package-manager/lockfile и executed commands with exit codes;
 - production `dist/` manifest path/hash и reproducibility comparison result;
 - QA report path, acceptance decision и counts of open issues by severity;
 - list of regression runs и exact tested environments/browser versions;
@@ -131,10 +130,10 @@ archive-root/
 - После upload, но до public release, повторить launch, one tap/click, mute, pause/resume, local save/load, leaderboard unavailable/success path as available и rewarded success/cancel path в Yandex test environment.
 - Любой new fatal/console error, package-path failure, data-loss symptom, stuck ad pause или score submission regression переоткрывает gate, увеличивает candidate build metadata и перезапускает затронутую regression.
 
-## Planning-stage decision and risks
+## Current candidate decision and risks
 
-- Release readiness: `NOT READY — planning only`.
+- Release readiness: `NOT READY — implementation candidate; browser/Yandex environment gates pending`.
 - Art/audio payload may threaten startup and stage-7 memory budgets; mitigation — manifest budgets, staged loading and PERF-01–PERF-09 gate.
 - Yandex APIs/policies may change before integration; mitigation — source/date revalidation immediately before adapter work and again before upload.
 - Reward callback race may duplicate a boost or leave audio paused; mitigation — idempotent lifecycle contract and `QA:R-01…R-07` / `AC:Y-09` / `AC:Y-10` / `AC:A-07` / `AC:A-08` tests.
-- No production ZIP, tag, report or upload is authorized by this document at the current stage.
+- Production ZIP/tag/upload разрешаются только после финального gate; build и QA reports создаются до него.

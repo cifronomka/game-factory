@@ -1,0 +1,27 @@
+:root{color-scheme:dark;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#050407;color:#fff3df}
+*{box-sizing:border-box}
+html,body,#app{width:100%;height:100%;min-height:100%;margin:0;overflow:hidden}
+body{background:#050407}
+button{font:inherit}
+.app-shell{position:relative;width:100%;height:100%;min-height:420px;background:#050407}
+.boot-screen,.fatal-screen{position:absolute;inset:0;display:grid;place-items:center;z-index:20;background:radial-gradient(circle at 50% 55%,#32140f,#08070a 58%);padding:24px;text-align:center}
+.boot-screen__mark{width:54px;height:54px;margin:0 auto 18px;border:3px solid #8f3322;border-top-color:#ffd370;border-radius:50%;animation:spin .9s linear infinite}
+.boot-screen p,.fatal-screen p{max-width:480px;color:#d7bdab;line-height:1.5}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dialog-backdrop{position:absolute;inset:0;z-index:15;display:grid;place-items:center;background:#050407b8;backdrop-filter:blur(6px);padding:20px}
+.dialog-backdrop[hidden]{display:none}
+.dialog{width:min(460px,100%);border:1px solid #92533b;border-radius:18px;background:linear-gradient(155deg,#2a1b20,#100d12);box-shadow:0 24px 80px #000;padding:24px;text-align:center}
+.dialog h1,.dialog h2{margin:0 0 10px;font-family:Georgia,serif;letter-spacing:.06em;color:#ffd6a2}
+.dialog p{color:#d8c3b4;line-height:1.45;margin:8px 0 20px}
+.dialog__stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:16px 0 22px}
+.dialog__stat{padding:12px;border:1px solid #51352f;border-radius:12px;background:#120e12}
+.dialog__stat strong{display:block;font-size:1.35rem;color:#ffe8c7;font-variant-numeric:tabular-nums}
+.dialog__actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.dialog button{min-height:48px;border:1px solid #9d5b36;border-radius:12px;background:#342127;color:#fff3df;padding:10px 18px;cursor:pointer}
+.dialog button[data-primary]{background:linear-gradient(#a54325,#6c241b);border-color:#e27c42;font-weight:700}
+.dialog button:focus-visible{outline:3px solid #ffd370;outline-offset:3px}
+.toast{position:absolute;z-index:30;left:50%;bottom:max(128px,calc(env(safe-area-inset-bottom) + 116px));transform:translateX(-50%);max-width:min(520px,calc(100% - 32px));padding:10px 16px;border:1px solid #79503d;border-radius:999px;background:#100d12eb;color:#ffe0bc;text-align:center;pointer-events:none;transition:opacity .2s}
+.toast[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.boot-screen__mark{animation:none}.toast{transition:none}}
+@media (orientation:landscape) and (max-height:419px){.app-shell{min-height:0}}
+@media (orientation:landscape) and (max-height:419px){.toast{left:auto;right:10px;bottom:74px;transform:none;max-width:240px}}

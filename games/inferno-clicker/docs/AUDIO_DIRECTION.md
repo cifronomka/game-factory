@@ -1,125 +1,89 @@
 # Audio Direction — «Зажги»
 
-## Назначение
+## Corrective Cycle 02
 
-Документ задаёт звуковую систему, её адаптивную динамику и lifecycle. Перечень производимых файлов, вариантов и форматов находится в `ASSET_PLAN.md`.
+Пользовательский review 2026-08-20 классифицировал прежний `Fire Loop by qubodup` как газовую горелку. Этот OGG/FLAC удалён. Новый candidate использует два полевых fire layers и три коротких fanning variants: игрок должен слышать дерево/угли и ощущать, что раздувает огонь опахалом, а не нажимает arcade-кнопку.
 
-## Music direction
+## Runtime sources
 
-Музыка — тёмная ритуальная электроакустика без хоррор-скримеров: низкий воздушный drone, приглушённый пульс, рамочные барабаны, металлические резонансы и синтетический хор без слов. Темп — `96 BPM`, размер `4/4`, гармонический центр D с устойчивым педальным тоном. Задача музыки — расти вместе с пламенем, не утомляя при частом tapping и не маскируя feedback.
-
-Пять синхронных stem-loop по 8 тактов (`20 s` при 96 BPM), с одинаковыми точками начала/конца:
-
-1. `music-dark-bed` — воздушный drone и очень редкие низкие текстуры; стадии 1–7.
-2. `music-low-pulse` — мягкий пульс без резкой атаки; плавно входит со стадии 2.
-3. `music-percussion` — редкая ритуальная перкуссия; стадии 4–7.
-4. `music-infernal-tone` — металлический/хоровой слой без речи; стадии 5–7.
-5. `music-inferno-climax` — высокая остинатная искра и усиление downbeat; только стадия 7.
-
-Все stems музыкально полноценны в любой разрешённой комбинации и имеют phase-aligned master. Смена стадии меняет gain на следующей четверти с equal-power crossfade `1.25 s`; при быстром падении стадии слой может уйти сразу с `0.6 s` fade, но не обрывается. `stageProgress` тонко управляет фильтром/громкостью в пределах текущей стадии, а дискретный `stageChanged` включает состав слоёв. Gameplay меняет stage без гистерезиса; presentation crossfade не задерживает core transition.
-
-## Ambient layers
-
-| Слой | Содержание | Trigger / gain | Переход |
-|---|---|---|---|
-| `amb-dark-room` | Воздух большой каменной камеры, очень тихий низкий rumble | Всегда после первого user gesture, `-30…-27 LUFS` relative mix | Seamless loop, fade-in `1.5 s` |
-| `amb-fire-crackle-a/b` | Два взаимозаменяемых loop углей/огня | A со стадии 1; B добавляется со стадии 4, gain следует normalized heat | Crossfade `1.0 s`, случайный swap каждые 2–4 loop cycles |
-| `amb-chain-room` | Дальний металл и редкие цепи | Стадии 4–7, максимум один accent каждые `6 s` | Gain fade `1.5 s`, accents отдельно |
-| `amb-whispers-texture` | Невербальная обратная гранулярная текстура, без слов | Стадии 6–7, очень тихо | Fade `2.0 s`; отключается при reduced sensory mode |
-
-Ambient не меняет правила игры. Random accents используют детерминированный session seed, чтобы QA мог воспроизводить микс; timing jitter не влияет на game RNG.
-
-## SFX
-
-| Событие | Характер | Варианты | Cooldown / polyphony |
-|---|---|---:|---|
-| Обычный tap | Короткий сухой уголь + мягкий огненный tick, без резкого high-end | 6 | `25 ms`; pool 4, oldest-quietest voice steal |
-| Critical tap | Более яркий snap с коротким tonal ping | 3 | `120 ms`; polyphony 2 |
-| Заряд Резонанса | Низкий короткий pulse, четыре ступени высоты/яркости | 4 linked cues | Один на accepted rhythmic tap; polyphony 1 |
-| Вспышка / Передышка | Тёплый expansion / мягкий contracting exhale | 1 / 1 | По одному на state transition; polyphony 1 |
-| Stage-up | Ритуальный rise + удар, длительность до `1.4 s` | 7 связанных вариантов | `1.5 s`; polyphony 1; higher stage wins |
-| Stage-down | Мягкое осыпание углей без fail-jingle | 2 | `800 ms`; polyphony 1 |
-| Слуга: появление | Зольный swirl и короткая ухмылка-выдох без речи | 2 | `2 s`; polyphony 1 |
-| Слуга: выдох/debuff | Направленный воздушный whoosh с холодным tail | 3 | `500 ms`; polyphony 2 |
-| Слуга: порыв отменён | Короткий тёплый ash-pop | 2 | Один на успешные 4 taps; polyphony 1 |
-| Демонесса: reveal | Низкий metallic bloom | 1 | Один раз за reveal; polyphony 1 |
-| Демонесса: cast | Обратный рунический sweep + impact | 2 | `1 s`; polyphony 1 |
-| Клеймо разрушено | Шесть осколочных accents, собранных в короткий release | 1 | Один на успешные 6 taps; polyphony 1 |
-| Debuff active | Тихая cold shimmer-петля | 1 loop | Только один instance; fades `150 ms` |
-| Debuff end | Тёплый release и возврат crackle | 2 | `500 ms`; polyphony 1 |
-| Inferno entered | Самый полный rise/impact, без clipping | 1 | Один раз на вход; polyphony 1 |
-| Окно жара | Собирающийся tonal ring / активный bright hiss | 1 / 1 | Telegraph и active; не чаще event schedule |
-| Rewarded CTA | Тихий трёхнотный намёк, только по focus/hover | 1 | `2 s`; polyphony 1 |
-| Rewarded confirmed | «Печать» из low impact, восходящей квинты и огненного bloom | 1 | Один раз только после rewarded callback |
-| Rewarded ending | Три мягких затухающих tick в последние 3 секунды | 1 sequence | Один sequence; не перекрывает tap |
-| Rewarded ended | Спокойное снятие ауры без fail-tone | 1 | Один раз; polyphony 1 |
-| UI press / disabled | Сухой stone tick / muted knock | 2 / 1 | `80 ms`; общий pool 2 |
-| Personal best | Короткий золотой chord, отличный от stage-up | 1 | Один раз за сессию при первом превышении |
-
-## Tap feedback
-
-- AudioContext создаётся/возобновляется только из первого `pointerdown` или другого явного user gesture; до этого игра визуально работает без ошибки.
-- Sample уже декодирован и находится в пуле до активного gameplay. Цель: onset звука не позже `50 ms` после принятого input на target device.
-- Шесть вариантов выбираются shuffle-bag алгоритмом: один и тот же вариант не играет дважды подряд. На каждый voice применяются pitch `±3%`, gain `±1.5 dB` и stereo pan максимум `±0.12` на desktop; на mono mobile pan отключается.
-- При input быстрее `25 ms` новые звуки не наслаиваются бесконечно: лишние taps агрегируются в один более плотный accent на следующем `50 ms` окне. Визуальный и игровой tap при этом не теряются.
-- Tap-bus немного ярче при heat, но общий gain ограничен. Ни скорость воспроизведения, ни pitch не растут без верхней границы.
-
-## Progression audio
-
-| Стадия | Music/ambient state | Особый акцент |
+| Layer | Assets | Role |
 |---|---|---|
-| 1. Тьма | Dark bed + room tone + тихий crackle A | Почти пустой спектр, редкие угольные clicks. |
-| 2. Искра | Добавляется low pulse, crackle следует heat | Первый тёплый stage-up. |
-| 3. Пепельный слуга | Состав стадии 2, появляется character SFX | Выдох кратко duck'ит crackle на `2 dB`. |
-| 4. Алый порог | Добавляются percussion, chain ambience и crackle B | Удар врат/рунический rise. |
-| 5. Демонесса угасания | Добавляется infernal tone | Cast duck'ит music на `3 dB` на `450 ms`; active cold loop обозначает debuff. |
-| 6. Круг Инферно | Все слои кроме climax; whispers texture тихо | Перкуссия открывает фильтр, accents становятся плотнее. |
-| 7. Инферно | Добавляется climax, stems достигают nominal gain | Уникальный enter cue; tap/score feedback остаётся впереди микса. |
+| Wood/ember bed | `assets/audio/fire/embers-wood-bed.{ogg,mp3}` | Основной 29.26 s fire loop |
+| Charcoal crackle | `assets/audio/fire/charcoal-crackle.{ogg,mp3}` | Негромкий 3.59 s crackle loop |
+| Fanning A/B/C | `assets/audio/fan/fan-soft-{a,b,c}.{ogg,mp3}` | Три 0.75 s варианта раздувания |
 
-При stage-down слой уходит, но музыка не «наказывает» диссонансом. Возврат в уже достигнутую стадию снова даёт stage-up cue, однако не чаще одного раза в `1.5 s`. Personal-best cue имеет приоритет выше обычного stage-up, а Inferno enter — выше personal best. Резонанс, Вспышка, Передышка, Порыв слуги, Клеймо и Окно жара используют отдельные cues и не зависят от слышимости музыки; при mute их полностью дублируют visual indicators из `ART_DIRECTION.md`.
+OGG Vorbis — primary, MP3 — matching browser fallback. Runtime не загружает внешние URL; source pages, авторы, CC0, edits и hashes записаны в `assets/PROVENANCE.md`, `assets/AUDIO_CREDITS.txt` и manifest.
 
-## Rewarded boost audio
+## Sound character
 
-«Печать Инферно x2» даёт `tapPower×2` на 20 секунд активного gameplay и начинается только после `rewarded: true`, закрытия рекламы и фактического resume от platform adapter. На подтверждении звучит отдельный `sfx-boost-start`; active state добавляет тихий синхронный `music-boost-shimmer` stem и усиливает high crackle не более чем на `1.5 dB`. Последние 3 секунды обозначаются мягким countdown cue. В конце boost stem уходит за `350 ms`, звучит neutral end cue, основной mix продолжает текущую stage без reset.
+- Wood bed: uneven dry crackle, ember body и open-air space; steady jet hiss, propane roar и tonal hum запрещены.
+- Crackle: редкие transient pops ниже уровня основного действия; слой не должен превращаться в короткий очевидный loop.
+- Fanning: мягкий широкий air push с быстрым входом и длинным спадом; не click, laser, pitched sweep или одинаковый per-tap whoosh.
+- Taps не создают pitch ladder, score jingle или hidden rhythm cue.
+- Stage и character one-shots не входят в текущий candidate registry и не заявляются как реализованные.
 
-- Cancel/error/ad unavailable: reward audio и active layer не запускаются; после возврата восстанавливается прежний mix.
-- Duplicate callback: lifecycle token позволяет выдать cue и reward ровно один раз.
-- Pause/background во время active boost: аудио и 20-секундный active-time таймер заморожены одной политикой; после resume остаток эффекта продолжается, новый start cue не звучит.
+## Tap aggregation
 
-## Loop requirements
+Gameplay продолжает принимать каждый valid tap. Audio получает те же `tap-accepted` events, но только presentation-слой:
 
-- Music stems: ровно `20.000 s`, `48 kHz`, phase-aligned, одинаковые loop markers `0` и `960000` samples, stereo.
-- Ambient loops: `8–30 s`, sample-accurate end-to-start, mono где spatial width не нужна; перед экспортом проверяются на click и DC offset.
-- Active debuff/boost loops: `5–10 s`, отдельные fade-in/out до `350 ms`; baked fade на границе loop запрещён.
-- Primary delivery — Opus `48 kHz`; fallback — MP3 `44.1/48 kHz`. Runtime выбирает ровно один совместимый format pack и не загружает оба.
-- Metadata/loop points фиксируются в asset manifest, а не только в имени файла. Все source masters остаются lossless вне release bundle; в `assets/audio/` планируются только оптимизированные exports.
+1. собирает их в 120 ms окно;
+2. выбирает один из трёх fanning buffers;
+3. не стартует новый fan чаще чем раз в 180 ms;
+4. допускает максимум 2 одновременных fan voices;
+5. меняет gain в ограниченном диапазоне по размеру burst, не меняя playback rate или core state.
 
-## Громкость и микс
+Таким образом частое раздувание слышимо, но не становится пулемётом и не влияет на heat/score.
 
-- Master target при полном составе: `-14 LUFS-I`, true peak не выше `-1 dBTP`.
-- Music stems как группа: nominal `-20 LUFS`, ambience `-30…-25 LUFS`, tap transient peaks около `-12 dBFS`, stage/reward cues не выше `-8 dBFS` до master limiter.
-- Tap/critical cue sidechain-duck'ит music максимум на `1.5 dB`/`80 ms`; enemy cast — максимум `3 dB`/`450 ms`; UI не duck'ит музыку.
-- One-shot limiter защищает от rapid taps, но не должен заметно pump'ить ambient. Проверка проходит на максимальной разрешённой input rate.
-- Controls: явная mute/unmute кнопка, состояние сохраняется; стартовое значение следует сохранённой настройке, при её отсутствии — unmuted, но звук не стартует до user gesture. Изменение system volume не симулируется.
-- При reduced sensory mode whispers выключены, high-frequency crackle ниже на `3 dB`, все важные состояния сохраняют distinct cues.
+## Runtime graph
 
-## Pause, focus и реклама
+```text
+wood loop ─────┐
+crackle loop ──┴→ ambienceBus ─┐
+fan voices ─────→ fanBus ──────┼→ master → destination
+                               └→ mute/pause envelope
+```
 
-Единый audio lifecycle управляется application state machine, а не отдельными рекламными callbacks:
+- После trusted gesture assets загружаются одной coalesced попыткой.
+- OGG decode failure пробует соответствующий MP3; неудача конкретной пары даёт silence без refetch на каждый tap.
+- Максимум 2 ambience + 2 fan sources; `AudioMixerState` hard cap — 10 voices.
+- Stage увеличивает ambienceBus в узком диапазоне; tap rate не управляет EQ/pitch/loop cadence.
+- Reduced sensory снижает ambience/fan gains, сохраняя visual feedback.
 
-1. Перед показом рекламы gameplay переводится в pause, new one-shots блокируются, master плавно уходит в silence за `100 ms`, после чего AudioContext suspends.
-2. `visibilitychange=hidden`, blur или platform pause применяют ту же idempotent pause-операцию. Несколько причин хранятся как set; один resume не снимает другие причины.
-3. После закрытия рекламы platform adapter возвращает callback. Resume допускается один раз только когда callback завершён, document visible, window focused и пользователь не включил mute.
-4. AudioContext resumes из допустимого gesture/callback path; loop transport синхронизируется с сохранённой musical phase, затем master возвращается за `250 ms`. Просроченные one-shots не доигрываются.
-5. При отказе браузера возобновить context UI остаётся рабочим и показывает ненавязчивый mute/audio-locked state; следующий pointerdown повторяет resume.
-6. Reward cue воспроизводится только после confirmed reward и после допустимого resume. При cancel/error восстанавливается прежняя stage mix без reward cue.
+## Lifecycle
 
-Таймеры boost/debuff и audio lifecycle должны следовать одной gameplay pause policy. Нельзя продолжать boost countdown, пока platform pause останавливает игру.
+1. До trusted gesture не создаётся playable source и не возникает autoplay rejection.
+2. Menu, visibility, platform и ad reasons образуют set. Первый reason плавно глушит master ≤100 ms, последний resume возвращает его за 250 ms.
+3. Pause очищает pending fan window; после resume нет catch-up burst.
+4. Mute имеет приоритет над resume.
+5. Destroy останавливает loops/voices, очищает timers и закрывает context; late decode не может создать source.
 
-## Handoff и риски
+## Objective QA
 
-- Решено: five-stem adaptive score, отдельные ambient/SFX buses, bounded tap polyphony, sample-accurate loops и idempotent ad/focus lifecycle.
-- Главный риск — fatigue от частых taps. Митигация: shuffle bag, малые randomization ranges, 25 ms cooldown, voice aggregation и ограниченный high-end.
-- Риск рассинхронизации stems после suspend/resume требует общего transport clock и automated phase/duplicate-resume test.
-- Риск размера bundle снижается codec selection, lazy preload будущих layers и лимитами `ASSET_PLAN.md`.
-- Финальные audio files на planning stage не создаются; до производства необходимы лицензия/provenance и loudness/loop QA каждого export.
+### Automated
+
+- OGG/MP3 magic, bytes, hashes, durations, license and credits match manifest.
+- `createOscillator`, generated noise, pitch ladder и legacy `fire-loop.*` references в production source = 0.
+- Repeated unlock starts exactly two ambience sources once.
+- Failed decode performs one bounded codec pass and does not refetch on later taps.
+- 100 rapid taps preserve gameplay events while fan starts follow 120/180 ms limits; active fan voices ≤2.
+- Pause/mute/destroy/resume rejection paths produce no unhandled promise and no duplicate source.
+
+### Perceptual
+
+Нужны два независимых слушателя на exact build:
+
+1. Оба классифицируют base bed как «дерево/угли/открытый огонь»; ответ «газ/горелка/факел/струя» = FAIL.
+2. Оба слышат при серии taps раздувание/опахало; «клик/лазер/ритм/синтетический свист» = FAIL.
+3. За 10 минут нет audible seam click/pop, раздражающего high hiss или fatigue >2/5.
+4. Mute, background и provider pause дают тишину; resume не даёт burst.
+
+## Mix guardrails
+
+- Master decoded/mixed peak должен оставаться ≤−1 dBFS.
+- Wood bed ниже fanning attention; crackle значительно тише wood bed.
+- Fanning gain capped, variants rotate; одновременная сумма не должна маскировать HUD/system audio.
+- Компрессор/limiter не используется для превращения плохого steady hiss в «огонь».
+
+## Status and risk
+
+Registry, codec fallback, source lifecycle и aggregation покрыты автоматическими тестами. Субъективное соответствие «не газовая горелка» и отсутствие loop seam ещё не являются PASS: это внешний listening gate до release. Если новый bed снова воспринимается как газовый, меняется сам source asset, а не EQ поверх него.

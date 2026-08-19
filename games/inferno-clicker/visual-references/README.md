@@ -18,3 +18,9 @@
 - `stage-references/` — окружение, уровни, backgrounds и lighting.
 
 Если референсы конфликтуют со спецификацией, mobile constraints или читаемостью, агент фиксирует конфликт и предлагает адаптацию; референс не переопределяет требования молча.
+
+## Локальный reference set
+
+В `stage-references/` сохранены семь browser-captured reference views и один contact sheet, соответствующие remote-последовательности `22_45_07`, `22_45_14`, `22_45_23`, `22_45_28`, `22_45_33`, `22_45_40`, `22_45_46` из `cifronomka/game-factory/main`. Они нужны для воспроизводимого mood/composition review в рабочей копии, но не являются оригинальными production masters и не копируются в `assets/` или `dist/`.
+
+Production ImageGen outputs имеют независимый brief/provenance в `assets/PROVENANCE.md`; пиксели reference views не отгружаются.

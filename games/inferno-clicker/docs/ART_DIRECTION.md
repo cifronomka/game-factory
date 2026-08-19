@@ -1,152 +1,85 @@
 # Art Direction — «Зажги»
 
-## Назначение
+## Corrective Cycle 02
 
-Документ задаёт визуальную систему игры «Зажги» и правила её консистентности. Производственный перечень файлов находится в `ASSET_PLAN.md`; материалы из `visual-references/` используются только как ориентиры после проверки прав и не считаются готовыми production assets.
+Пользовательский review 2026-08-20 установил новый baseline: огонь должен читаться как движущиеся языки пламени, а не как деформируемая статичная карточка; смена стадий должна быть анимирована; Пепельный слуга и Демонесса угасания должны иметь появление, живой idle и отдельное тушащее действие.
 
-## Визуальный стиль
+Concept art из `visual-references/` задаёт mood, palette, fixed hearth/camera и путь darkness → Inferno. Его нельзя использовать как fullscreen screen или копировать пиксели в production. Persistent world, characters, flame layers, particles, runes, glow, smoke, overlays, HUD и transition FX остаются раздельными.
 
-Направление: **stylized dark fantasy / infernal occult casual**. Это таинственное, выразительное и слегка дерзкое фэнтези, а не хоррор. Главная эмоция — любопытство: свет центрального пламени постепенно позволяет рассмотреть всё более масштабный мир.
+## Visual language
 
-- Формы крупные и хорошо читаемые, с мягко заострёнными силуэтами, умеренной орнаментальностью и рисованной фактурой камня, золы и металла.
-- Контраст строится между почти чёрной холодной периферией и тёплым красно-оранжевым центром. Цвет сообщает механику: жар — тёплый, подавление — краткий холодный фиолетово-бирюзовый акцент, награда — бело-золотое ядро с малиновым ореолом.
-- Персонажи харизматичны и театральны, не натуралистичны. Допустимы рога, хвосты, маски, рунические детали и преувеличенные жесты.
-- Не допускаются gore, кровь, расчленение, натуралистичные повреждения, шок-контент, эротизация, откровенная одежда или позы, фотореалистичный оккультизм и мелкие пугающие детали.
-- Пламя, UI и критически важные сигналы не полагаются только на красно-зелёное различие; форма, яркость и движение дублируют смысл.
+- Dark-fantasy / infernal-casual, 12+, без gore, nudity, sexualized pose и реальных культовых символов.
+- Portrait logical canvas `1080×1920`; landscape сохраняет центральный hearth и не растягивает art.
+- Палитра: soot/charcoal → ember orange → scarlet → white-gold. Rewarded state добавляет purple-gold, не подменяя normal Inferno.
+- Источник света — очаг. Мир раскрывается теми же слоями, а не семью разными backplates.
+- Верхний title plaque из references — layout cue; игровой текст остаётся DOM HUD.
 
-Семь PNG из `visual-references/stage-references/` являются главным mood/composition reference для постепенного раскрытия камеры, но не production assets. Их provenance/licensing пока не подтверждены отдельной записью, поэтому допустимо только reference use; все runtime exports создаются заново, декомпозируются и получают provenance в asset manifest.
+## Seven-stage reveal
 
-### Разбор текущих visual references
+| Stage | Main reveal | Flame treatment |
+|---:|---|---|
+| 1 | Почти чёрный chamber, едва заметный ritual anchor | low family, маленький authored loop |
+| 2 | Рунный круг и трещины начинают читаться | low family + stage flare |
+| 3 | Появляется Ash Servant | low→mid crossfade, appearance→idle |
+| 4 | Gate/chains/scarlet accents, Demoness silhouette | mid family + stage flare |
+| 5 | Demoness раскрывается и действует | mid family, appearance/idle/cast/hold |
+| 6 | Ritual circle, pylons и distant host | mid→high crossfade |
+| 7 | White-gold climax, watchers/winged host | high family with reinforced high-core pass |
 
-Все семь изображений имеют portrait-композицию `941×1672` и показывают одну камеру с нарастающим светом. Они задают value hierarchy, перспективу, плотность reveal и масштаб кульминации, но не точные runtime pixels.
+Снижение stage использует тот же authored stage-flare atlas в обратном порядке с cool tint и root-locked target. Это осознанный V2 candidate contract: отдельный collapse atlas не заявляется. Каждый boundary дополнительно меняет environment reveal и glow за 0.8–1.5 s.
 
-| Reference stage | Что берём как ориентир | Что реализуется отдельно / адаптируется |
-|---|---|---|
-| 1. Тьма | Почти чёрная камера, крошечный ember на центральном ритуальном круге | Far chamber, ritual plane, darkness mask, flame core и onboarding pulse — отдельные layers |
-| 2. Искра | Тёплый локальный свет раскрывает ближний камень и часть круга | Cracks/runes emissive masks, outer flame, glow, embers и floor overlays |
-| 3. Пепельный слуга | Слуга слева от пламени, направленный выдох, более читаемая арка | Character atlas/state machine отдельно от flame; ash stream и counter ring процедурные |
-| 4. Алый порог | Врата, цепи, дальний силуэт и красный bounce light | Gate, pylons, chains, distant silhouette, crack light и transition burst — независимые assets |
-| 5. Демонесса угасания | Центральный властный персонаж и огненные tendrils | Полностью новый stylized non-sexualized closed-armor design; исходную фотореалистичность, декольте/открытую ногу и статичный full-screen pose не переносить |
-| 6. Круг Инферно | Полный круг/руны, высокое широкое пламя, цепи и плотная камера | Rune sets, pylons, observers, flame ribbons, smoke/haze и controlled particles по отдельности |
-| 7. Инферно | Бело-золотой вертикальный столб, lightning, силуэты и максимальное раскрытие | Stage-7 beam, arcs, silhouettes, glow/distortion и environment overlays с жёсткими caps; сохранить тёмную HUD/periphery zone |
+## Authored flame
 
-Верхняя декоративная плашка с названием стадии — только композиционный пример. Production HUD остаётся DOM/CSS, использует scalable panel/typography и показывает score/multiplier/progress без запекания текста в raster. Concept PNG запрещено добавлять в runtime как flat portrait/landscape background или crossfade между семью полными экранами.
+- Low: core 8 frames + outer 8 frames, `256×512` cells, 10 fps.
+- Mid: core 10 + outer 10, `320×640` cells, 10 fps.
+- High: core 12 + outer 12, `256×640` cells, 11 fps.
+- Core и outer имеют независимые фазовые offset и общий root pivot `(0.50,.965)`.
+- Family switch crossfade: 1.05 s; вход Stage 7: 1.5 s.
+- Stage flare: 8 frames, 8 fps one-shot, forward upward / reverse + cool tint downward.
 
-## Палитра
+Кадры меняют silhouette, развилки, отрывы и negative spaces. Tint/opacity/scale/glow не засчитываются как authored frame variation. Geometric flame, moving crop, slice deformation и static-card fallback запрещены. Procedural остаются только glow/light masks, embers, smoke/haze и bounded tap/seal impulses.
 
-| Роль | Цвет/диапазон | Контраст/применение |
-|---|---|---|
-| Глубокая тьма | `#060609`–`#101016` | Фон и края сцены; не использовать как единственный контур интерактивного объекта. |
-| Холодный камень | `#18171F`–`#34303B` | Окружение, проявляющееся от света; локальный контраст с огнём не ниже 3:1 для важных форм. |
-| Пепел/кость | `#6F6870`–`#B0A49A` | Вторичные фактуры и нейтральный текст; не имитировать кровь или останки. |
-| Уголь | `#3B1613`–`#7A2419` | Внутренняя масса огня, трещины, глубокие руны. |
-| Алое пламя | `#C52E1A`–`#F05A24` | Основной игровой акцент и рост heat. |
-| Горячее золото | `#FF9B32`–`#FFD36A` | Ядро пламени, stage-up и положительная обратная связь. |
-| Белый жар | `#FFF0C2` | Короткие пики, critical tap и Инферно; площадь ограничить, чтобы не терять иерархию. |
-| Холодное угасание | `#51407F`–`#55A6A0` | Только debuff/подавление; вместе с кольцевой формой и замедлением, не только цветом. |
-| Rewarded power | `#9A5CFF` + `#FFE38A` | «Печать Инферно x2»; отдельная фиолетово-золотая аура поверх обычного огня. |
-| UI-текст | `#F4E9D8` / `#BDB1A7` | Основной/вторичный текст; контраст к подложке не ниже 4.5:1. |
+Tap не выбирает кадр и не ускоряет animation loop. Height/brightness impulse визуально подтверждает раздувание и ограничивается presentation cap; gameplay принимает taps независимо.
 
-## Композиция и слои
+## Character animation
 
-Центр игровой зоны — пламя на ритуальном очаге. Вокруг него строятся концентрические кольца раскрытия, поэтому даже без текста направление действия понятно. Score и multiplier находятся над очагом, stage progress — вокруг/под ним, а кнопка добровольной награды и системные controls не перекрывают tap-zone.
+### Ash Servant
 
-Сцена должна собираться из независимых слоёв:
+- `appearance`: 6 frames at 10 fps, once.
+- `idle`: 6 frames at 8 fps, loop; перенос веса, дыхание, движение головы/плеч.
+- `inhale`: 6 frames at 10 fps, once during telegraph.
+- `blow`: 6 frames at 10 fps, loop during effect.
+- Отдельный ash stream связывает mouth/action lane с outer flame.
 
-1. **Far background** — почти чёрная архитектурная масса и виньетка; покрывает весь viewport.
-2. **Midground architecture** — камни, дальние арки, врата и опоры; проявляется маской освещения.
-3. **Ritual plane** — круг, трещины и руны в перспективе; его раскрытие является главным индикатором stage progress.
-4. **Characters/observers** — Пепельный слуга, Демонесса угасания и дальние наблюдатели; каждый имеет отдельные states и hit-independent placement.
-5. **Foreground framing** — цепи, край каменной площадки, зола; не закрывает центр и UI.
-6. **Dynamic light/occlusion** — радиальный свет, локальные свечения, холодная маска debuff; генерируются во время выполнения.
-7. **FX** — пламя, дым, угольки, искры, heat distortion и stage burst; процедурные и масштабируемые по quality/reduced motion.
-8. **HUD/overlays** — score, multiplier, stage, boost/debuff indicators, mute и modal states; всегда поверх художественных слоёв.
+### Demoness
 
-Portrait reference canvas — `1080×1920`. Центральная action-zone занимает примерно `x=190…890`, `y=530…1510`; ядро огня находится около `50%` ширины и `62%` высоты. Верхняя HUD-zone — `y=120…420`, нижняя auxiliary-zone — `y=1530…1790`. Контент вне центральных 70% ширины считается декоративным и может обрезаться.
+- Закрытый 12+ redesign, никакой сексуализации concept pose.
+- `appearance`: 6 frames at 10 fps, once.
+- `idle`: 6 frames at 8 fps, loop.
+- `cast`: 6 frames at 10 fps, once during telegraph.
+- `hold`: 6 frames at 10 fps, loop during effect.
+- Отдельная cold ribbon связывает hand/action lane с hearth.
 
-Для landscape сцена расширяется по бокам темнотой/архитектурой, не растягивается. Центральная игровая колонка ограничивается `min(72vw, 760px)`, HUD переезжает по бокам только при ширине от `900px`. Все края учитывают CSS `env(safe-area-inset-*)`; minimum inset для содержимого — `16 CSS px` после safe area.
+После effect state machine возвращается в `idle`; recovery выражен последними action poses и переходом в idle, отдельного recovery asset нет. Pause замораживает application clock. Персонаж не перекрывает центральный tap target и остаётся отдельным от flame/environment.
 
-## UI language
+## Quality tiers
 
-- Панели — тёмный полупрозрачный камень/дым с тонкой тёплой кромкой; без тяжёлых рамок и мелкой филиграни.
-- Primary typeface — системный стек `system-ui, Arial, sans-serif`; декоративные руны никогда не заменяют читаемый текст. Цифры score используют tabular numerals.
-- Основные числа: минимум `28 CSS px` на reference viewport; вспомогательный текст — минимум `16 CSS px`; multiplier — минимум `20 CSS px`.
-- Любая интерактивная область — не менее `48×48 CSS px`, расстояние между соседними controls — не менее `8 CSS px`.
-- Нажатие на игровую зону даёт ответ за один кадр: короткое сжатие/вспышка ядра, импульс кольца и 1–3 искры. UI-кнопка имеет default, pressed, disabled, focus-visible и loading states.
-- Stage-up одновременно меняет название, контур прогресса, свет сцены и даёт короткую вспышку; debuff имеет холодное кольцо/иконку и countdown. Никакая механика не сообщается одним цветом.
-- Яркость вспышек ограничена: не более трёх полноэкранных вспышек в секунду и без резкой инверсии экрана. В режиме reduced motion полноэкранные вспышки заменяются статическим ореолом.
+- High: native authored fps, ≤80 embers, ≤24 smoke, ≤2 pulses.
+- Low: те же authored frames с ограниченными particles; static fallback запрещён.
+- Off/reduced: authored poster/спокойная выборка кадров, impulse/flash и частицы сокращены, но telegraph/effect pose остаются различимы.
+- Auto downgrade меняет presentation cost, но не gameplay timing.
 
-### Язык игровых сигналов
+## Visual QA rubric
 
-- **Резонанс:** вокруг очага последовательно загораются четыре янтарных сегмента. Они соответствуют ровно четырём ритмичным accepted taps; слишком ранний сброс быстро стягивает сегменты к центру без красного «наказания».
-- **Вспышка, 1,5 s:** после четвёртого заряда кольцо расширяется, ядро становится бело-золотым, а DOM multiplier получает ясный `×2` rhythm accent. Сигнал отличается от фиолетово-золотой rewarded-печати формой и цветом.
-- **Передышка, 1,0 s:** кольцо сжимается и становится пунктирным; рядом появляется короткая подсказка-пиктограмма паузы. Tap остаётся возможным, поэтому pressed feedback не выключается.
-- **Порыв слуги:** на телеграфе `1,0 s` слуга делает вдох, направленные частицы собираются от огня к нему, а над очагом показывается 4-сегментный counter. Успех разбивает counter тёплой вспышкой; провал переводит поток в холодный выдох.
-- **Холодное клеймо:** за `2,0 s` шесть участков холодного кольца должны разрушаться по одному на accepted tap. Неразбитые участки замыкаются в static debuff ring с countdown `4,0 s`.
-- **Окно жара:** отдельное золотое кольцо собирается `0,75 s`, затем расширяется и остаётся активным `1,50 s`. Оно не похоже ни на холодный debuff, ни на фиолетовые дуги рекламы.
-- **Слишком быстрый ввод:** ignored tap может дать малый серый ripple/короткую подпись, но не flame burst, progress segment или score pop-up; feedback ограничен одним разом в `500 ms`.
-- **Убывающая отдача:** принятый tap с `cadenceFactor<1` сохраняет обычный feedback, но дополнительно даёт короткое нейтральное ash-ring с интенсивностью, обратной factor. Это объясняет soft fatigue curve без красного наказания; rejected tap №9+ по-прежнему использует отдельный throttled too-fast cue.
+PASS требует exact-build evidence:
 
-## Characters
+1. За 2 s idle минимум 12 sampled frames и минимум 8 различных authored flame cells; silhouette tongues действительно меняются.
+2. Каждый из шести upward boundaries и применимые downward boundaries показывает ≥3 промежуточных состояния без pop/black frame/root jump.
+3. Servant и Demoness в blind test различимы в appearance/idle/attack; attack cause и влияние на flame читаются без HUD label.
+4. Characters/host/HUD остаются читаемы на `360×640`, `390×844`, `768×1024`, `1366×768` и `800×360`.
+5. Reduced Motion не превращает actors/flame в прежние static cards и не меняет encounter timing.
+6. P05→P100 сохраняет сильный последовательный reveal; Inferno не выжигает HUD и silhouettes.
 
-### Пепельный слуга
+## Remaining risk
 
-Небольшой бес размером около 28% высоты action-zone: крупная голова, угольные рожки, короткий плащ из золы, выразительные брови и самоуверенная ухмылка. Силуэт асимметричен за счёт хвоста/плеча, но лицо читается на ширине 90 CSS px. Он не выглядит ребёнком, животным-жертвой или телесным ужасом. States: hidden, emerge, idle, inhale, blow/debuff, retreat. Вихрь его выдоха — отдельный процедурный FX.
-
-### Демонесса угасания
-
-Крупный персонаж второго плана, видимая высота 45–55% action-zone. Дизайн властный и церемониальный: рогатая корона/маска, многослойный закрытый костюм-доспех, длинный графичный силуэт, холодное руническое свечение в ладонях. Никаких декольте, бельевой стилизации, эротических поз или гиперреалистичной анатомии. States: silhouette, reveal, idle, cast, suppression-hold, release/fade. Во время cast руки и холодное кольцо должны оставаться заметными за пламенем.
-
-### Наблюдатели
-
-Не отдельные монстры крупным планом, а 3–5 абстрактных силуэтов в арках с парными глазами и медленным параллаксом. Они создают масштаб, не хоррор-скример. Глаза не мигают чаще одного раза за 4 секунды и исчезают при reduced motion.
-
-## Backgrounds
-
-Окружение — единая инфернальная ритуальная камера с фиксированной перспективой. Far layer остаётся тёмным; midground и ritual plane раскрываются световой маской, а foreground задаёт глубину. Каждый смысловой объект хранится отдельно: врата, круг, цепи, руны, трещины, персонажи. Декоративные руны не повторяют реальные экстремистские/религиозные символы; используется оригинальный абстрактный алфавит.
-
-Параллакс очень мал: far `0.2×`, mid `0.5×`, foreground `0.8×` от нормализованного pointer/tilt displacement, максимум 6/10/14 CSS px. Device orientation не запрашивается; pointer parallax отключён на touch и при reduced motion. Crop работает через cover для far background и anchored contain для смысловых слоёв. Вертикальный очаг и персонажи не обрезаются в диапазоне `320×568`–`1440×2560` и landscape `568×320`–`2560×1440`.
-
-## Visual progression: семь стадий
-
-| Стадия | Что видно | Пламя/свет | Новые сигналы и движение |
-|---|---|---|---|
-| 1. Тьма | Только контур очага и 5–10% ритуального круга; окружение скрыто. | Уголёк с радиусом света около 8% короткой стороны. | Единичная пылинка; никаких персонажей и активных рун. |
-| 2. Искра | Ближние камни, зола, 25% круга, первые трещины и 2–3 руны. | Небольшое красно-оранжевое пламя, радиус около 18%. | Тихие угольки и мягкий импульс рун. |
-| 3. Пепельный слуга | 40% круга и боковая ниша, из которой выходит слуга. | Пламя устойчивее, жёлтое ядро; при выдохе наклоняется и холодеет по краю. | Отдельные emerge/blow states, направленный поток пепла и debuff-кольцо. |
-| 4. Алый порог | 60% сцены: инфернальные врата, цепи, крупные руны и огненные трещины. | Высота огня примерно 34% action-zone, активный красный bounce light. | Цепи слегка отклоняются, за вратами виден силуэт Демонессы. |
-| 5. Демонесса угасания | 75% сцены и полностью читаемый крупный персонаж. | Плотное бело-золотое ядро; при suppression появляется холодная внешняя оболочка, не скрывающая heat. | Reveal/cast персонажа, руническое кольцо подавления, countdown в HUD. |
-| 6. Круг Инферно | 90% камеры: арки с наблюдателями, полный круг, дополнительные цепи и руны. | Широкое пламя, больше угольков и мягкая heat haze. | 3–5 силуэтов, более быстрый пульс рун, максимум 60 ember particles. |
-| 7. Инферно | Вся смысловая сцена; периферия сохраняет тёмную рамку для контраста. | Мощный вертикальный столб до 72% action-zone, белое ядро, золотой/алый ореол. | Активен полный круг, до 80 угольков, quarter-resolution distortion; multiplier и hold-time получают высший приоритет. |
-
-При снижении стадии раскрытые элементы не исчезают мгновенно: их свет за `0.8–1.5 s` уходит в силуэт. Это только presentation fade и не задерживает stage/gameplay state: согласно `GAME_DESIGN.md` stage пересчитывается без гистерезиса. Art реагирует на дискретный `stageChanged` и непрерывный нормализованный `stageProgress`.
-
-Rewarded-режим «Печать Инферно x2» даёт `tapPower×2` ровно на 20 секунд активного gameplay, не меняет stage напрямую и не маскирует debuff: вокруг ядра появляется фиолетово-золотая печать из трёх дуг, у искр появляется золотой хвост, а отдельный DOM HUD countdown показывает остаток эффекта. Таймер стартует только после закрытия рекламы и фактического resume. За 3 секунды до конца аура плавно ослабевает; завершение не выглядит как потеря heat.
-
-## Consistency rules
-
-- Один источник ключевого света — пламя; холодная магия является временным вторичным источником. Тени и rim light всегда согласованы с ними.
-- Смысловые контуры имеют толщину не менее 2 physical px после масштабирования; мелкая фактура не должна создавать шум вокруг score, multiplier и огня.
-- Все characters, ritual decals, gates и foreground экспортируются отдельно с прямым alpha; premultiplied alpha выполняется только в renderer, чтобы избежать тёмных ореолов.
-- Камера фиксирована, перспектива ритуальной плоскости и персонажей едина. Нельзя масштабировать персонажа для stage-up вместо подготовленного состояния/позиции.
-- Layered scene рендерится PixiJS, читаемый HUD — DOM/CSS поверх canvas. Пламя и частицы создаются процедурно; raster flame loop не используется. Concept art не используется как background целиком.
-- Не рисовать реальные бренды, письменные заклинания или узнаваемые религиозные/экстремистские знаки. Руны — оригинальные абстрактные glyphs.
-- Для asset review обязательны: силуэт на `360×640`, grayscale value check, симуляция deuteranopia/protanopia, UI contrast audit и просмотр reduced-motion режима.
-
-## Ограничения mobile browser
-
-- **Minimum readable/touch sizes:** текст `16 CSS px`, ключевые числа `20–28 CSS px`, touch target `48×48 CSS px`, safe gap `8 CSS px`.
-- **Aspect ratios/orientation:** portrait — primary (`9:16`, `3:5`, `2:3`); landscape (`16:9`, `18:9`, `4:3`) — обязательный адаптивный fallback без поворота устройства.
-- **DPR:** render scale ограничивается `min(devicePixelRatio, 2)`; FX buffer — максимум `0.75×`, distortion — `0.25×` основной поверхности.
-- **Texture/download budget:** art ≤ `4.0 MB` compressed total, critical-first-load art target ≤ `1.8 MB` и hard cap `2.0 MB`, чтобы весь initial JS/CSS/assets payload оставался ≤ `3.0 MB`; decoded textures target ≤ `48 MB`, hard cap `64 MB`; ни одна texture dimension не выше `2048 px`; полный release package ≤ `15 MB`.
-- **Runtime budget:** до 80 ember, 24 smoke и 2 ripple emitters одновременно на high quality; low quality — 28/8/1; off — particles, parallax и distortion отключены, остаются static flame/light/state indicators. Никаких runtime blur больше 24 CSS px на full-resolution canvas.
-- **Reduced motion:** отключает parallax/distortion/camera impulse, сокращает частицы минимум на 60%, заменяет циклические вспышки статическим glow; игровые таймеры и feedback сохраняются.
-- **Contrast/fallback:** при отключённых shader/filters остаются отдельные flame core sprite/vector, stage label, progress ring и debuff/boost icons; контент остаётся понятным без blend modes.
-
-## Handoff и риски
-
-- Решено: единая layered-сцена, семь проверяемых visual states, процедурное пламя/FX, отдельные non-sexualized characters, portrait-first с полноценным landscape fallback.
-- Текущие seven-stage concepts разобраны и используются как reference-only; внешний блокер перед производством — подтверждённый provenance/licensing и отдельные оригинальные exports по `ASSET_PLAN.md`.
-- Главный риск — GPU overdraw от света, дыма и distortion. Митигация: малые FX buffers, particle caps, quality tiers `high/low/off` и hard decoded-memory cap.
-- Риск визуального шума на стадиях 6–7 снижается сохранением тёмной периферии и неизменной HUD-zone.
-- Проверка готовности направления: все visual assets из `ASSET_PLAN.md` должны пройти mobile silhouette/contrast/crop/reduced-motion review до статуса READY.
+Автоматические atlas/state/pause/preload tests проходят, но они не доказывают субъективную плавность. Главные открытые риски: generative identity drift между character cells, frame-to-frame flame flicker и близость worst decoded residency `61.29 MiB` к hard limit `64 MiB`. До release нужны browser motion capture, quantitative frame comparison и два независимых visual reviewer.

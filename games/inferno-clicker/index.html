@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+    <meta name="theme-color" content="#07070b" />
+    <meta name="description" content="Зажги — infernal-casual игра о живом пламени и личном рекорде." />
+    <link rel="stylesheet" href="./src/styles.css" />
+    <title>Зажги</title>
+  </head>
+  <body>
+    <div id="app" aria-live="polite"></div>
+    <script>
+      window.__YANDEX_SDK_READY__ = (() => {
+        if (window.YaGames) return Promise.resolve(true);
+        const host = location.hostname.toLowerCase();
+        const isYandexHost = host === 'yandex.ru' || host.endsWith('.yandex.ru')
+          || host === 'yandex.net' || host.endsWith('.yandex.net')
+          || host === 'yandex.com' || host.endsWith('.yandex.com')
+          || host.endsWith('.yandex.kz') || host.endsWith('.yandex.by');
+        if (!isYandexHost) return Promise.resolve(false);
+        return new Promise((resolve) => {
+          let settled = false;
+          const finish = (ready) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timeout);
+            resolve(ready);
+          };
+          const sdk = document.createElement('script');
+          sdk.src = '/sdk.js';
+          sdk.onload = () => finish(Boolean(window.YaGames));
+          sdk.onerror = () => finish(false);
+          const timeout = setTimeout(() => finish(false), 5000);
+          document.head.append(sdk);
+        });
+      })();
+    </script>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

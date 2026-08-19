@@ -1,0 +1,27 @@
+INFERNO CLICKER — AUDIO CREDITS
+
+All recordings below are dedicated to the public domain under CC0 1.0:
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Fireplace Sound Loop — PagDev
+https://opengameart.org/content/fireplace-sound-loop
+Runtime: audio/fire/embers-wood-bed.ogg and .mp3
+
+Fire Crackling — AntumDeluge
+https://opengameart.org/content/fire-crackling
+Runtime: audio/fire/charcoal-crackle.ogg and .mp3
+
+Short Wind Sound — remaxim
+https://opengameart.org/content/short-wind-sound
+Runtime excerpt: audio/fan/fan-soft-a.ogg and .mp3
+
+Air whoosh — pyranostudios
+https://opengameart.org/content/air-whoosh
+Runtime excerpt: audio/fan/fan-soft-b.ogg and .mp3
+
+Air Woosh Move — Almitory
+https://opengameart.org/content/air-woosh-move
+Runtime excerpt: audio/fan/fan-soft-c.ogg and .mp3
+
+Runtime conversions are mono 44.1 kHz OGG Vorbis with MP3 fallback. Tap
+responses are bounded fanning/bellows cues. There are no generated tones.

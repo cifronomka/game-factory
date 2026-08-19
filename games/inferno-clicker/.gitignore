@@ -1,0 +1,12 @@
+node_modules/
+.vite/
+coverage/
+playwright-report/
+test-results/
+reports/
+dist/*
+!dist/.gitkeep
+releases/*.zip
+releases/*.sha256
+*.log
+.DS_Store
