@@ -6,7 +6,9 @@ import {
   HEAT_WINDOW_ACTIVE_MS,
   HEAT_WINDOW_TELEGRAPH_MS,
   SERVANT_EFFECT_MS,
+  SERVANT_DECAY_FACTOR,
   SERVANT_TELEGRAPH_MS,
+  DEMONESS_DECAY_FACTOR,
   canOfferRewarded,
 } from '../core/index.js';
 
@@ -19,14 +21,32 @@ function encounterDuration(encounter) {
 
 /** @param {import('../core/contracts.js').GameState} state */
 export function toPresentationViewModel(state, settings, capabilities) {
-  const encounter = state.encounter
-    ? {
-        kind: state.encounter.kind,
-        phase: state.encounter.phase === 'effect' ? 'active' : 'telegraph',
-        progress: Math.max(0, Math.min(1, 1 - state.encounter.msLeft / encounterDuration(state.encounter))),
-        remainingMs: state.encounter.msLeft,
-      }
-    : null;
+  const encounters = state.encounters.map((encounter) => ({
+    kind: encounter.kind,
+    phase: encounter.phase === 'effect' ? 'active' : 'telegraph',
+    progress: Math.max(0, Math.min(1, 1 - encounter.msLeft / encounterDuration(encounter))),
+    remainingMs: encounter.msLeft,
+  }));
+  const debuffs = state.encounters
+    .filter((candidate) => candidate.phase === 'effect' && candidate.kind !== 'heat-window')
+    .sort((left, right) => (left.kind === 'servant' ? 0 : 1) - (right.kind === 'servant' ? 0 : 1))
+    .map((candidate) => candidate.kind === 'servant'
+      ? {
+          kind: /** @type {const} */ ('servant'),
+          sourceLabel: 'Пепельный слуга',
+          effectLabel: 'Пепельный выдох',
+          decayFactor: SERVANT_DECAY_FACTOR,
+          decayIncreasePercent: 80,
+          remainingMs: candidate.msLeft,
+        }
+      : {
+          kind: /** @type {const} */ ('demoness'),
+          sourceLabel: 'Демонесса угасания',
+          effectLabel: 'Холодное угасание',
+          decayFactor: DEMONESS_DECAY_FACTOR,
+          decayIncreasePercent: 50,
+          remainingMs: candidate.msLeft,
+        });
   return {
     stage: state.stage,
     stageProgress: state.stageProgress,
@@ -35,10 +55,10 @@ export function toPresentationViewModel(state, settings, capabilities) {
     bestScore: state.bestScore,
     multiplier: state.multiplier,
     infernoHoldMs: state.currentInfernoHoldMs,
-    encounter,
+    encounters,
+    debuffs,
+    combinedDecayFactor: state.decayFactor,
     boost: state.boost ? { active: true, remainingMs: state.boost.msLeft } : null,
-    sealBroken: state.sealBroken,
-    sealLockedAtCap: !state.sealBroken && state.heat >= 559,
     paused: state.phase === 'PAUSED' || state.phase === 'AD_BREAK' || state.phase === 'RESULTS',
     muted: settings.muted,
     quality: settings.quality,
@@ -57,8 +77,6 @@ export function toPresentationEvent(event) {
   if (event.type === 'stageChanged') return { type: 'stage-changed', from: data.from, to: data.to };
   if (event.type === 'encounterStarted') return { type: 'encounter-cue', kind: data.kind, phase: 'telegraph' };
   if (event.type === 'encounterEffect') return { type: 'encounter-cue', kind: data.kind, phase: 'active' };
-  if (event.type === 'sealBlocked') return { type: 'seal-blocked' };
-  if (event.type === 'sealBroken') return { type: 'seal-broken' };
   if (event.type === 'boostStarted') return { type: 'boost-changed', active: true };
   if (event.type === 'boostEnded') return { type: 'boost-changed', active: false };
   return null;

@@ -24,20 +24,20 @@
 1. Пользователь открывает игру и за время не более 5 секунд после появления интерактивного экрана видит почти тёмную сцену, едва заметный уголёк и короткую подсказку «Жми, чтобы разжечь».
 2. Первый tap/click немедленно усиливает свет, огонь и звук; подсказка исчезает после первого ввода и более не прерывает игру.
 3. Игрок повышает `heat` и получает всё более высокий stage multiplier; каждый корректный tap имеет полную базовую силу, а рост decay требует постепенно нажимать быстрее.
-4. Начиная с третьей стадии мир отвечает телеграфируемыми помехами, временно усиливающими decay. Они не добавляют управление или tap-комбинации: игрок продолжает разжигать огонь прямыми нажатиями.
-5. На стадии 4 игрок видит понятную инфернальную печать и заполненный почти до конца прогресс: пока печать не сломана в текущем run, `heat` не поднимается выше `559`, поэтому порог стадии 5 (`560`) не пересекается. Taps при этом не отклоняются: они продолжают давать stage-4 score и мгновенную реакцию печати.
-6. Явное подтверждение «Печати Инферно ×2» навсегда ломает progression seal для текущего run и одновременно даёт существующий `tapPower ×2` на `20 с` активного gameplay. После окончания ×2 печать остаётся сломанной до restart.
-7. Пока настоящая rewarded-реклама не подключена, Web/dev показывает честно подписанную CTA «Получить ×2 (тест)» и через тот же `PlatformService`/terminal-success contract ломает печать без имитации рекламного ролика. Production Yandex позднее заменяет test stub официальным rewarded callback.
+4. Начиная с третьей стадии мир отвечает телеграфируемыми помехами, временно усиливающими decay. Пепельный слуга и Демонесса могут действовать одновременно, но показываются отдельными статусами, а их общий множитель ограничен `×2,50`. Они не добавляют управление или tap-комбинации: игрок продолжает разжигать огонь прямыми нажатиями.
+5. Все семь стадий доступны только через прямые taps и возрастающий decay: порог стадии 5 равен `560`, а общий предел heat — `1000`; permission, реклама или отдельная progression gate для crossing отсутствуют.
+6. После достижения stage 4 и `45 с` активного gameplay игрок может добровольно открыть sheet усиления и получить `tapPower ×2` на `20 с` активного gameplay. Усиление ускоряет набор heat, но ничего не разблокирует.
+7. Пока настоящая rewarded-реклама не подключена, Web/dev показывает честно подписанную CTA «Получить ×2 (тест)» и через тот же `PlatformService`/terminal-success contract запускает временный boost без имитации рекламного ролика. Production Yandex позднее заменяет test stub официальным rewarded callback.
 8. После первого входа в Инферно цель меняется с раскрытия сцены на удержание жара и улучшение `Best Score` и времени удержания Инферно.
 9. Когда пламя полностью угасает, игрок получает экран результата с очками, достигнутой стадией, временем Инферно, личными рекордами и одной основной кнопкой «Разжечь снова».
 
 ## Ключевая ценность
 
 - Любопытство материализовано в механике: каждый новый диапазон жара действительно открывает ранее скрытую часть сцены, а не только меняет число.
-- Управление остаётся одношаговым и прямым: каждый корректный tap обрабатывается полностью, даёт score и немедленный feedback. Единственное исключение для прироста heat — явно показанный progression seal на `559`, который ограничивает не ввод, а переход в stage 5.
+- Управление остаётся одношаговым и прямым: каждый корректный tap обрабатывается полностью, даёт score, heat и немедленный feedback вплоть до общего cap `1000`.
 - Прогресс ощущается сразу через синхронный свет, огонь, окружение, звук, multiplier и stage feedback.
 - Седьмая стадия не является концом контента: после её открытия появляется skill-based задача удержания Инферно и охота за личным/публичным рекордом.
-- Печать оформлена как заранее видимый progression gate, а не скрытая потеря силы tap: игрок может продолжать stage-4 score-run, открыть test/provider sheet или завершить/restart без внезапного модального окна.
+- Rewarded placement оформлен как необязательное ускорение: его отсутствие, ошибка или закрытие не ограничивают ни одну стадию и не открывают модальное окно автоматически.
 - Визуальный product intent: огонь должен ощущаться живым через sprite/frame animation, а персонажи — через различимые appearance, idle и attack-состояния. Audio intent — спокойный огонь и воздушный шум раздувания/атаки; частота taps не создаёт ритм или обязательный per-tap звук.
 
 ## Продуктовый scope и ограничения
@@ -45,7 +45,7 @@
 - Версия 1.0: один основной режим, одна сцена с семью состояниями раскрытия, одна базовая схема управления, один публичный leaderboard `Best Score`, четыре локальных рекорда и один rewarded-placement.
 - Вне scope 1.0: сюжетная кампания, магазин, покупки, валюта, инвентарь, аккаунтная прокачка, PvP, социальные кланы, обязательные interstitial ads и процедурная генерация уровней.
 - Candidate 0.1.0 реализует утверждённый scope; новые режимы, economy и дополнительные платформы не входят в текущий release и требуют change request.
-- Direct-tap score-run, стадии 1–4, restart, локальные рекорды и настройки доступны без рекламы, авторизации, leaderboard и сети. Полная прогрессия в стадии 5–7 требует единственного подтверждённого seal-success текущего run: до подключения настоящей рекламы Web/dev предоставляет явно маркированный test stub, а production Yandex использует только официальный rewarded callback.
+- Direct-tap score-run, все семь стадий, restart, локальные рекорды и настройки доступны без рекламы, авторизации, leaderboard и сети. Rewarded/test provider даёт только необязательный временный boost.
 - Ввод: touch/pointer на мобильном и основной mouse click на desktop. Клавиатурная активация не входит в обязательную acceptance-matrix 1.0, но может быть добавлена как тот же логический `tap` без изменения core rules.
 - Интерфейс: приоритет портретным viewport 360×640–430×932 CSS px; обязательная адаптация desktop без растягивания ключевых контролов за удобную область.
 - Tap-target центрального огня и основные кнопки должны иметь интерактивную область не менее 48×48 CSS px; primary flame zone — не менее 96×96 CSS px.
@@ -59,11 +59,11 @@
 | Риск | Вероятность | Влияние | Ранний сигнал | Митигация | Владелец |
 |---|---|---|---|---|---|
 | Однообразное бесконечное нажатие | Высокая | Высокое | более 50% тестеров называют второй минутный отрезок повторением первого; одинаковая частота ввода на протяжении >30 с | семь крупных visual milestones, телеграфируемые decay-события на стадиях 3/5, friendly Heat Window на 6+, смена цели после входа в Инферно | Product/Game Designer |
-| Физическая усталость от быстрого tapping | Высокая | Высокое | жалоба на усталость у >20% тестеров либо обязательная частота >10 taps/с дольше 30 с | paired canonical traces используют 2→7,14 taps/с, помехи короткие, fail имеет grace; реальные taps не ослабляются и не отбрасываются, а seal ограничивает только heat crossing | Product/Game Designer + QA |
-| Все семь стадий раскрываются слишком быстро | Средняя | Высокое | >35% новых игроков с подтверждённой печатью достигают Инферно быстрее 90 с | целевое первое достижение после старта run `90–180 с`; корректировать только документированные интервалы/decay после расчёта и rebaseline | Product/Game Designer |
-| Инферно кажется недостижимым | Средняя | Высокое | <8% первых завершённых сессий достигают стадии 7 либо <70% seal-success runs достигают stage 5 | onboarding до стадии 2, явные 559/560 и permanent-for-run unlock, paired fixture; после success разрешён только рассчитанный тюнинг decay/дебаффов без скрытого ослабления taps | Product/Game Designer + QA |
+| Физическая усталость от быстрого tapping | Высокая | Высокое | жалоба на усталость у >20% тестеров либо обязательная частота >10 taps/с дольше 30 с | V5 canonical использует 2→7,14 taps/с, помехи короткие, fail имеет grace; реальные taps не ослабляются и не отбрасываются | Product/Game Designer + QA |
+| Все семь стадий раскрываются слишком быстро | Средняя | Высокое | >35% новых игроков достигают Инферно быстрее 90 с без boost | целевое первое достижение `90–180 с` при постепенном ускорении; корректировать только документированные intervals/decay после расчёта и rebaseline | Product/Game Designer |
+| Инферно кажется недостижимым | Средняя | Высокое | <8% первых завершённых сессий достигают стадии 7 | onboarding до стадии 2, direct no-reward V5 fixture, human-input profiles и tap-rate matrix; разрешён только рассчитанный тюнинг decay/дебаффов без скрытого ослабления taps | Product/Game Designer + QA |
 | После первого Инферно нет причины возвращаться | Средняя | Высокое | медиана дополнительных сессий после первого достижения <1 | `Best Score`, longest Inferno hold, max multiplier, экран следующего достижимого рекорда и необязательный ежедневный ритуал без streak-loss | Product/Game Designer |
-| Progression seal воспринимается как скрытая поломка или paywall | Высокая | Высокое | >15% достигших cap уходят за 10 с без открытия sheet; >10% считают taps «переставшими работать» | замок и `559/560` показаны до упора, каждый tap продолжает score/feedback, CTA объясняет постоянный unlock текущего run и временный ×2; Web/dev честно помечает test stub, покупок нет | Monetization + Product |
+| Rewarded boost воспринимается как обязательный paywall | Средняя | Высокое | >10% игроков считают stage 5+ недоступными без provider | все семь стадий проходят no-reward V5 и skilled-mouse traces; CTA обещает только временный ×2, close/error/unavailable не меняют progression | Monetization + Product |
 | Реклама ломает аудио/таймер/состояние | Средняя | Высокое | heat, score или boost меняются во время ad lifecycle; повторная награда | pause/resume contract, reward только после confirmed callback и ровно один раз, regression tests | Platform Integration + QA |
 | Тёмная сцена нечитаема на мобильном экране | Средняя | Высокое | >10% тестеров не находят огонь за 5 с; элементы сливаются на low-brightness profile | минимальный контраст интерактивного уголька, onboarding pulse, visual QA на целевых viewport/brightness | Art + QA |
 | Эффекты перегружают слабые устройства или вызывают дискомфорт | Средняя | Высокое | FPS ниже бюджета, input latency выше 100 мс, жалобы на мерцание/тошноту | performance tiers, reduced motion, particle caps и запрет частых вспышек | Architect + Art + QA |
@@ -79,20 +79,20 @@
 | First-input conversion | валидные загрузки с первым tap/click ≤5 с / интерактивные загрузки | N/A — новый продукт | ≥85% | первые 1 000 загрузок | product analytics |
 | Stage 2 comprehension | первые сессии, достигшие «Искры» ≤20 с / валидные первые сессии | N/A | ≥80% | первые 1 000 первых сессий | game events |
 | First-session stage funnel | доля первых сессий, достигших стадий 3 / 5 / 7 | N/A | ≥65% / ≥30% / 8–25% | первые 1 000 первых сессий | `stage_enter` events |
-| Time to first Inferno | медиана активного времени до первого входа в стадию 7 среди run с `seal_broken` | N/A | 90–180 с | первые 300 достижений | game events |
+| Time to first Inferno | медиана активного времени до первого входа в стадию 7 | N/A | 90–180 с | первые 300 достижений | game events |
 | Session length | медиана активной длительности валидной сессии | N/A | 3–6 мин | первые 1 000 сессий | session events |
 | Repeat-session rate | пользователи с ≥2 валидными сессиями за 24 ч / новые пользователи | N/A | ≥30% | rolling 14 days | anonymized analytics |
 | D1 retention | новые пользователи, вернувшиеся на следующий календарный день / новые пользователи | N/A | ≥18% | rolling 28 days | platform/product analytics |
 | Inferno continuation | пользователи с ещё одной валидной сессией в течение 7 дней после первого Инферно / впервые достигшие Инферно | N/A | ≥35% | cohort 28 days | game events |
-| Input integrity | уникальные корректные taps, обработанные и начислившие score / все корректные taps; heat применён с явным clamp 559/1000 | N/A | 100% до аварийного synthetic-flood guard | каждый release + первые 1 000 сессий | input telemetry, агрегировано |
-| Seal sheet comprehension | достигшие stage 4 и открывшие seal sheet до завершения run / достигшие stage 4 | N/A | ≥75% | первые 500 stage-4 runs | game events |
-| Seal success | подтверждённые success callbacks / открытия seal sheet | N/A | Web/dev test ≥95%; Yandex rewarded ≥70% | rolling 14 days, min 500 eligible | platform + game events |
+| Input integrity | уникальные корректные taps, обработанные и начислившие score / все корректные taps; heat clamp только `1000` | N/A | 100% до аварийного synthetic-flood guard | каждый release + первые 1 000 сессий | input telemetry, агрегировано |
+| Optional boost adoption | достигшие stage 4 и добровольно открывшие boost sheet / достигшие stage 4 | N/A | 15–60% | первые 500 stage-4 runs | game events |
+| Reward success | подтверждённые success callbacks / открытия boost sheet | N/A | Web/dev test ≥95%; Yandex rewarded ≥70% | rolling 14 days, min 500 eligible | platform + game events |
 | Reward reliability | награды, выданные ровно один раз / confirmed rewarded callbacks | N/A | 100% | каждый release + production | platform telemetry |
 | Runtime stability | валидные сессии без uncaught error / валидные сессии | N/A | ≥99,5% | rolling 7 days | error telemetry |
 
 ## Аналитические события минимального набора
 
-Без персональных данных должны различаться: `interactive_ready`, `session_start`, `stage_enter`, `stage_leave`, `enemy_event_start`, `enemy_event_end`, `heat_window_start`, `heat_window_end`, `seal_shown`, `seal_blocked`, `seal_sheet_open`, `seal_broken`, `rewarded_offer`, `rewarded_start`, `rewarded_complete`, `rewarded_cancel`, `rewarded_error`, `test_reward_success`, `inferno_enter`, `inferno_exit`, `session_end`, `personal_best`, `input_overflow`. Для run хранятся булевы признаки `seal_broken` и `boost_used`; provider различает `web-test`, `dev-test`, `yandex`, частота tap передаётся агрегатами, а не сырым таймлайном.
+Без персональных данных должны различаться: `interactive_ready`, `session_start`, `stage_enter`, `stage_leave`, `enemy_event_start`, `enemy_event_end`, `heat_window_start`, `heat_window_end`, `boost_sheet_open`, `rewarded_offer`, `rewarded_start`, `rewarded_complete`, `rewarded_cancel`, `rewarded_error`, `test_reward_success`, `boost_started`, `boost_completed`, `inferno_enter`, `inferno_exit`, `session_end`, `personal_best`, `input_overflow`. Для run хранится только булев признак `boost_used`; provider различает `web-test`, `dev-test`, `yandex`, частота tap передаётся агрегатами, а не сырым таймлайном.
 
 ## Решения и открытые вопросы
 
@@ -100,7 +100,7 @@
 |---|---|---|---|
 | Решено | Название 1.0 — «Зажги», slug — `inferno-clicker`; семь исходных названий и порядок стадий сохранены. | Product/Game Designer | принято до реализации |
 | Решено | Главный публичный leaderboard содержит только `Best Score`; highest stage, longest Inferno hold и max multiplier — локальные показатели профиля/экрана результата. | Product/Game Designer + Platform | принято до реализации |
-| Решено | Stage 5+ требует сломанной печати текущего run: locked heat cap `559`, threshold stage 5 остаётся `560`. Seal-success доступен после stage 4 и 45 секунд active run, навсегда открывает crossing в этом run и даёт ×2 на 20 active seconds; assisted heat не даёт прямых tap-score points. | Product/Game Designer | corrective cycle |
+| Решено | Все семь стадий доступны без provider; heat clamp всегда `1000`. После stage 4 и 45 секунд active run добровольный reward даёт только ×2 heat tapPower на 20 active seconds; assisted heat не даёт прямых tap-score points. | Product/Game Designer | corrective cycle 03 |
 | Решено | Пока provider-реклама отсутствует, Web/dev CTA называется «Получить ×2 (тест)» и возвращает стандартный terminal `rewarded` success без fake-ad UI; production Yandex позднее заменяет только adapter callback. | Product + Platform | corrective cycle |
 | Решено | Первый release — один бесконечный score-run до полного угасания; после Инферно игрок продолжает удержание ради рекорда. | Product/Game Designer | принято до реализации |
 | Решено | Retention строится на личных рекордах и ежедневном ритуале без серии посещений, валюты и штрафа за пропуск. | Product/Game Designer | принято до реализации |
@@ -111,5 +111,5 @@
 
 - Измеримые правила и исходный баланс находятся в `GAME_DESIGN.md`; QA должен трассировать direct taps, stage thresholds, scoring, increasing decay, enemy events, pause и persistence.
 - Architecture должна обеспечить независимый от FPS расчёт активного времени и единый pointer/touch/mouse input path без двойного события.
-- Art/Audio должны сделать каждую стадию, seal locked/broken и каждый вражеский/Heat Window сигнал различимыми даже при muted audio либо reduced motion; product intent требует frame/sprite animation огня, appearance/idle/attack персонажей и fire/air-fanning ambience без tap-rate rhythm.
+- Art/Audio должны сделать каждую стадию, boost и каждый вражеский/Heat Window сигнал различимыми даже при muted audio либо reduced motion; product intent требует frame/sprite animation огня, appearance/idle/attack персонажей и fire/air-fanning ambience без tap-rate rhythm.
 - Открытые вопросы не блокируют planning; они имеют владельцев и контрольные сроки.

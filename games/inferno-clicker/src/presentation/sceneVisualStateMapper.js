@@ -27,7 +27,7 @@ function opacityAfter(stage, threshold, progress) {
   return 0.35 + progress * 0.65;
 }
 
-/** @param {StageId} stage @param {PresentationViewModel['encounter']} encounter */
+/** @param {StageId} stage @param {import('./types.js').EncounterViewModel|null} encounter */
 function mapServant(stage, encounter) {
   if (stage < 3) return 'hidden';
   if (encounter?.kind !== 'servant') return stage === 3 ? 'emerge' : 'idle';
@@ -36,14 +36,13 @@ function mapServant(stage, encounter) {
   return 'idle';
 }
 
-/** @param {StageId} stage @param {PresentationViewModel['encounter']} encounter */
+/** @param {StageId} stage @param {import('./types.js').EncounterViewModel|null} encounter */
 function mapDemoness(stage, encounter) {
   if (stage < 4) return 'hidden';
-  if (stage === 4) return 'silhouette';
-  if (encounter?.kind !== 'demoness') return stage === 5 ? 'reveal' : 'idle';
+  if (encounter?.kind !== 'demoness') return stage === 4 ? 'silhouette' : stage === 5 ? 'reveal' : 'idle';
   if (encounter.phase === 'telegraph') return 'cast';
   if (encounter.phase === 'active') return 'hold';
-  return 'idle';
+  return stage === 4 ? 'silhouette' : 'idle';
 }
 
 /** @param {QualityTier} quality @param {boolean} reducedMotion */
@@ -68,7 +67,10 @@ export class SceneVisualStateMapper {
     const flameHeight = 0.045 + Math.pow(heatRatio, 0.82) * 0.91;
     const caps = qualityCaps(viewModel.quality, viewModel.reducedMotion);
     const stageEmberLimit = viewModel.stage === 7 ? 80 : viewModel.stage === 6 ? 60 : viewModel.stage * 7;
-    const demonessSuppression = viewModel.encounter?.kind === 'demoness' && viewModel.encounter.phase === 'active';
+    const encounters = Array.isArray(viewModel.encounters) ? viewModel.encounters : [];
+    const servantEncounter = encounters.find((item) => item.kind === 'servant') ?? null;
+    const demonessEncounter = encounters.find((item) => item.kind === 'demoness') ?? null;
+    const demonessSuppression = demonessEncounter?.phase === 'active';
 
     return Object.freeze({
       stage: viewModel.stage,
@@ -90,10 +92,12 @@ export class SceneVisualStateMapper {
         pylons: opacityAfter(viewModel.stage, 6, stageProgress),
         foreground: 0.32 + reveal * 0.68,
       }),
-      servant: mapServant(viewModel.stage, viewModel.encounter),
-      demoness: mapDemoness(viewModel.stage, viewModel.encounter),
+      servant: mapServant(viewModel.stage, servantEncounter),
+      demoness: mapDemoness(viewModel.stage, demonessEncounter),
+      encounters,
+      debuffs: Array.isArray(viewModel.debuffs) ? viewModel.debuffs : [],
+      combinedDecayFactor: viewModel.combinedDecayFactor ?? 1,
       hostLevel: viewModel.stage >= 7 ? 2 : viewModel.stage >= 6 ? 1 : 0,
-      encounter: viewModel.encounter,
       boostActive: viewModel.boost?.active ?? false,
       boostEnding: (viewModel.boost?.active ?? false) && (viewModel.boost?.remainingMs ?? 0) <= 3_000,
       emberCap: Math.min(caps.ember, stageEmberLimit),

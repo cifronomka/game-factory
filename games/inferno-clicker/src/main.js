@@ -61,7 +61,6 @@ async function bootstrap() {
   let lastFrame = performance.now();
   let previousPauseReasons = new Set();
   let rewardSequence = 0;
-  let lastSealToastAtMs = Number.NEGATIVE_INFINITY;
   const performanceQuality = new PerformanceQualityController();
   const saveCoordinator = new SaveCoordinator({
     initialValue: persisted,
@@ -169,10 +168,10 @@ async function bootstrap() {
     platform.pauseGame('menu');
     const isTestProvider = capabilities.rewardedProvider === 'test';
     const description = isTestProvider
-      ? 'Активировать тестовый ×2 на 20 секунд и сломать Печать Инферно для этого забега? Это тест, реклама не показывается.'
-      : 'Посмотреть короткую рекламу, сломать Печать Инферно и получить ×2 силу жара на 20 секунд активной игры?';
+      ? 'Активировать тестовый ×2 к силе жара на 20 секунд? Это тест, реклама не показывается.'
+      : 'Посмотреть короткую рекламу и получить ×2 к силе жара на 20 секунд активной игры?';
     const confirmLabel = isTestProvider ? 'Получить ×2 (тест)' : 'Посмотреть рекламу';
-    dialog.innerHTML = `<article class="dialog" role="dialog" aria-modal="true" aria-labelledby="reward-title"><h2 id="reward-title">Печать Инферно</h2><p>${description}</p><div class="dialog__actions"><button type="button" data-cancel>Не сейчас</button><button type="button" data-primary data-confirm>${confirmLabel}</button></div></article>`;
+    dialog.innerHTML = `<article class="dialog" role="dialog" aria-modal="true" aria-labelledby="reward-title"><h2 id="reward-title">Усиление жара ×2</h2><p>${description}</p><div class="dialog__actions"><button type="button" data-cancel>Не сейчас</button><button type="button" data-primary data-confirm>${confirmLabel}</button></div></article>`;
     dialog.hidden = false;
     const cancel = /** @type {HTMLButtonElement} */ (dialog.querySelector('[data-cancel]'));
     const confirm = /** @type {HTMLButtonElement} */ (dialog.querySelector('[data-confirm]'));
@@ -199,7 +198,7 @@ async function bootstrap() {
     closeDialog();
     const result = await rewardResult;
     engine.resolveRewarded(requestId, result.status);
-    if (result.status === 'rewarded') showToast(capabilities.rewardedProvider === 'test' ? 'Тестовый ×2 активирован — печать сломана' : 'Печать сломана: сила жара ×2');
+    if (result.status === 'rewarded') showToast(capabilities.rewardedProvider === 'test' ? 'Тестовый ×2 активирован на 20 секунд' : 'Сила жара ×2 на 20 секунд');
     else if (result.status === 'closed') showToast('Награда не получена');
     else showToast('Множитель сейчас недоступен');
   }
@@ -255,17 +254,12 @@ async function bootstrap() {
       const mapped = toPresentationEvent(event);
       if (mapped) {
         if (mapped.type === 'tap-accepted') {
-          mapped.critical = engine.state.encounter?.kind === 'heat-window'
-            && engine.state.encounter.phase === 'effect';
+          mapped.critical = engine.state.encounters.some((encounter) => encounter.kind === 'heat-window'
+            && encounter.phase === 'effect');
         }
         presentation.dispatch(/** @type {any} */ (mapped));
       }
       if (event.type === 'recordsChanged') saveCoordinator.request();
-      if (event.type === 'sealBlocked' && event.atMs - lastSealToastAtMs >= 2_000) {
-        lastSealToastAtMs = event.atMs;
-        showToast('559 / 560 — Печать Инферно преграждает путь');
-      }
-      if (event.type === 'sealBroken') showToast('Печать сломана — путь к Инферно открыт');
       if (event.type === 'runEnded') {
         void saveCoordinator.flushNow();
         void platform.submitScore(engine.state.bestScore);

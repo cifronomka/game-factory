@@ -5,7 +5,6 @@ import test from 'node:test';
 import {
   FIXED_STEP_MS,
   MAX_SCORE,
-  SEAL_HEAT_CAP,
   GameEngine,
   createInitialState,
   reduceFixedStep,
@@ -48,12 +47,11 @@ test('emergency guard accepts 256 commands per step and rejects only impossible 
   const result = reduceFixedStep(createInitialState(), commands);
   assert.equal(result.events.filter((event) => event.type === 'tapAccepted').length, 256);
   assert.equal(result.events.filter((event) => event.data?.reason === 'input-overflow').length, 44);
-  assert.ok(result.state.heat < SEAL_HEAT_CAP && result.state.heat > SEAL_HEAT_CAP - 1);
-  assert.equal(result.state.scoreAcc, 18_027.5);
-  assert.equal(result.state.sealCapImpulses, 80);
-  assert.equal(result.events.filter((event) => event.type === 'sealBlocked').length, 80);
+  assert.equal(result.state.heat, 797.35);
+  assert.equal(result.state.scoreAcc, 35_745);
+  assert.equal(result.state.runHighestStage, 6);
   const lastTap = result.events.filter((event) => event.type === 'tapAccepted').at(-1);
-  assert.equal(lastTap?.data?.scoreAwarded, 60);
+  assert.equal(lastTap?.data?.scoreAwarded, 97.5);
 });
 
 test('stage is recalculated before score and each upward stage bonus is granted once', () => {
@@ -105,10 +103,10 @@ test('sub-step encounter boundary applies old and new decay modifiers exactly', 
   encounter.stage = 3;
   encounter.runHighestStage = 3;
   encounter.reachedStageTwo = true;
-  encounter.encounter = { kind: 'servant', phase: 'telegraph', msLeft: 20 };
+  encounter.encounters = [{ kind: 'servant', phase: 'telegraph', msLeft: 20 }];
   const encounterResult = reduceFixedStep(encounter, []);
-  assert.equal(encounterResult.state.encounter?.phase, 'effect');
-  assert.equal(encounterResult.state.encounter?.msLeft, 2_470);
+  assert.equal(encounterResult.state.encounters[0]?.phase, 'effect');
+  assert.equal(encounterResult.state.encounters[0]?.msLeft, 2_470);
   assert.ok(Math.abs(encounterResult.state.heat - 299.704) < 1e-9);
 });
 
@@ -170,6 +168,4 @@ test('confirmed restart routes through abandoned RESULTS and carries sanitized r
   assert.equal(engine.state.records.bestScore, 1_234);
   assert.equal(engine.state.runHighestStage, 1);
   assert.equal(engine.state.rewardedUsedThisRun, false);
-  assert.equal(engine.state.sealBroken, false);
-  assert.equal(engine.state.sealCapImpulses, 0);
 });

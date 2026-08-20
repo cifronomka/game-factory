@@ -40,7 +40,7 @@
  * @property {() => Promise<import('./result.js').Result<import('./save.js').InfernoSaveV1|null>>} loadData
  * @property {(score:number) => Promise<import('./result.js').Result<void>>} submitScore
  * @property {() => Promise<import('./result.js').Result<LeaderboardEntry[]>>} getLeaderboard
- * @property {(placement:'inferno-seal') => Promise<RewardedResult>} showRewardedAd
+ * @property {(placement:'inferno-seal') => Promise<RewardedResult>} showRewardedAd Internal legacy-compatible placement id; it grants only the optional timed boost.
  * @property {(placement:string) => Promise<AdResult>} showInterstitial
  * @property {(reason?:PauseReason) => import('./result.js').Result<void>} pauseGame
  * @property {(reason?:PauseReason) => import('./result.js').Result<void>} resumeGame

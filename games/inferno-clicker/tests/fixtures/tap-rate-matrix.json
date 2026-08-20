@@ -1,0 +1,37 @@
+{
+  "name": "tapRateMatrixV2",
+  "version": 2,
+  "scenarios": [
+    {
+      "name": "slow",
+      "intervalMs": 500,
+      "stopMs": 180000,
+      "expected": { "stageReachedAtMs": { "2": 9000, "3": 43500, "4": 147000 }, "acceptedTaps": 360, "score": 21282, "heat": 378.6947093031625, "maxHeat": 382.27499515058923, "currentInfernoHoldMs": 0, "runHighestStage": 4, "finalStage": 3 }
+    },
+    {
+      "name": "normal",
+      "intervalMs": 250,
+      "stopMs": 180000,
+      "expected": { "stageReachedAtMs": { "2": 4250, "3": 18250, "4": 39250, "5": 76500 }, "acceptedTaps": 720, "score": 57380, "heat": 686.3921215646932, "maxHeat": 688.1921215646934, "currentInfernoHoldMs": 0, "runHighestStage": 5, "finalStage": 5 }
+    },
+    {
+      "name": "fast",
+      "intervalMs": 200,
+      "stopMs": 180000,
+      "expected": { "stageReachedAtMs": { "2": 3400, "3": 14000, "4": 29400, "5": 52000, "6": 92200 }, "acceptedTaps": 900, "score": 96562, "heat": 842.1729347839772, "maxHeat": 848.6979347839772, "currentInfernoHoldMs": 0, "runHighestStage": 6, "finalStage": 6 }
+    },
+    {
+      "name": "very-fast",
+      "intervalMs": 140,
+      "stopMs": 180000,
+      "expected": { "stageReachedAtMs": { "2": 2380, "3": 9520, "4": 18760, "5": 31500, "6": 48160, "7": 66920 }, "acceptedTaps": 1286, "score": 238888, "heat": 932.0800000000002, "maxHeat": 999.82, "currentInfernoHoldMs": 105660, "runHighestStage": 7, "finalStage": 7 }
+    },
+    {
+      "name": "boosted-normal",
+      "intervalMs": 250,
+      "stopMs": 180000,
+      "rewardAtMs": 68000,
+      "expected": { "stageReachedAtMs": { "2": 4250, "3": 18250, "4": 39250, "5": 70500, "6": 83250 }, "acceptedTaps": 720, "score": 73972, "heat": 729.047760649091, "maxHeat": 773.3307692285994, "currentInfernoHoldMs": 0, "runHighestStage": 6, "finalStage": 5 }
+    }
+  ]
+}

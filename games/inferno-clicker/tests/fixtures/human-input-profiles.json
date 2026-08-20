@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "description": "Deterministic hypotheses for production-browser pointer/touch replay; browser evidence must be recorded separately.",
+  "profiles": [
+    {
+      "name": "casual-mobile",
+      "input": "touch",
+      "stopMs": 180000,
+      "tapPattern": { "kind": "continuous", "intervalsMs": [420, 380, 450, 350, 400] },
+      "expected": { "stageReachedAtMs": { "2": 6800, "3": 32420, "4": 84800 }, "acceptedTaps": 450, "score": 28085, "heat": 410.8291234877897, "maxHeat": 413.1041234877896, "currentInfernoHoldMs": 0, "runLongestInfernoHoldMs": 0, "runHighestStage": 4, "finalStage": 4, "maxConcurrentEnemyDebuffs": 1, "rewardResolvedAtMs": null }
+    },
+    {
+      "name": "fast-mobile",
+      "input": "touch",
+      "stopMs": 180000,
+      "tapPattern": { "kind": "continuous", "intervalsMs": [200, 220, 240, 210, 230] },
+      "expected": { "stageReachedAtMs": { "2": 3720, "3": 15600, "4": 33000, "5": 60500, "6": 122760 }, "acceptedTaps": 819, "score": 82455, "heat": 759.4069524348507, "maxHeat": 760.1287145574028, "currentInfernoHoldMs": 0, "runLongestInfernoHoldMs": 0, "runHighestStage": 6, "finalStage": 6, "maxConcurrentEnemyDebuffs": 2, "rewardResolvedAtMs": null }
+    },
+    {
+      "name": "casual-mouse",
+      "input": "mouse",
+      "stopMs": 180000,
+      "tapPattern": { "kind": "continuous", "intervalsMs": [300, 250, 280, 260, 310] },
+      "expected": { "stageReachedAtMs": { "2": 4750, "3": 20690, "4": 45630, "5": 97430 }, "acceptedTaps": 643, "score": 50457, "heat": 569.1755153325678, "maxHeat": 583.9681284795183, "currentInfernoHoldMs": 0, "runLongestInfernoHoldMs": 0, "runHighestStage": 5, "finalStage": 5, "maxConcurrentEnemyDebuffs": 2, "rewardResolvedAtMs": null }
+    },
+    {
+      "name": "skilled-mouse",
+      "input": "mouse",
+      "stopMs": 180000,
+      "tapPattern": { "kind": "burst-rest", "intervalsMs": [120, 140, 160, 150, 130], "activeMs": 8000, "restMs": 1300 },
+      "expected": { "stageReachedAtMs": { "2": 2360, "3": 10820, "4": 21820, "5": 35720, "6": 59420, "7": 87770 }, "acceptedTaps": 1126, "score": 191514, "heat": 911.3688343720279, "maxHeat": 958.168834372027, "currentInfernoHoldMs": 11200, "runLongestInfernoHoldMs": 13063.497888823875, "runHighestStage": 7, "finalStage": 7, "maxConcurrentEnemyDebuffs": 2, "rewardResolvedAtMs": null }
+    },
+    {
+      "name": "extreme-burst",
+      "input": "mouse",
+      "stopMs": 180000,
+      "tapPattern": {
+        "kind": "phased",
+        "phases": [
+          { "durationMs": 60000, "intervalsMs": [200, 220, 240, 210, 230] },
+          { "durationMs": 3000, "intervalsMs": [100] },
+          { "durationMs": 117000, "intervalsMs": [200, 220, 240, 210, 230] }
+        ]
+      },
+      "expected": { "stageReachedAtMs": { "2": 3720, "3": 15600, "4": 33000, "5": 60000, "6": 106100 }, "acceptedTaps": 835, "score": 85372, "heat": 758.0429021364461, "maxHeat": 759.992902136446, "currentInfernoHoldMs": 0, "runLongestInfernoHoldMs": 0, "runHighestStage": 6, "finalStage": 6, "maxConcurrentEnemyDebuffs": 2, "rewardResolvedAtMs": null }
+    },
+    {
+      "name": "skilled-mouse-rewarded",
+      "input": "mouse",
+      "stopMs": 180000,
+      "rewardAfterMs": 65000,
+      "tapPattern": { "kind": "burst-rest", "intervalsMs": [120, 140, 160, 150, 130], "activeMs": 8000, "restMs": 1300 },
+      "expected": { "stageReachedAtMs": { "2": 2360, "3": 10820, "4": 21820, "5": 35720, "6": 59420, "7": 67770 }, "acceptedTaps": 1126, "score": 209713, "heat": 911.3691452101481, "maxHeat": 999.46, "currentInfernoHoldMs": 11200, "runLongestInfernoHoldMs": 74809.38271604983, "runHighestStage": 7, "finalStage": 7, "maxConcurrentEnemyDebuffs": 2, "rewardResolvedAtMs": 65000 }
+    }
+  ]
+}

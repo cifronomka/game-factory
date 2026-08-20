@@ -1,8 +1,8 @@
 # Asset Plan — «Зажги»
 
-## Corrective Cycle 02 baseline
+## Corrective Cycle 04 production baseline
 
-Этот документ описывает фактически подключённый candidate после пользовательского review 2026-08-20. Старые одиночные flame cards, статичные cutouts Пепельного слуги/Демонессы и `audio/fire-loop.*` удалены. Concept art остаётся только художественным ориентиром и не используется как плоский экран.
+Этот документ описывает фактически подключённый Cycle 04 candidate. Пламя и audio Cycle 02 сохранены без bitmap/recording regression. Character v3 исправляет пространственную упаковку, а runtime добавляет phase-driven timing, recovery, concurrent effects и living Inferno. Дефектные ImageGen v4-кандидаты Demoness с baked matte отклонены и в registry/package не входят.
 
 Все runtime paths указаны относительно корня игры. Точный размер, SHA-256, preload group, codec и длительность являются машиночитаемой частью `assets/assets-manifest.json`; источники и лицензии — `assets/PROVENANCE.md` и `assets/AUDIO_CREDITS.txt`.
 
@@ -18,21 +18,22 @@
 | FL-HIGH-CORE | Высокое ветвящееся ядро/Inferno column | 6–7 | `/assets/flame/atlases/core-high-v2.webp` + JSON, 1536×1280 | Yes | 12 frames, 11 fps loop | Yes | No body synthesis | Yes | READY — preload S5 60% |
 | FL-HIGH-OUTER | Высокие внешние языки | 6–7 | `/assets/flame/atlases/outer-high-v2.webp` + JSON, 1536×1280 | Yes | 12 frames, 11 fps loop, phase +4 | Yes | No body synthesis | Yes | READY — preload S5 60% |
 | FX-STAGE-FLARE | Скрывает texture swap и подчёркивает каждый stage boundary | 1–7 | `/assets/flame/transitions/stage-flare-v2.webp` + JSON, 1024×1024 | Yes | 8 frames at 8 fps; forward upward, reverse + cool tint downward; family crossfade 1.05 s, entry S7 1.5 s | Yes | Runtime tint/light | Yes | READY — preload S1 60% |
-| CH-ASH-SERVANT | Отдельный живой персонаж и видимая атака на пламя | 3–7 | `/assets/characters/ash-servant/ash-servant-states-v2.webp` + JSON, 1536×1024 | Yes | 6-frame rows: appearance 10 fps once, idle 8 fps loop, inhale 10 fps once, blow 10 fps loop | Yes | Отдельный bounded ash stream | Yes | READY — preload S2 60% |
-| CH-DEMONESS | Отдельный живой персонаж и угашающая атака | 4–7 | `/assets/characters/demoness/demoness-states-v2.webp` + JSON, 1536×1024 | Yes | 6-frame rows: appearance 10 fps once, idle 8 fps loop, cast 10 fps once, hold 10 fps loop | Yes | Отдельная cold ribbon/aura | Yes | READY — preload S3 60% |
-| CH-INFERNO-HOST | Watchers/winged silhouettes кульминации | 6–7 | `/assets/characters/character-inferno-host.webp`, RGBA WebP 1024×683 | Yes | Reveal + restrained drift | Yes | Transform only | No | READY — preload S5 60% |
+| CH-ASH-SERVANT | Stationary comic devil и читаемый длинный выдох | 3–7 | `/assets/characters/ash-servant/ash-servant-states-v3.webp` + JSON, lossless VP8L 1536×1120, 24 cells 256×280 | Yes, gutter ≥8 | appearance; restrained idle 4 fps; phase-selected prepare/inhale/hold/exhale ramp/peak/fade; 450 ms authored reverse recovery | Existing generated source, lossless repack | Ash stream, ember drift, proportional flame bend | Yes | READY — preload S2 60% |
+| CH-DEMONESS | Высокая спокойная infernal queen, disapproval и cold cast | 4–7 | `/assets/characters/demoness/demoness-states-v3.webp` + JSON, lossless VP8L 1536×1120, 24 cells 256×280 | Yes, gutter ≥8 | silhouette does not consume reveal; appearance; idle/disapproval 1.2/3 fps; cast/gather/hold/release; 800 ms authored reverse recovery | Existing generated source, lossless repack; v4 rejected | Hand-socket cold ribbon/haze and proportional cold fire response | Yes | READY — preload S3 60% |
+| CH-INFERNO-HOST | Living watchers/winged silhouettes кульминации | 6–7 | `/assets/characters/character-inferno-host.webp` + `/assets/characters/character-inferno-host-v3.json`, RGBA WebP 1024×683 | Yes | 5 real non-overlapping regions, independent 5.5–8.9 s periods; 1.5 s Stage 6→7 staged reveal | Yes | Region transforms/glow; no whole-plate drift | Spatial crop animation | READY — preload S5 60% |
 
 ### Multilayer flame contract
 
-Пламя не является одной картинкой. Renderer независимо рисует core, outer, additive glow, embers/sparks, smoke/heat haze, tap impulse, seal impulse и stage flare. Core/outer меняют реальный authored silhouette по кадрам. Tap не ускоряет sprite timeline: visual impulse агрегируется presentation-слоем и не меняет gameplay. `SpriteAnimator` использует application clock; pause/background замораживают кадры без catch-up.
+Пламя не является одной картинкой. Renderer независимо рисует core, outer, additive glow, embers/sparks, smoke/heat haze, tap impulse и stage flare. Core/outer меняют реальный authored silhouette по кадрам. Character reaction накладывает только bounded bend/height/brightness/cold-edge поверх продолжающегося authored loop и не сбрасывает его timeline. Seal impulse отсутствует.
 
 Внутри family изменение стадии идёт через непрерывный heat-driven размер/свет и 8-frame flare. На границах `2↔3` и `5↔6` одновременно выполняется root-locked crossfade соседних authored families. Stage 7 использует high family с дополнительным вторым high-core pass; rewarded tint остаётся отдельным состоянием.
 
 ### Character state contract
 
-- Servant: первое появление проигрывает `appearance`, затем `idle`; telegraph выбирает `inhale`, effect — `blow` и ash stream от персонажа к outer flame.
-- Demoness: первое появление проигрывает `appearance`, затем `idle`; telegraph выбирает `cast`, effect — `hold` и cold ribbon к очагу.
-- Окончание действия возвращает персонажа в `idle`; отдельный recovery asset в этом candidate не используется и не заявляется.
+- Servant: `prepare → inhale-ramp → inhale-hold → exhale-start → exhale-ramp → exhale-peak → exhale-fade → exhale-end → recovery`; один normalized strength одновременно управляет ash stream, ember drift и flame reaction.
+- Demoness: Stage 4 silhouette заморожен и не расходует reveal; Stage 5 запускает appearance. Спокойный idle содержит presentation-only disapproval раз в 5–9 s. Attack: `cast-look → arms-rise → cast-gather → cold-ramp → cold-hold → cold-release → recovery`.
+- Recovery использует обратный порядок уже authored action frames: 450 ms Servant и 800 ms Demoness; новых bitmap-дубликатов нет.
+- `encounters[]` допускает одновременную работу обоих actors. HUD получает отдельные `debuffs[]` rows и общий capped factor, но не влияет на animation/gameplay clocks.
 - Reduced Motion сохраняет authored poses/frames с уменьшенной частотой эффектов; static cutout fallback отсутствует.
 
 ## Audio registry
@@ -62,11 +63,11 @@ Accepted taps объединяются в окно 120 ms, новый fan voice 
 | Budget | Result | Hard limit | Status |
 |---|---:|---:|---|
 | Startup critical art | 818,566 B | 1.5 MiB | PASS |
-| Total registered art | 6,255,308 B | 9.8 MiB | PASS |
-| Worst decoded bitmap residency | 64,269,312 B / 61.29 MiB | 64 MiB | PASS, margin is small |
+| Total registered art | 7,456,934 B | 9.8 MiB | PASS |
+| Worst decoded bitmap residency | 65,448,960 B / 62.42 MiB | 64 MiB | PASS, margin is small |
 | Both stored audio codec packs | 675,540 B | 2.2 MiB | PASS |
 | Largest texture side | 1600 px | 2048 px | PASS |
-| Working production package | 7,153,769 B / 70 files | 15 MiB | PASS offline; clean release identity still required |
+| Working production package | 8,430,646 B / 71 files | 15 MiB | PASS offline; clean release identity still required |
 
 ## Verification status and remaining risk
 

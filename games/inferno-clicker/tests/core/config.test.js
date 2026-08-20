@@ -3,8 +3,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  DEMONESS_DECAY_FACTOR,
+  ENEMY_DECAY_FACTOR_CAP,
   MAX_SCORE,
-  SEAL_HEAT_CAP,
+  SERVANT_DECAY_FACTOR,
   STAGES,
   configForStage,
   progressForStage,
@@ -13,7 +15,6 @@ import {
 import { createDefaultRecords, sanitizeRecords } from '../../src/core/engine.js';
 
 test('seven-stage config has the committed thresholds, decay, multipliers and bonuses', () => {
-  assert.equal(SEAL_HEAT_CAP, 559);
   assert.deepEqual(STAGES.map((entry) => entry.lowerHeat), [0, 80, 220, 380, 560, 730, 900]);
   assert.deepEqual(STAGES.map((entry) => entry.decayPerSecond), [0.5, 2, 4, 6.5, 9, 13, 18]);
   assert.deepEqual(STAGES.map((entry) => entry.multiplier), [1, 1.25, 1.5, 2, 2.5, 3.25, 5]);
@@ -23,6 +24,9 @@ test('seven-stage config has the committed thresholds, decay, multipliers and bo
   assert.equal(stageForHeat(1_000).stage, 7);
   assert.equal(configForStage(5).lowerHeat, 560);
   assert.equal(progressForStage(150, 2), 0.5);
+  assert.equal(SERVANT_DECAY_FACTOR, 1.8);
+  assert.equal(DEMONESS_DECAY_FACTOR, 1.5);
+  assert.equal(ENEMY_DECAY_FACTOR_CAP, 2.5);
 });
 
 test('record input is sanitized to persistence-safe bounds', () => {

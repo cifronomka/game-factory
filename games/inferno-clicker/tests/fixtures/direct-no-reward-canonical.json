@@ -1,0 +1,15 @@
+{
+  "name": "canonicalDirectNoRewardV5",
+  "version": 5,
+  "firstTapMs": 0,
+  "intervalByRunHighestStageMs": [500, 500, 250, 250, 200, 140, 140],
+  "stopMs": 180000,
+  "expected": {
+    "stageReachedAtMs": { "2": 9000, "3": 43500, "4": 64500, "5": 102000, "6": 145200, "7": 164800 },
+    "acceptedTaps": 786,
+    "score": 110498,
+    "heat": 946.4654166638675,
+    "currentInfernoHoldMs": 15060,
+    "runHighestStage": 7
+  }
+}

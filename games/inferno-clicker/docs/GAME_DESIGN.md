@@ -14,8 +14,8 @@
 - `stageProgress` — нормализованный прогресс внутри текущего диапазона: `clamp((heat-L)/(U-L), 0, 1)`, где `[L,U)` — границы стадии; для стадии 7 используются `L=900`, `U=1000`.
 - `tapPower` — номинальный прирост heat от принятого tap до ограничения `[0,1000]`.
 - `decayRate` — потеря heat в секунду активного времени до временных модификаторов.
+- `enemyDecayFactor` — произведение активных вражеских факторов, ограниченное диапазоном `[1,00;2,50]`; это не tap penalty и не permission state.
 - `multiplier` — multiplier текущей stage в диапазоне `[1,5]`; временные эффекты и rewarded boost его не умножают.
-- `sealBroken` — run-local boolean; новый run начинается с `false`, подтверждённый reward success один раз ставит `true`, после чего значение не меняется до restart и не сохраняется между run.
 - Run детерминирован относительно последовательности ввода и активного времени; frame rate и wall clock не меняют результат. Базовый simulation step — фиксированные `50 ms`; crossing порогов интерполируется внутри шага.
 
 ## Core loop
@@ -28,8 +28,8 @@ tap/click
 → игрок увеличивает частоту taps, чтобы обгонять растущий decay
 → телеграфируемая помеха временно усиливает decay, не меняя управление
 → вход в новую stage даёт разовый score bonus
-→ на вершине stage 4 явная инфернальная печать удерживает heat на 559, пока игрок не подтвердит seal-success
-→ success навсегда открывает stage 5+ для run и одновременно даёт ×2 heat на 20 active seconds
+→ все семь stages открываются теми же прямыми taps без provider permission
+→ добровольный rewarded success может временно дать ×2 heat на 20 active seconds
 → после входа в Инферно игрок удерживает heat ради score и рекорда времени
 ```
 
@@ -40,10 +40,10 @@ tap/click
 - Gameplay input — один логический `tap`: left mouse `pointerdown` либо новый touch/pen contact внутри центральной интерактивной области. Одно физическое касание не может породить одновременно pointer и synthetic click.
 - Каждый уникальный корректный `pointerdown`, включая разные touch `pointerId`, принимается ровно один раз. Повтор одного активного pointerId до `pointerup/pointercancel`, повторный `inputId`, secondary mouse button, удержание, drag за пределами области и synthetic repeat игнорируются.
 - Все уникальные taps с timestamp внутри simulation step `50 ms` обрабатываются по `(timestamp, enqueue order)`. Нет rolling rate cap, diminishing return, cooldown или combo requirement.
-- Только невозможный synthetic flood ограничен `256` уникальными командами в одном step (`>5120 taps/s`); дальнейшие команды получают технический `input-overflow`, не являющийся частью баланса. Visual feedback может агрегироваться, но score и nominal heat calculation выполняются для каждого принятого tap; фактический heat затем ограничивается только явным ceiling 559/1000.
+- Только невозможный synthetic flood ограничен `256` уникальными командами в одном step (`>5120 taps/s`); дальнейшие команды получают технический `input-overflow`, не являющийся частью баланса. Visual feedback может агрегироваться, но heat и score применяются для каждого принятого tap до общего ceiling `1000`.
 - UI-кнопки pause, mute, reduced motion, rewarded offer, restart и leaderboard не считаются gameplay taps.
 - Во время `PAUSED`, `AD_BREAK`, `RESULTS` и `LOADING` gameplay taps не принимаются.
-- Базовая прогрессия требует постепенно повысить частоту примерно с 2 taps/с на ранних stages до 7,14 taps/с возле Inferno. Без подтверждённого seal-success текущий run честно заканчивает progression на stage 4 cap; после success все stages достигаются теми же прямыми taps.
+- Базовая прогрессия требует постепенно повысить частоту примерно с 2 taps/с на ранних stages до 7,14 taps/с возле Inferno. Все stages достижимы без reward теми же прямыми taps.
 
 ## Числовой порядок обновления
 
@@ -51,7 +51,7 @@ tap/click
 
 1. Разбить step по границам таймеров и timestamps всех принятых taps; для одинакового timestamp сохранить enqueue order.
 2. До каждой границы применить decay за точный elapsed slice и завершить истёкшие эффекты.
-3. Для каждого tap на границе рассчитать `tapPower` и прибавить heat с clamp: верхняя граница равна `559`, пока `sealBroken=false`, и `1000`, когда `sealBroken=true`. Clamp печати не отклоняет tap и не меняет его nominal score power.
+3. Для каждого tap на границе рассчитать `tapPower` и прибавить heat с единственным clamp `1000`.
 4. Пересчитать stage по новому heat; каждую впервые пересечённую вверх границу начислить один stage bonus. Если один tap пересёк несколько границ, начисляются все ещё не полученные бонусы по порядку.
 5. Начислить tap score с multiplier уже пересчитанной новой stage; Inferno hold score и время начислять только за фактические slices при `heat ≥900`.
 6. После последнего tap применить оставшийся slice до конца step и обновить `score`, `bestScore`, `stageProgress` и persistence dirty state.
@@ -65,8 +65,8 @@ tap/click
 `tapPower = baseTapPower × heatWindowFactor × rewardedFactor`
 
 - `heatWindowFactor = 2,00` только во время мирового Окна жара; иначе `1,00`.
-- `rewardedFactor = 2,00` только во время «Печати Инферно ×2»; иначе `1,00`.
-- Факторы перемножаются. Каждый normal tap номинально даёт ровно `3 heat`, Heat Window или rewarded — `6`, оба эффекта вместе — `12`; `heat = min(sealBroken ? 1000 : 559, heat + tapPower)`.
+- `rewardedFactor = 2,00` только во время добровольного rewarded boost; иначе `1,00`.
+- Факторы перемножаются. Каждый normal tap даёт ровно `3 heat`, Heat Window или rewarded — `6`, оба эффекта вместе — `12`; `heat = min(1000, heat + tapPower)`.
 
 Для scoring используется `scoreTapPower = tapPower / rewardedFactor`: добавочный heat от рекламы не даёт прямых tap-score points, но может косвенно помочь быстрее войти в высокую stage или дольше её удерживать.
 
@@ -79,7 +79,7 @@ tap/click
 
 ## Direct-tap pressure
 
-Каждый корректный tap имеет одинаковую базовую отдачу независимо от предыдущих интервалов. Никакое состояние не требует cadence/combo-права на эффективный tap. Единственный progression clamp — видимая печать: при `sealBroken=false` tap у cap по-прежнему начисляет stage-4 score и даёт seal/flame feedback, но фактический heat не превышает `559`. После seal-success возрастающая сложность полностью наблюдаема в `stageDecay`: для удержания stage 7 без событий требуется больше `18/3 = 6 taps/s`; при коротком Порыве слуги требуется до `32,4/3 = 10,8 taps/s`, при Клейме — `27/3 = 9 taps/s`. Временный отрицательный net heat допустим и компенсируется быстрым tapping до/после эффекта.
+Каждый корректный tap имеет одинаковую базовую отдачу независимо от предыдущих интервалов. Никакое состояние не требует cadence/combo/provider-права на эффективный tap. Возрастающая сложность полностью наблюдаема в `stageDecay`: для удержания stage 7 без событий требуется больше `18/3 = 6 taps/s`; при коротком Порыве слуги требуется до `32,4/3 = 10,8 taps/s`, при Клейме — `27/3 = 9 taps/s`, при их пересечении cap даёт `45/3 = 15 taps/s`. Последнее — короткое окно, а не sustained target: taps не ослабляются, а временный отрицательный net heat компенсируется до/после эффекта.
 
 ## Scoring и multiplier
 
@@ -116,25 +116,24 @@ Stage пересчитывается без гистерезиса по теку
 | 1 | Тьма | `[0,80)` | 0,5 | едва видимый уголёк, минимальное свечение, почти тишина; врагов нет |
 | 2 | Искра | `[80,220)` | 2,0 | проявляются камни, пепел, круг, трещины и первые руны; появляется crackle/ambient |
 | 3 | Пепельный слуга | `[220,380)` | 4,0 | появляется стилизованный бес; активируется Порыв слуги |
-| 4 | Алый порог | `[380,560)` | 6,5 | врата, цепи, яркие руны, огненные трещины, силуэт большой сущности и понятная progression seal; locked cap 559 |
-| 5 | Демонесса угасания | `[560,730)` | 9,0 | доступна только при `sealBroken=true`; появляется стилизованная демонесса; активно Холодное клеймо |
+| 4 | Алый порог | `[380,560)` | 6,5 | врата, цепи, яркие руны, огненные трещины и силуэт большой сущности |
+| 5 | Демонесса угасания | `[560,730)` | 9,0 | появляется стилизованная демонесса; активно Холодное клеймо |
 | 6 | Круг Инферно | `[730,900)` | 13,0 | наблюдатели, глаза, цепи, множество рун и жар; активны Окна жара |
 | 7 | Инферно | `[900,1000]` | 18,0 | огненный столб, максимальное раскрытие и множитель; цель — удержание |
 
-Целевые ориентиры при постепенном росте частоты от 2 до 7,14 taps/с: стадия 2 — `5–15 с`, стадия 3 — `25–50 с`, stage 4 — `55–80 с`, первое касание locked cap — `90–120 с`; после подтверждённого seal-success первый вход в Инферно должен укладываться в `90–180 с` от старта run. Это playtest targets, а не скрытое scaling: формулы не меняются по пользователю. Обязательны две paired traces: no-boost остаётся на stage 4, boosted достигает stage 7.
+Целевые ориентиры при постепенном росте частоты от 2 до 7,14 taps/с: стадия 2 — `5–15 с`, стадия 3 — `25–50 с`, stage 4 — `55–80 с`, stage 5 — `90–120 с`, первый вход в Инферно — `90–180 с`. Это playtest targets, а не скрытое scaling: формулы не меняются по пользователю. Обязательный no-reward V5 trace достигает stage 7; boosted trace измеряет только ускорение.
 
-## Инфернальная печать — progression gate stage 4 → 5
+## Прямая прогрессия stage 4 → 5
 
-- Порог stage 5 остаётся `560`; пока `sealBroken=false`, effective heat ceiling равен ровно `559`. Stage-4 progress у cap равен `(559-380)/(560-380)=0,9944`, поэтому UI показывает почти заполненную шкалу, lock-mark и текст `559 / 560 — Печать преграждает путь`.
-- Каждый tap у печати остаётся accepted: получает обычный stage-4 tap score `10×3×2=60`, запускает немедленный flame/seal impulse и не зависит от cadence. Presentation coalesces повторное объяснение, чтобы modal/toast не появлялся на каждый tap.
-- Только terminal outcome `rewarded` для текущего `runId` атомарно ставит `sealBroken=true` до запуска queued boost. `closed`, `error`, `unavailable`, duplicate/late callback и cancel sheet не ломают печать.
-- Первая успешная активация одновременно запускает существующий `rewardedFactor=2` на `20 000 ms` активного gameplay. После истечения boost `rewardedFactor` возвращается к 1, но `sealBroken` остаётся true даже после падения ниже stage 5.
-- Restart/reload создаёт новый run с `sealBroken=false`; persisted `highestStageReached` не переносит unlock.
-- До подключения рекламы Web/dev provider показывает явную CTA `Получить ×2 (тест)` и confirm `Активировать тестовый ×2 и сломать печать`. Он не рисует fake-ad, а асинхронно возвращает тот же idempotent terminal `rewarded` callback через `PlatformService`. Production Yandex заменяет provider на официальный rewarded callback, не меняя core transition.
+- Порог stage 5 равен `560` и пересекается обычным accepted tap, как любой другой threshold; единственный heat ceiling равен `1000`.
+- Rewarded availability, provider outcome, сеть, авторизация и persisted records не участвуют в stage calculation.
+- При heat `558,34` normal tap даёт heat `561,34`, stage 5 и однократный stage-5 bonus; отдельного permission state или unlock event нет.
 
 ## Вражеские события и Heat Window
 
-События используют только активное время нахождения в текущей или более высокой stage. Одновременно может быть активно не более одного события; если сроки совпали, приоритет `Холодное клеймо > Порыв слуги > Окно жара`. Countdown события идёт только пока его stage eligible, нет другого события и нет stage transition; иначе он заморожен без накопления очереди. Повторный интервал конкретного события отсчитывается от завершения предыдущего telegraph/effect; после любого события выдерживается общий gap `1,0 с` до продолжения остальных countdown.
+Каждый источник использует собственный countdown активного времени и не замораживает другие eligible источники. Поэтому Пепельный слуга, Демонесса и friendly Heat Window могут иметь одновременные telegraph/effect phases. При совпадении timestamp transitions обрабатываются в стабильном порядке `Демонесса → Пепельный слуга → Окно жара` только ради детерминированного event stream; это не приоритет и не отменяет остальные события. Повторный interval каждого источника начинается после завершения его собственного effect.
+
+Одновременные вражеские эффекты рассчитываются предсказуемо: `enemyDecayFactor = min(2,50; servantFactor × demonessFactor)`. Один Пепельный выдох даёт `×1,80`, одно Холодное угасание — `×1,50`, вместе получается cap `×2,50`, а не `×2,70`. Этот фактор умножает только stage decay; normal tapPower остаётся `3`, любой tap сохраняет score и не сокращает таймер. Heat Window и rewarded boost являются отдельными положительными статусами и в enemy factor не входят.
 
 ### Порыв слуги — stage 3+
 
@@ -156,24 +155,23 @@ Stage пересчитывается без гистерезиса по теку
 - Внутри окна `heatWindowFactor=2`; окно не меняет stage multiplier.
 - Понижение ниже 730 отменяет telegraph/window; при возврате первый trigger снова через 6,0 с.
 
-Все события обязаны иметь отдельный визуальный сигнал; критический смысл не может передаваться только цветом или звуком.
+Все события обязаны иметь отдельный визуальный сигнал; критический смысл не может передаваться только цветом или звуком. Активные enemy effects выводятся отдельными строками: `Пепельный слуга / Пепельный выдох / Decay ×1,80` и `Демонесса угасания / Холодное угасание / Decay ×1,50`, каждая со своим remaining time. При overlap обе строки видимы одновременно; optional total `Общий decay ×2,50` не заменяет источники.
 
-## Seal success и rewarded bonus — «Печать Инферно ×2»
+## Необязательный rewarded boost — «Усиление жара ×2»
 
-- Placement разблокируется, когда в текущем run одновременно выполнены `runHighestStage ≥4`, `activeRunTime ≥45,0 с` и `sealBroken=false`. Persisted all-time record `highestStageReached` не делает новый run eligible сам по себе. Компактная неблокирующая CTA видна только в safe PLAYING, не перекрывает flame и при click лишь открывает pause/boost confirm sheet с pause reason `menu`. Provider запускается отдельным confirm control внутри этого явно открытого sheet, после чего добавляется pause reason `ad`. Во время encounter, stage transition, любого другого pause, active boost или pending request opener CTA скрыта. Модальное предложение само не появляется.
-- После подтверждённого terminal `rewarded` callback печать ломается для текущего run и ровно один раз запускается `20,0 с` активного gameplay времени с `rewardedFactor=2`; boost начинается только после valid resume.
-- Визуальный power mode: отличимый знак печати, более светлое ядро/оттенок огня, усиленный glow и particles в пределах performance/reduced-motion budget; отдельный sound cue, не обязательный для понимания.
-- Seal success не меняет stage thresholds, stage multiplier, decay или event schedule: он снимает только run-local ceiling `559`. Boost усиливает heat tapPower; добавочная provider-половина tapPower исключается из прямого tap-score через `scoreTapPower`.
+- Placement разблокируется, когда в текущем run одновременно выполнены `runHighestStage ≥4` и `activeRunTime ≥45,0 с`. Persisted all-time record `highestStageReached` не делает новый run eligible сам по себе. Компактная неблокирующая CTA видна только в safe PLAYING, не перекрывает flame и при click лишь открывает pause/boost confirm sheet с pause reason `menu`. Provider запускается отдельным confirm control внутри этого явно открытого sheet, после чего добавляется pause reason `ad`. Во время encounter, stage transition, любого другого pause, active boost или pending request opener CTA скрыта. Модальное предложение само не появляется.
+- После подтверждённого terminal `rewarded` callback ровно один раз запускается `20,0 с` активного gameplay времени с `rewardedFactor=2`; boost начинается только после valid resume и ничего не разблокирует.
+- Визуальный power mode: более светлое ядро/оттенок огня, усиленный glow и particles в пределах performance/reduced-motion budget; отдельный sound cue, не обязательный для понимания.
+- Boost не меняет stage thresholds, stage multiplier, decay или event schedule. Он усиливает heat tapPower; добавочная provider-половина tapPower исключается из прямого tap-score через `scoreTapPower`.
 - Лимит `1` подтверждённый boost за run; offer исчезает после успеха. Следующий показ в новом run разрешён не раньше чем через `90 с` активного времени текущей app session после успешного reward; session cooldown не сохраняется после полного перезапуска приложения.
-- Cancel/error/unavailable даёт 0 награды, не ломает seal, не расходует единственную попытку и не запускает cooldown. Terminal callback снимает только pause reason `ad`: при отсутствии других reasons игра ровно один раз возвращается в `PLAYING`, иначе остаётся `PAUSED`. Повторный добровольный запрос разрешён. Игра, таймеры и звук не идут во время provider flow.
-- Без offer доступны direct-tap run, stage 1–4 score, локальные рекорды и restart; stage 5–7 требуют seal success. Для аналитики/результата сохраняются `sealBroken` и `boostUsed`, публичный `Best Score` принимает оба типа run.
+- Cancel/error/unavailable даёт 0 награды, не расходует единственную попытку и не запускает cooldown. Terminal callback снимает только pause reason `ad`: при отсутствии других reasons игра ровно один раз возвращается в `PLAYING`, иначе остаётся `PAUSED`. Повторный добровольный запрос разрешён. Игра, таймеры и звук не идут во время provider flow.
+- Без offer доступны direct-tap run, stages 1–7, локальные рекорды и restart. Для аналитики/результата сохраняется только `boostUsed`; публичный `Best Score` принимает boosted и non-boosted runs.
 
 ## Прогрессия, leaderboard и persistence
 
 ### Внутри run
 
-- Цель до stage 4: открыть следующую область и получить stage bonus; на stage 4 — увидеть печать, решить открыть provider sheet либо продолжать stage-4 score-run.
-- После `sealBroken=true` цель снова состоит в открытии stages 5–7 и получении их однократных bonuses.
+- Цель до stage 7: прямыми taps открывать следующую область и получать stage bonus; optional boost лишь сокращает время набора heat.
 - После первого stage 7: улучшать score и `currentInfernoHold`, удерживая `heat ≥900`.
 - При падении ниже порога stage мир плавно скрывает соответствующий слой; milestone bonus и `runHighestStage` не теряются.
 
@@ -194,17 +192,17 @@ Stage пересчитывается без гистерезиса по теку
 ### Retention без dark patterns
 
 - Экран результата явно сравнивает run с `bestScore`, `longestInfernoHold` и `maxMultiplier` и показывает один ближайший личный target (например, `+5 000 до рекорда` или `+3,2 с удержания`).
-- «Ритуал дня» выбирается детерминированно по локальной календарной дате из двух задач, не требующих seal success: достичь stage 2/3/4 либо набрать заданное число score за один run. Inferno-hold не используется как daily requirement, потому что stage 5+ provider-gated.
+- «Ритуал дня» выбирается детерминированно по локальной календарной дате: достичь заданной stage, набрать score или удерживать Inferno заданное время. Ни одна задача не требует provider/boost.
 - За первое выполнение дня выдаётся только визуальная отметка дня и result celebration, без heat/score преимущества. Пропуск дня ничего не сбрасывает; streak и наказание отсутствуют.
 - Clock rollback не может выдать вторую отметку за уже записанную календарную дату; невозможность определить дату отключает ежедневную задачу, но не core game.
 
 ## Сложность
 
-- Сложность растёт через табличный stage decay, новые телеграфируемые события, более высокую цену ошибки на большом heat и один явно показанный progression gate `559→560`.
-- Dynamic difficulty adjustment, скрытое изменение tapPower, rubber-banding и незадокументированная зависимость от provider запрещены. Seal state и причина cap всегда видны.
-- Игрок компенсирует рост decay только большей частотой полноценных базовых taps; Heat Window даёт короткий понятный запас, а rewarded/test boost даёт фиксированный power spike после сознательного seal confirmation.
+- Сложность растёт только через табличный stage decay, новые телеграфируемые события и более высокую цену ошибки на большом heat.
+- Dynamic difficulty adjustment, скрытое изменение tapPower, rubber-banding и зависимость progression от provider запрещены.
+- Игрок компенсирует рост decay только большей частотой полноценных базовых taps; Heat Window даёт короткий понятный запас, а rewarded/test boost — необязательный фиксированный power spike.
 - Measurable tuning: canonical cadence равна `2 taps/s` на stages 1–2, `4 taps/s` на stages 3–4, `5 taps/s` на stage 5 и `7,14 taps/s` на stages 6–7. Номинальный normal net без events: stage 4 `12−6,5=+5,5 heat/s`, stage 5 `15−9=+6`, stage 6 `21,43−13=+8,43`, stage 7 `21,43−18=+3,43`. В stage-7 servant effect требуется `>10,8 taps/s`, но это краткое event-window, а не постоянная cadence gate.
-- Paired fixture targets: без success `runHighestStage=4`, с success stage 7 достигается в `116,54 с`; first-time playtest band для boosted Inferno `90–180 с`. Tap-комбинации и cooldown отсутствуют.
+- V5 fixture targets с независимыми concurrent schedules: no-reward stage 7 достигается в `164,80 с`; optional boost в `65,00 с` сокращает это до `102,71 с`. Gameplay tap-комбинации и cadence cooldown отсутствуют.
 - Если playtest funnel выходит за диапазоны из `PRODUCT_SPEC.md`, разрешён тюнинг только явных таблиц/чисел этого документа с обновлением тестов и acceptance, а не скрытая персонализация.
 
 ## Проигрыш и рестарт
@@ -223,7 +221,7 @@ Stage пересчитывается без гистерезиса по теку
 | Stage bonus | первый upward entry в stage 2–7 за run | 500 / 1 500 / 3 000 / 6 000 / 10 000 / 20 000 score | один раз на stage за run |
 | Inferno hold | каждую активную секунду heat ≥900 | `50 × multiplier` score и hold time | пока условие истинно |
 | Heat Window | active world window stage 6+ | heat tapPower ×2 на 1,5 активных секунды | deterministic schedule, без combo |
-| Печать Инферно ×2 | confirmed terminal `rewarded` после stage 4 eligibility | навсегда снять cap 559 для текущего run + heat tapPower ×2 на 20 активных секунд; прямой tap score без provider-добавки | 1/run; 90 с session cooldown после успеха; cancel/error без unlock/расхода |
+| Усиление жара ×2 | confirmed terminal `rewarded` после stage 4 eligibility | heat tapPower ×2 на 20 активных секунд; прямой tap score без provider-добавки; progression permission не меняется | 1/run; 90 с session cooldown после успеха; cancel/error без расхода |
 | Personal best | превышение сохранённого значения | result celebration + сохранение/submit | без gameplay power |
 | Ритуал дня | первое выполнение дневной задачи | визуальная отметка и celebration | 1/локальную дату, без streak |
 
@@ -233,7 +231,7 @@ Stage пересчитывается без гистерезиса по теку
 |---|---|---|---|---|
 | `LOADING` | запуск приложения | mute/reduced motion, если UI готов | успешный init → READY; recoverable platform failure → READY web fallback; fatal asset/core failure → ERROR | таймеров gameplay нет |
 | `READY` | загрузка или onboarding reset до stage 2 | gameplay tap, settings | первый tap → PLAYING | decay, score и события не идут |
-| `PLAYING` | первый tap/restart/resume | gameplay tap, pause, settings, открыть eligible seal/boost sheet | user/system/sheet pause → PAUSED; fail → RESULTS; fatal → ERROR | активное время идёт; locked heat clamp 559 либо unlocked clamp 1000 |
+| `PLAYING` | первый tap/restart/resume | gameplay tap, pause, settings, открыть eligible boost sheet | user/system/sheet pause → PAUSED; fail → RESULTS; fatal → ERROR | активное время идёт; heat clamp всегда 1000 |
 | `PAUSED` | user pause, visibility hidden, platform pause или открытый confirm sheet | resume, settings, confirmed restart; dedicated rewarded confirm только если sheet открыт из eligible safe PLAYING и других pause reasons нет | resume → PLAYING; rewarded confirm → AD_BREAK; confirmed restart → RESULTS с `abandoned=true` | все gameplay/audio/timers заморожены; opener CTA скрыта |
 | `AD_BREAK` | запуск rewarded рекламы | только platform-controlled UI | terminal callback снимает только `ad`: при оставшихся reasons → PAUSED, иначе → PLAYING; confirmed reward дополнительно ставит queued boost, который стартует после valid resume | полная заморозка, audio muted/paused |
 | `RESULTS` | условие угасания или confirmed restart | restart, leaderboard, settings | restart → READY | gameplay заморожен; persistence завершается |
@@ -244,21 +242,38 @@ Stage пересчитывается без гистерезиса по теку
 1. Новый run: heat 30, stage 1. Один обычный tap без эффектов даёт tapPower 3, heat 33, multiplier 1 и `scoreAcc +30`.
 2. При heat 78 обычный tap сначала даёт heat 81 и stage 2; tap points рассчитываются с новым stage multiplier: `3×1,25×10=37,5`, плюс stage bonus 500, итоговое приращение `537,5` в scoreAcc и `537` на экране.
 3. В stage 7 normal tap всегда даёт tapPower `3`, multiplier `5` и tap score `150`; удержание без событий требует частоты выше `6 taps/с`, потому что decay равен `18 heat/с`.
-4. В Heat Window stage 7 tapPower `3×2=6`, multiplier остаётся `5`, tap score `300`. При одновременной активной Печати heat tapPower `3×2×2=12`, но `scoreTapPower=6`, поэтому tap score остаётся `300`; рекламная добавка помогает удержанию, а не даёт прямых очков.
+4. В Heat Window stage 7 tapPower `3×2=6`, multiplier остаётся `5`, tap score `300`. При одновременном rewarded boost heat tapPower `3×2×2=12`, но `scoreTapPower=6`, поэтому tap score остаётся `300`; рекламная добавка помогает удержанию, а не даёт прямых очков.
 5. Двадцать корректных taps с любыми интервалами дают одинаковые номинальные `60 heat` до clamp/decay и двадцать отдельных tap-score начислений. Ни tap №9, ни два taps в одном 50-ms step не ослабляются.
 6. Холодное клеймо в stage 5: decay `9×1,5=13,5 heat/с`, но каждый normal tap сохраняет tapPower `3`; эффект заканчивается ровно через 4 активные секунды.
-7. При heat 905 и 1 активной секунде без taps Inferno hold заканчивается при пересечении 900 примерно через `0,278 с`; оставшиеся `0,722 с` действуют с decay stage 6, поэтому итоговый heat около `890,61`, stage 6. Hold score начисляется только за первые 0,278 с.
-8. При `sealBroken=false`, heat `558,34` и normal tap nominal heat равен `561,34`, но применяется cap `559`: stage остаётся 4, tap принят, `scoreAcc +60`, seal получает visual impulse.
-9. Terminal `rewarded` перед тем же tap сначала ставит `sealBroken=true`; tap с boost имеет heat power `6`, пересекает 560, даёт stage-5 bonus `6 000`, но direct tap score использует `scoreTapPower=3`: `3×2,5×10=75`.
+7. При одновременных Пепельном выдохе и Холодном угасании в stage 5: raw product `1,80×1,50=2,70`, effective factor ограничен `2,50`, поэтому decay равен `9×2,50=22,5 heat/с`. Обе source-строки и оба таймера остаются отдельными; tap сохраняет heat power `3`.
+8. При heat 905 и 1 активной секунде без taps Inferno hold заканчивается при пересечении 900 примерно через `0,278 с`; оставшиеся `0,722 с` действуют с decay stage 6, поэтому итоговый heat около `890,61`, stage 6. Hold score начисляется только за первые 0,278 с.
+9. При heat `558,34` normal tap даёт heat `561,34`, пересекает stage 5, начисляет bonus `6 000` и tap score `3×2,5×10=75` без reward или permission state.
+10. При том же heat и active rewarded boost tap имеет heat power `6`, но direct tap score всё равно использует `scoreTapPower=3`: `3×2,5×10=75`.
 
-### Paired canonical seal traces v3
+### Paired canonical direct traces v5
 
-Обе обязательные fixtures начинаются с нового профиля/start defaults; первый tap в `t=0 ms`; следующий tap планируется от предыдущего scheduled timestamp по `runHighestStage`: stages 1–2 — `500 ms`, 3–4 — `250 ms`, 5 — `200 ms`, 6–7 — `140 ms`. Общий deterministic checkpoint — конец fixed step в `t=117 000 ms`. Автоматические events используют versioned schedules этого документа; pause, restart, secondary input и wall-clock jumps отсутствуют. Один generator/config исполняется на 60/30/15 FPS.
+Обе обязательные fixtures начинаются с нового профиля/start defaults; первый tap в `t=0 ms`; следующий tap планируется от предыдущего scheduled timestamp по `runHighestStage`: stages 1–2 — `500 ms`, 3–4 — `250 ms`, 5 — `200 ms`, 6–7 — `140 ms`. Общий deterministic checkpoint — конец fixed step в `t=180 000 ms`. Автоматические events используют versioned schedules этого документа; pause, restart, secondary input и wall-clock jumps отсутствуют. Один generator/config исполняется на 60/30/15 FPS.
 
-- `canonicalSealNoBoostV3`: provider action отсутствует. Stages 2/3/4 впервые достигаются в `9 000 / 43 500 / 64 500 ms`; первый `sealBlocked` происходит на accepted tap в `101 750 ms`. В checkpoint: `runHighestStage=4`, stage 5 никогда не достигнута, `sealBroken=false`, max heat `559`, текущий heat `557,375`, `381` accepted taps, `61` blocked-at-cap impulses и score `24 507`.
-- `canonicalSealBoostedV3`: непосредственно перед scheduled tap в active time `102 000 ms` fixture выполняет explicit sheet confirm и один terminal `rewarded` success с request id; wall/ad time не добавляется. К этому моменту один accepted tap в `101 750 ms` уже дал `sealBlocked`; terminal success атомарно ломает seal до обработки tap в `102 000 ms`, boost стартует после valid resume. Stages 2/3/4/5/6/7 впервые достигаются в `9 000 / 43 500 / 64 500 / 102 000 / 110 800 / 116 540 ms`. В checkpoint: `sealBroken=true`, `sealCapImpulses=1`, `410` accepted taps, heat `911,908611±0,01`, score `64 913`, current Inferno hold `320 ms`, boost remaining `5 000 ms`.
+- `canonicalDirectNoRewardV5`: provider action отсутствует. Stages 2/3/4/5/6/7 впервые достигаются в `9 000 / 43 500 / 64 500 / 102 000 / 145 200 / 164 800 ms`. В checkpoint: `runHighestStage=7`, heat `946,465417±0,01`, `786` accepted taps, score `110 498`, current Inferno hold `15 060 ms`.
+- `canonicalDirectBoostedV5`: в active time `65 000 ms` fixture выполняет explicit sheet confirm и один terminal `rewarded` success; wall/ad time не добавляется. Stages 2/3/4/5/6/7 впервые достигаются в `9 000 / 43 500 / 64 500 / 75 750 / 83 950 / 102 710 ms`. В checkpoint: `runHighestStage=7`, heat `936,94±0,01`, `944` accepted taps, score `180 220`, current Inferno hold `65 950 ms`; boost уже завершён.
 
-Rebaseline обязан совпадать на 60/30/15 FPS: `±0,01 heat`, `±1 score`, exact accepted taps/stage timestamps. Старые V2 threshold/decay/tap numbers не изменены; разница вызвана только cap 559 и единственным success в boosted fixture. Любое изменение intervals, seal timing, schedules или provider outcome создаёт новую fixture version.
+Rebaseline обязан совпадать на 60/30/15 FPS: `±0,01 heat`, `±1 score`, exact accepted taps/stage timestamps. Threshold/decay/tap numbers не изменены; boosted fixture отличается только одним optional success. Любое изменение intervals, schedules или provider outcome создаёт новую fixture version.
+
+### Tap-rate simulation matrix v2
+
+Все сценарии начинаются с tap в `0 ms`, используют постоянный interval и checkpoint `180 000 ms`; результаты проверяются на 60/30/15 FPS.
+
+| Профиль | Interval / rate | Reward | Первый максимум stage | Final stage / heat | Score |
+|---|---:|---|---|---:|
+| slow | `500 ms / 2 taps/s` | нет | stage 4 в `147 000 ms` | 3 / `378,694709` | `21 282` |
+| normal | `250 ms / 4 taps/s` | нет | stage 5 в `76 500 ms` | 5 / `686,392122` | `57 380` |
+| fast | `200 ms / 5 taps/s` | нет | stage 6 в `92 200 ms` | 6 / `842,172935` | `96 562` |
+| very-fast | `140 ms / 7,14 taps/s` | нет | stage 7 в `66 920 ms` | 7 / `932,08` | `238 888` |
+| boosted-normal | `250 ms / 4 taps/s` | success в `68 000 ms` | stage 6 в `83 250 ms` | 5 / `729,047761` | `73 972` |
+
+### Human-input profile contract v1
+
+`tests/fixtures/human-input-profiles.json` задаёт неравномерные pointer/touch timestamp patterns для production-browser replay: casual mobile `2,50 taps/s`, fast mobile `4,55 taps/s`, casual mouse `3,57 taps/s`, skilled mouse bursts `7,14 taps/s` по 8 секунд с отдыхом `1,3 с`, extreme burst `10 taps/s` ровно 3 секунды на фоне fast-mobile pattern. Headless результаты и точные интервалы находятся в `reports/BALANCE_REPORT.md`. Они подтверждены на 60/30/15 FPS, но не считаются browser PASS до реального production-browser replay на touch-emulation и mouse.
 
 ## Edge cases
 
@@ -267,10 +282,9 @@ Rebaseline обязан совпадать на 60/30/15 FPS: `±0,01 heat`, `±
 - Low FPS: accumulator обрабатывает fixed steps 50 ms по monotonic active clock; threshold crossing интерполируется. Результат одного timestamped input trace одинаков в пределах tolerance `±0,01 heat`, `±1 score`, `±10 ms hold`.
 - Clock change: wall clock не влияет на run/boost; используется только для «Ритуала дня» с защитой от повторной выдачи.
 - Heat at max: taps продолжают начислять tap score, но heat остаётся 1000; particle/audio feedback не создаётся сверх performance caps.
-- Heat at locked seal: taps продолжают начислять stage-4 score; heat clamp 559, explanation UI и seal impulse bounded/coalesced. Никакой tap не получает `tapRejected` только из-за seal.
 - Multiple threshold crossing: stage events/bonuses вызываются последовательно один раз; downward crossing не отнимает score.
-- Simultaneous event and stage exit: уже наложенный Холодный debuff доигрывает срок; Порыв/Окно жара отменяются согласно их правилам; приоритет обработки задан числовым порядком update.
-- Reward callback duplicate/late: один provider request имеет idempotency key; второй callback не ломает seal повторно и не выдаёт boost. Callback после restart/result не переносит unlock/награду в новый run и логируется как ignored.
+- Simultaneous event and stage exit: уже наложенное Холодное угасание доигрывает срок; Пепельный выдох/Окно жара отменяются согласно их правилам; независимые timers не сливаются, оба enemy-source rows остаются отдельными, а factor всегда ограничен `×2,50`.
+- Reward callback duplicate/late: один provider request имеет idempotency key; второй callback не выдаёт boost повторно. Callback после restart/result не переносит награду в новый run и логируется как ignored.
 - Save unavailable/quota/corruption: run продолжается; показывается ненавязчивый статус локального сохранения, defaults не содержат NaN/отрицательных рекордов.
 - Reload во время active run: run намеренно не восстанавливается; records/settings сохраняются, новое состояние — READY с heat 30.
 - Leaderboard unavailable/auth denied: локальный bestScore остаётся источником UI; submit retry не блокирует results/restart.
@@ -279,7 +293,7 @@ Rebaseline обязан совпадать на 60/30/15 FPS: `±0,01 heat`, `±
 
 ## Требования для downstream-документов
 
-- `ACCEPTANCE_CRITERIA.md` должен покрыть все семь threshold/decay rows, every-valid-tap и rapid/multitouch parity, seal cap/unlock/reset, обе canonical V3 fixtures, три события без counter mini-games, scoring examples, fail/restart, provider timing, persistence и leaderboard fallback.
+- `ACCEPTANCE_CRITERIA.md` должен покрыть все семь threshold/decay rows, every-valid-tap и rapid/multitouch parity, обе canonical V5 fixtures, tap-rate matrix, human-input browser replays, concurrent source rows/`×2,50` cap, три события без counter mini-games, scoring examples, fail/restart, optional provider timing, persistence и leaderboard fallback.
 - `TECHNICAL_ARCHITECTURE.md` должен зафиксировать fixed-step 50 ms active-time simulation, input deduplication, state machine, versioned records/settings persistence без active-run restore и platform abstraction.
 - `ART_DIRECTION.md`/`AUDIO_DIRECTION.md` должны дать различимые сигналы telegraph/effect/Heat Window и семи стадий без зависимости только от цвета/звука.
 - Неопределённых значений и незаполненных шаблонных полей в этом документе нет; будущий баланс меняется только версионированным обновлением документа и связанных тестов.

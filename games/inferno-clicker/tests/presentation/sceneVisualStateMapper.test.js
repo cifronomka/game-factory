@@ -7,9 +7,9 @@ function model(overrides = {}) {
   return {
     stage: 1, stageProgress: 0, heat: 1, score: 0, bestScore: 0, multiplier: 1,
     infernoHoldMs: 0,
-    encounter: null, boost: null, paused: false, muted: false, quality: 'high',
+    encounters: [], debuffs: [], combinedDecayFactor: 1, boost: null, paused: false, muted: false, quality: 'high',
     reducedMotion: false, rewardedAvailable: true, rewardedSupported: true, rewardedProvider: 'test',
-    sealBroken: false, sealLockedAtCap: false, showTapHint: false, ...overrides,
+    showTapHint: false, ...overrides,
   };
 }
 
@@ -45,7 +45,7 @@ test('keeps architecture, characters and flame in the fixed compositing order', 
 
 test('maps characters, stage effects and boost without flattening the scene', () => {
   const mapper = new SceneVisualStateMapper();
-  const servant = mapper.map(model({ stage: 3, encounter: { kind: 'servant', phase: 'telegraph', progress: 0.2 } }));
+  const servant = mapper.map(model({ stage: 3, encounters: [{ kind: 'servant', phase: 'telegraph', progress: 0.2 }] }));
   assert.equal(servant.servant, 'inhale');
   assert.equal(servant.demoness, 'hidden');
   const climax = mapper.map(model({ stage: 7, boost: { active: true, remainingMs: 2500 } }));
@@ -72,9 +72,39 @@ test('maps passive encounter states without counter progress', () => {
   const mapper = new SceneVisualStateMapper();
   const state = mapper.map(model({
     stage: 5,
-    encounter: { kind: 'demoness', phase: 'active', progress: 0.5 },
+    encounters: [{ kind: 'demoness', phase: 'active', progress: 0.5 }],
   }));
   assert.equal(state.demoness, 'hold');
   assert.equal(state.coreColor, '#9ed9d1');
-  assert.equal('acceptedTaps' in state.encounter, false);
+  assert.equal('acceptedTaps' in state.encounters[0], false);
+});
+
+test('keeps an active Demoness effect revealed after heat falls to Stage 4', () => {
+  const mapper = new SceneVisualStateMapper();
+  const state = mapper.map(model({
+    stage: 4,
+    encounters: [{ kind: 'demoness', phase: 'active', progress: 0.7 }],
+  }));
+  assert.equal(state.demoness, 'hold');
+  assert.equal(state.coreColor, '#9ed9d1');
+});
+
+test('maps concurrent character encounters independently', () => {
+  const mapper = new SceneVisualStateMapper();
+  const state = mapper.map(model({
+    stage: 6,
+    encounters: [
+      { kind: 'servant', phase: 'active', progress: 0.5 },
+      { kind: 'demoness', phase: 'active', progress: 0.5 },
+    ],
+    debuffs: [
+      { kind: 'servant', sourceLabel: 'Пепельный слуга', effectLabel: 'Пепельный выдох', decayFactor: 1.8, decayIncreasePercent: 80, remainingMs: 2_000 },
+      { kind: 'demoness', sourceLabel: 'Демонесса угасания', effectLabel: 'Холодное угасание', decayFactor: 1.5, decayIncreasePercent: 50, remainingMs: 3_000 },
+    ],
+    combinedDecayFactor: 2.5,
+  }));
+  assert.equal(state.servant, 'blow');
+  assert.equal(state.demoness, 'hold');
+  assert.equal(state.debuffs.length, 2);
+  assert.equal(state.combinedDecayFactor, 2.5);
 });

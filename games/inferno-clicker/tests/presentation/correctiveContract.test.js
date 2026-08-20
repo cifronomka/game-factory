@@ -46,23 +46,22 @@ test('flame and characters use authored frame atlases without static-card deform
   assert.match(flame, /stage-flare-v2\.webp/);
   assert.match(flame, /SpriteAnimator/);
   assert.doesNotMatch(flame, /flame-core-organic|flame-outer-organic|inferno-beam-organic|drawSlice|slice deformation/i);
-  assert.match(characters, /ash-servant-states-v2\.webp/);
-  assert.match(characters, /demoness-states-v2\.webp/);
+  assert.match(characters, /ash-servant-states-v3\.webp/);
+  assert.match(characters, /demoness-states-v3\.webp/);
   assert.match(characters, /appearance.*idle.*inhale.*blow/s);
   assert.match(characters, /appearance.*idle.*cast.*hold/s);
   assert.doesNotMatch(characters, /drawServant|drawDemoness|fallback character/i);
 });
 
-test('test rewarded provider and seal states are explicit presentation contracts', async () => {
+test('test rewarded provider remains explicit and removed seal presentation cannot regress', async () => {
   const [types, hud] = await Promise.all([
     source('../../src/presentation/types.js'),
     source('../../src/presentation/ui/domHud.js'),
   ]);
   assert.match(types, /rewardedProvider/);
-  assert.match(types, /sealBroken/);
-  assert.match(types, /sealLockedAtCap/);
-  assert.match(types, /seal-blocked/);
-  assert.match(types, /seal-broken/);
+  assert.doesNotMatch(types, /sealBroken|sealLockedAtCap|seal-blocked|seal-broken/);
+  assert.doesNotMatch(hud, /Печать удерживает предел|data-seal/);
   assert.match(hud, /Получить ×2 \(тест\)/);
-  assert.match(hud, /Печать удерживает предел/);
+  assert.match(hud, /data-debuffs/);
+  assert.match(hud, /Общий decay/);
 });

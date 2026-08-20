@@ -6,7 +6,7 @@
 /** @typedef {'telegraph'|'effect'} EncounterPhase */
 /** @typedef {'rewarded'|'closed'|'unavailable'|'error'} RewardedOutcome */
 /** @typedef {import('./config.js').Stage} Stage */
-/** @typedef {'phaseChanged'|'pauseReasonsChanged'|'tapAccepted'|'tapRejected'|'sealBlocked'|'sealBroken'|'stageChanged'|'stageBonus'|'infernoEntered'|'infernoExited'|'encounterStarted'|'encounterEffect'|'encounterEnded'|'rewardRequested'|'rewardResolved'|'boostStarted'|'boostEnded'|'runEnded'|'recordsChanged'} DomainEventType */
+/** @typedef {'phaseChanged'|'pauseReasonsChanged'|'tapAccepted'|'tapRejected'|'stageChanged'|'stageBonus'|'infernoEntered'|'infernoExited'|'encounterStarted'|'encounterEffect'|'encounterEnded'|'rewardRequested'|'rewardResolved'|'boostStarted'|'boostEnded'|'runEnded'|'recordsChanged'} DomainEventType */
 
 /**
  * @typedef {object} PersistentRecords
@@ -31,7 +31,6 @@
  * @property {number|null} demonessMs
  * @property {number|null} heatWindowMs
  * @property {number} heatWindowSequenceIndex
- * @property {number} globalGapMs
  */
 
 /**
@@ -46,13 +45,12 @@
  * @property {Stage} stage
  * @property {number} stageProgress
  * @property {number} decayRate
+ * @property {number} decayFactor
  * @property {number} tapPower
- * @property {EncounterState|null} encounter
+ * @property {EncounterState[]} encounters
  * @property {EncounterClocks} encounterClocks
  * @property {{msLeft:number}|null} boost
  * @property {boolean} queuedBoost
- * @property {boolean} sealBroken
- * @property {number} sealCapImpulses
  * @property {number} activeRunTimeMs
  * @property {number} currentInfernoHoldMs
  * @property {number} runLongestInfernoHoldMs

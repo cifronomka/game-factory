@@ -27,7 +27,7 @@ class DevPlatformService extends WebPlatformService {
     return ok(this.capabilities);
   }
 
-  /** @param {'inferno-seal'} _placement */
+  /** @param {'inferno-seal'} _placement Internal legacy-compatible id for the optional timed boost. */
   showRewardedAd(_placement) {
     if (this.pendingDevReward) return this.pendingDevReward;
     this.requestCounter += 1;

@@ -2,7 +2,9 @@
 
 ## Статус
 
-Этот документ — единый implementation brief следующего цикла по результатам пользовательского просмотра build `0.1.0+dd459e6fed2e`. Предыдущий build считается качественной технической базой, но не финальной версией animation, difficulty и audio. До выполнения критериев этого документа release запрещён.
+**SUPERSEDED — historical only.** Этот brief описывает закрытый cycle 02 и больше не является текущим gameplay-контрактом. Решение о Stage-4 seal отменено corrective cycle 03: все семь стадий доступны без provider, rewarded даёт только optional ×2 на 20 active seconds. Актуальные правила находятся в `PRODUCT_SPEC.md`, `GAME_DESIGN.md`, `MONETIZATION.md` и V4 fixtures. Visual/audio решения этого файла сохраняют историческую трассировку, но пункты о seal нельзя использовать для implementation или release acceptance.
+
+Ниже сохранён исходный текст cycle 02 без переписывания истории.
 
 ## Цель цикла
 

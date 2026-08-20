@@ -13,49 +13,73 @@
       "x": 0,
       "y": 0,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 125.0,
+      "sha256": "6feaf6a7573332a27390ed1a804f9cb40cf3d19cc44017b8e5147b88b537971b",
+      "provenance": "authored all-stages transition-flare atlas frame 0; decoded RGBA crop from stage-flare-v2.webp"
     },
     {
       "x": 256,
       "y": 0,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 125.0,
+      "sha256": "79b6027c34023031a2b973fc73934642811c93eb3d355a2f62e0a524f226e2e0",
+      "provenance": "authored all-stages transition-flare atlas frame 1; decoded RGBA crop from stage-flare-v2.webp"
     },
     {
       "x": 512,
       "y": 0,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 125.0,
+      "sha256": "b03c76c4b9524f2d2e64f47f615e056cf1f0d30d1706c59d32eac30d217f1bb4",
+      "provenance": "authored all-stages transition-flare atlas frame 2; decoded RGBA crop from stage-flare-v2.webp"
     },
     {
       "x": 768,
       "y": 0,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 125.0,
+      "sha256": "f6643c2cc79f40c74df43281af0215895d2c415b7c1219cd100d26fe89588d70",
+      "provenance": "authored all-stages transition-flare atlas frame 3; decoded RGBA crop from stage-flare-v2.webp"
     },
     {
       "x": 0,
       "y": 512,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 125.0,
+      "sha256": "d2b69300ffde1b284c0bffe178ff7268d8b13ed642c88a06bfba2af6e0b34cf9",
+      "provenance": "authored all-stages transition-flare atlas frame 4; decoded RGBA crop from stage-flare-v2.webp"
     },
     {
       "x": 256,
       "y": 512,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 125.0,
+      "sha256": "b0a788666ddc407cf7a4fac05b20617d6783f600e6e9bb63fa688ea9ab143ec9",
+      "provenance": "authored all-stages transition-flare atlas frame 5; decoded RGBA crop from stage-flare-v2.webp"
     },
     {
       "x": 512,
       "y": 512,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 125.0,
+      "sha256": "8d870ed76c51430db0fa739c2b2de47d72a28be8ceb195d9a0e3255aaf34457f",
+      "provenance": "authored all-stages transition-flare atlas frame 6; decoded RGBA crop from stage-flare-v2.webp"
     },
     {
       "x": 768,
       "y": 512,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 125.0,
+      "sha256": "d01be2d7b1cb396041f43ef0fa40f62a31195a8fc102235fc33cdf1edc65bc4f",
+      "provenance": "authored all-stages transition-flare atlas frame 7; decoded RGBA crop from stage-flare-v2.webp"
     }
   ]
 }

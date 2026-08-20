@@ -37,6 +37,7 @@ export class InfernoScene {
     this.frameId = 0;
     this.lastFrame = 0;
     this.elapsed = 0;
+    this.screenImpulse = Object.freeze({ x: 0, y: 0 });
     this.pointerHandler = (/** @type {PointerEvent} */ event) => this.handlePointer(event);
     this.pointerReleaseHandler = (/** @type {PointerEvent} */ event) => this.activePointers.delete(event.pointerId);
     /** @type {Set<number>} */
@@ -53,8 +54,9 @@ export class InfernoScene {
   /** @param {any} state */
   setState(state) {
     this.state = state;
-    this.flame.setState(state);
     this.characters.setState(state);
+    this.flame.setState(state);
+    this.flame.setCharacterReaction(this.characters.getFlameReaction());
   }
 
   async prepareCriticalAssets() {
@@ -114,8 +116,9 @@ export class InfernoScene {
     const delta = Math.min(0.05, Math.max(0, (now - this.lastFrame) / 1000));
     this.lastFrame = now;
     if (!this.state?.paused) this.elapsed += delta;
-    this.flame.update(delta);
     this.characters.update(delta);
+    this.flame.setCharacterReaction(this.characters.getFlameReaction());
+    this.flame.update(delta);
     this.render();
     this.frameId = requestAnimationFrame((time) => this.frame(time));
   }
@@ -131,13 +134,20 @@ export class InfernoScene {
     context.fillStyle = '#050407';
     context.fillRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
     const transform = sceneTransform(this.canvas.clientWidth, this.canvas.clientHeight);
+    const flameStats = this.flame.getStats();
+    const entry = flameStats.infernoEntryProgress;
+    const impulseWindow = state.stage === 7 && !state.reducedMotion && entry < 0.32 ? 1 - entry / 0.32 : 0;
+    this.screenImpulse = Object.freeze({
+      x: Math.sin(entry * Math.PI * 24) * 6 * impulseWindow,
+      y: Math.cos(entry * Math.PI * 18) * 3 * impulseWindow,
+    });
     context.save();
-    context.translate(transform.left, transform.top);
+    context.translate(transform.left + this.screenImpulse.x * transform.scale, transform.top + this.screenImpulse.y * transform.scale);
     context.scale(transform.scale, transform.scale);
     for (const layer of SCENE_LAYER_ORDER) {
       if (layer === 'far-chamber') this.environment.drawFar(context, state);
       else if (layer === 'midground-architecture') this.environment.drawMidground(context, state);
-      else if (layer === 'ritual-plane') this.environment.drawRitual(context, state, this.elapsed);
+      else if (layer === 'ritual-plane') this.environment.drawRitual(context, state, this.elapsed, entry);
       else if (layer === 'characters') this.characters.draw(context, state, this.elapsed);
       else if (layer === 'flame-rig') this.flame.drawFlame(context, this.elapsed);
       else if (layer === 'lighting-fx') this.flame.drawFx(context, this.elapsed);
@@ -146,7 +156,15 @@ export class InfernoScene {
     context.restore();
   }
 
-  getDiagnostics() { return Object.freeze({ ...this.flame.getStats(), characters: this.characters.getDiagnostics(), layers: [...SCENE_LAYER_ORDER] }); }
+  getDiagnostics() {
+    const flame = this.flame.getStats();
+    return Object.freeze({
+      ...flame,
+      characters: this.characters.getDiagnostics(),
+      infernoPayoff: Object.freeze({ ...flame.infernoPayoff, screenImpulse: this.screenImpulse, screenImpulseEnabled: true }),
+      layers: [...SCENE_LAYER_ORDER],
+    });
+  }
 
   destroy() {
     this.running = false;

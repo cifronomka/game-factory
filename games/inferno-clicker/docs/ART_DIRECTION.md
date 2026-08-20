@@ -1,6 +1,6 @@
 # Art Direction — «Зажги»
 
-## Corrective Cycle 02
+## Corrective Cycle 04
 
 Пользовательский review 2026-08-20 установил новый baseline: огонь должен читаться как движущиеся языки пламени, а не как деформируемая статичная карточка; смена стадий должна быть анимирована; Пепельный слуга и Демонесса угасания должны иметь появление, живой idle и отдельное тушащее действие.
 
@@ -37,7 +37,7 @@ Concept art из `visual-references/` задаёт mood, palette, fixed hearth/c
 - Family switch crossfade: 1.05 s; вход Stage 7: 1.5 s.
 - Stage flare: 8 frames, 8 fps one-shot, forward upward / reverse + cool tint downward.
 
-Кадры меняют silhouette, развилки, отрывы и negative spaces. Tint/opacity/scale/glow не засчитываются как authored frame variation. Geometric flame, moving crop, slice deformation и static-card fallback запрещены. Procedural остаются только glow/light masks, embers, smoke/haze и bounded tap/seal impulses.
+Кадры меняют silhouette, развилки, отрывы и negative spaces. Tint/opacity/scale/glow не засчитываются как authored frame variation. Geometric flame, moving crop, slice deformation и static-card fallback запрещены. Procedural остаются только glow/light masks, embers, smoke/haze, bounded tap/stage impulses и синхронизированная реакция на персонажей.
 
 Tap не выбирает кадр и не ускоряет animation loop. Height/brightness impulse визуально подтверждает раздувание и ограничивается presentation cap; gameplay принимает taps независимо.
 
@@ -46,21 +46,23 @@ Tap не выбирает кадр и не ускоряет animation loop. Heig
 ### Ash Servant
 
 - `appearance`: 6 frames at 10 fps, once.
-- `idle`: 6 frames at 8 fps, loop; перенос веса, дыхание, движение головы/плеч.
-- `inhale`: 6 frames at 10 fps, once during telegraph.
-- `blow`: 6 frames at 10 fps, loop during effect.
-- Отдельный ash stream связывает mouth/action lane с outer flame.
+- `idle`: 6 authored frames at restrained 4 fps; дыхание и малые движения головы/плеч без перемещения root.
+- Telegraph: `prepare → inhale-ramp → inhale-hold`; effect: `exhale-start → ramp → peak → fade → end`; recovery ≤450 ms.
+- Отдельный ash stream, lateral ember drift и bend/suppression пламени используют один `exhaleStrength`, поэтому причина и эффект совпадают по кадру.
 
 ### Demoness
 
 - Закрытый 12+ redesign, никакой сексуализации concept pose.
 - `appearance`: 6 frames at 10 fps, once.
-- `idle`: 6 frames at 8 fps, loop.
-- `cast`: 6 frames at 10 fps, once during telegraph.
-- `hold`: 6 frames at 10 fps, loop during effect.
-- Отдельная cold ribbon связывает hand/action lane с hearth.
+- `idle`: спокойная выборка authored frames; каждые 5–9 active секунд seeded gesture `look → pause → one slow negative head movement → return`.
+- Telegraph: `cast-look → arms-rise → cast-gather`; effect: `cold-ramp → cold-hold → cold-release`; recovery ≤800 ms.
+- Отдельная cold ribbon связывает hand/action lane с hearth, а тот же `coldStrength` управляет холодным краем и подавлением пламени.
 
-После effect state machine возвращается в `idle`; recovery выражен последними action poses и переходом в idle, отдельного recovery asset нет. Pause замораживает application clock. Персонаж не перекрывает центральный tap target и остаётся отдельным от flame/environment.
+После effect state machine возвращается в `idle`; recovery использует обратный порядок уже authored action frames, без дубликата bitmap. Pause замораживает application clock. Персонаж не перекрывает центральный tap target и остаётся отдельным от flame/environment. Servant и Demoness могут действовать одновременно: каждый сохраняет собственный таймер, позу и FX.
+
+### Inferno host
+
+Host bitmap разделён metadata на пять непересекающихся пространственных регионов: left/right wings, left/right watchers и crown. У регионов разные фазы и периоды 5.5–8.9 s; whole-plate drift запрещён. Первый переход 6→7 длится 1.5 s и сочетает staged host reveal, расширение high flame, ember burst, rune wave и bounded lighting pulse. В каждом 5-секундном окне sustained Inferno видимо меняются минимум две области.
 
 ## Quality tiers
 
@@ -82,4 +84,4 @@ PASS требует exact-build evidence:
 
 ## Remaining risk
 
-Автоматические atlas/state/pause/preload tests проходят, но они не доказывают субъективную плавность. Главные открытые риски: generative identity drift между character cells, frame-to-frame flame flicker и близость worst decoded residency `61.29 MiB` к hard limit `64 MiB`. До release нужны browser motion capture, quantitative frame comparison и два независимых visual reviewer.
+Автоматические atlas/state/pause/preload tests проходят, но они не доказывают субъективную плавность. Дефектные ImageGen v4-кандидаты Demoness с baked matte отклонены; production сохраняет coherent v3 bitmap и новый queen-like timing/FX. Главные открытые риски: frame-to-frame flame flicker и близость worst decoded residency `62.42 MiB` к hard limit `64 MiB`. До release нужны browser motion capture, quantitative frame comparison и два независимых visual reviewer.

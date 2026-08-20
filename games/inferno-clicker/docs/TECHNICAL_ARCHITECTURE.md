@@ -6,7 +6,7 @@
 
 ## Статус и владелец
 
-- Этап: Corrective Cycle 02; техническая база candidate `0.1.0+dd459e6fed2e` существует, но progression, animation и audio подсистемы повторно открыты до новой regression.
+- Этап: Corrective Cycle 04; direct-tap V5/concurrent-hazard и presentation polish находятся в implementation, прежние exact-build visual reports не закрывают новый temporal gate.
 - Владелец: Game Architect.
 - Primary runtime: браузер внутри Yandex Games.
 - Architecture rule: ни один модуль `src/core/` не импортирует Yandex SDK, VK Bridge, Android API, DOM или renderer.
@@ -79,14 +79,13 @@ type GameState = {
   stageProgress: number;        // 0..1 within current threshold band
   decayRate: number;            // heat units/s, derived from config + effects
   tapPower: number;             // derived base value, not persisted independently
-  encounter: null | {
+  encounters: Array<{
     kind: 'servant' | 'demoness' | 'heat-window';
     phase: 'telegraph' | 'effect';
     msLeft: number;
-  };
-  boost: null | { kind: 'inferno-seal'; activeMsLeft: number };
-  sealBroken: boolean;           // run-local; false on restart/reload, true only after one confirmed provider success
-  sealCapImpulses: number;       // diagnostic count of accepted taps clamped at heat 559
+  }>;
+  decayFactor: number;          // product of active enemy effects, capped at 2.50
+  boost: null | { activeMsLeft: number };
   activeRunTimeMs: number;
   infernoHoldMs: number;
   runHighestStage: number;
@@ -97,7 +96,7 @@ type GameState = {
 };
 ```
 
-Все thresholds и coefficients находятся в versioned immutable config. Core работает fixed simulation step `50 ms`; renderer интерполирует визуал. После frame gap входной frame delta ограничивается `100 ms`, а pause/background gap не догоняется. Во время `PAUSED` и `AD_BREAK` simulation clock и rewarded timer не идут, поэтому background tab и provider flow не сжигают heat. Пока `sealBroken=false`, каждый tap полностью получает Stage-4 score/feedback, но heat clamp'ится к `559`; только terminal confirmed reward ставит `sealBroken=true` до запуска queued 20-s boost. Restart/reload relock'ит seal.
+Все thresholds и coefficients находятся в versioned immutable config. Core работает fixed simulation step `50 ms`; renderer интерполирует визуал. После frame gap входной frame delta ограничивается `100 ms`, а pause/background gap не догоняется. Во время `PAUSED` и `AD_BREAK` simulation clock и rewarded timer не идут, поэтому background tab и provider flow не сжигают heat. Каждый accepted tap применяет heat до единственного cap `1000`; provider state не участвует в stage crossing. Terminal confirmed reward только ставит queued 20-s boost.
 
 Gameplay schedules в MVP детерминированы активным временем и versioned config; core PRNG для progression/encounters не используется. Только несмысловые visual/audio variations получают отдельный injected session seed и не меняют state/score. Серверного authoritative anti-cheat в MVP нет; leaderboard submission проходит sanity checks и rate limit adapter, а риск client-side manipulation фиксируется как известное ограничение.
 
@@ -137,15 +136,22 @@ Core является единственным владельцем `stage` и `
 
 ### Character animation contract
 
-`CharacterScene` использует atlas clips, а не один cutout с whole-body scale/rotate. Ash Servant имеет `appearance → idle → inhale → blow`, Demoness — `appearance → idle → cast → hold`; каждый clip содержит шесть authored frames, exact fps записан в `ASSET_PLAN.md`. После effect state machine возвращает actor в idle; отдельный recovery atlas не используется. Первый вход запускает appearance один раз, затем idle. Core telegraph/effect events выбирают attack clip; pause и teardown замораживают/отменяют clip без catch-up.
+`CharacterScene` использует atlas clips и phase interpolation, а не один cutout с whole-body dance/warp. Core отдаёт независимые `encounters[]`; presentation derives phase progress from each source timer and never changes hazard timing.
+
+- Ash Servant keeps one stationary hearth-side root. The 1.0 s telegraph is split into prepare, inhale ramp and hold; the 2.5 s effect is split into exhale start/ramp/peak/fade/end followed by a 450 ms presentation-only recovery. One normalized `exhaleStrength` drives ash-stream reach/opacity, lateral ember velocity and flame bend/suppression, so cause and reaction grow and recover together.
+- Demoness is a larger restrained actor with silhouette/reveal, slow idle, seeded presentation-only disapproval look/head-shake, deliberate arms-rise/gather, 4.0 s cold ramp/hold/release and 800 ms recovery. `coldStrength` drives hand-to-hearth ribbon, cold haze and flame height/brightness/spark suppression. Whole-body rhythmic rocking and detached components are forbidden.
+- Servant and Demoness may animate attacks simultaneously. HUD receives a vertical `debuffs[]` list with source, effect, factor and remaining time for each; combined core factor is displayed only as an optional total and never replaces source rows.
+- Stage-7 host is split into at least five separately addressable spatial regions with different deterministic phase offsets/periods. Stage 6→7 adds one bounded 1.5 s entry sequence; ambient host/flame/runes/particles continue afterward. Reduced Motion removes the camera impulse and lowers particle cost without making the scene static.
+
+Pause and teardown freeze/clear all actor, recovery, idle-gesture and host clocks without wall-clock catch-up. Exact timings and binary QA metrics are fixed in `CORRECTIVE_CYCLE_04.md`.
 
 ### Presentation events and automated verification
 
-Core публикует typed domain events `tapAccepted`, `tapRejected`, `stageChanged`, `encounterStarted/Effect/Ended`, `sealBlocked`, `sealBroken`, `boostStarted/Ended`, `runEnded`, `recordsChanged` и `pauseReasonsChanged`. App/presentation агрегирует accepted taps в semantic `acceptedHeatBurst` не чаще одного раза за 120 ms для visual/audio fanning; это событие не возвращается в core и не может менять heat/score. Scene, DOM HUD, audio и telemetry подписываются независимо; ни один consumer не вызывает gameplay mutations напрямую.
+Core публикует typed domain events `tapAccepted`, `tapRejected`, `stageChanged`, `encounterStarted/Effect/Ended`, `boostStarted/Ended`, `runEnded`, `recordsChanged` и `pauseReasonsChanged`. App/presentation агрегирует accepted taps в semantic `acceptedHeatBurst` не чаще одного раза за 120 ms для visual/audio fanning; это событие не возвращается в core и не может менять heat/score. Scene, DOM HUD, audio и telemetry подписываются независимо; ни один consumer не вызывает gameplay mutations напрямую.
 
 - Headless core и deterministic clock позволяют unit/property simulations без DOM, Canvas, audio или SDK; отдельный seeded harness проверяет только несмысловые presentation/audio variations и не входит в gameplay state.
-- `SceneVisualStateMapper` проверяется table-driven snapshot tests для семи stages и всех encounter/boost combinations без запуска WebGL.
-- Renderer integration tests проверяют atlas bounds/hash, frame selection, layer order, unique passes/emitters, reversible transitions, pause freeze и cleanup; управляемый реальный браузер выполняет visual rubric, motion evidence и screenshot tests на exact build.
+- `SceneVisualStateMapper` проверяется table-driven snapshot tests для семи stages, all single/concurrent encounter combinations and boost without launching Canvas.
+- Renderer integration tests проверяют atlas bounds/hash, frame selection, phase-strength curves, stable roots, layer order, unique passes/emitters, reversible transitions, asynchronous host regions, pause freeze and cleanup; a managed production browser records temporal evidence on the exact build.
 - Character state machines используют domain events и asset states из `ASSET_PLAN.md`; hit testing остаётся только у центральной gameplay zone и DOM controls.
 
 ## Input
@@ -159,7 +165,7 @@ Core публикует typed domain events `tapAccepted`, `tapRejected`, `stage
 
 ## Persistence
 
-Persisted schema `InfernoSaveV1` содержит `schemaVersion`, `bestScore`, all-time `highestStageReached`, `longestInfernoHoldMs`, stage-only `maxMultiplier` (`1..5`), `runsPlayed`, tutorial flags, audio/reduced-motion settings, daily-ritual date/status и `updatedAt`. Старое значение maxMultiplier выше 5 при load clamp'ится до 5. Текущий `runHighestStage`, heat, score, timers, encounters, `sealBroken` и boost не сохраняются и не восстанавливаются после reload/relaunch: новый run начинается в `READY` с `heat=30` и locked seal.
+Persisted schema `InfernoSaveV1` содержит `schemaVersion`, `bestScore`, all-time `highestStageReached`, `longestInfernoHoldMs`, stage-only `maxMultiplier` (`1..5`), `runsPlayed`, tutorial flags, audio/reduced-motion settings, daily-ritual date/status и `updatedAt`. Старое значение maxMultiplier выше 5 при load clamp'ится до 5. Текущий `runHighestStage`, heat, score, timers, encounters и boost не сохраняются и не восстанавливаются после reload/relaunch: новый run начинается в `READY` с `heat=30`.
 
 - Local: `localStorage` через web adapter; `SaveCoordinator` coalesces изменения на 500 ms, сериализует write, flushes при pause/visibility/pagehide и не позволяет позднему promise перезаписать новый максимум.
 - Yandex: local-first, затем `Player.getData()/setData()` при доступном player; merge по максимуму для рекордов и по `updatedAt` для настроек.
@@ -228,11 +234,11 @@ node scripts/package.mjs
 ## Testing strategy
 
 - Unit/property tests: heat clamp, decay integration, every-valid-tap throughput, scoring, thresholds, encounters, boost timer, pause clock, corrupted save migration.
-- Deterministic simulations: scripted tap timelines на 60/30/15 FPS дают одинаковое core state в допустимой погрешности `≤0.01 heat`, `≤1 score` и `≤10 ms` для hold time.
+- Deterministic simulations: paired direct V5 traces, constant-rate controls and irregular human-profile hypotheses on 60/30/15 FPS give the same core state within `≤0.01 heat`, `≤1 score` and `≤10 ms` hold tolerance. Human plausibility is then checked through the production browser input path rather than inferred from headless math alone.
 - Adapter contract suite: web и Yandex mock проходят одинаковые success/closed/unavailable/error cases.
 - E2E: boot, touch emulation, mouse, seven stages, restart, persistence, rewarded lifecycle, offline/no-SDK fallback.
 - Visual regression: stages 1–7 на `360×640`, `390×844`, `768×1024`, `1366×768` с rubric из `QA_PLAN.md`.
-- Performance run: stage-7 maximum FX, 10 minutes, quality auto-degrade verified.
+- Performance run: Stage-7 entry plus sustained maximum FX for 10 minutes, asynchronous host active, mobile emulation and desktop, quality auto-degrade verified.
 
 ## Architecture decisions и риски
 

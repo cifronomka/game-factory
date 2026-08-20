@@ -14,73 +14,109 @@
       "x": 0,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "de64485cb509b795fb0fd52dc3e86f36a39aa22f676a462d13dcaf38b65b6d3e",
+      "provenance": "authored high outer atlas frame 0; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 256,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "728b5f5786b523a13ac25bc2d8576f8c79e47ae7449d23bd2f9094efc764bfce",
+      "provenance": "authored high outer atlas frame 1; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 512,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "b150789e6ed6353f5cb970d273e7e82d99363f23aff48f5a21f74eb39888b452",
+      "provenance": "authored high outer atlas frame 2; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 768,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "bb2b61da4b06a9ad9299ac5e796f4db994eb96727db4c658b0e119e6fc71b8df",
+      "provenance": "authored high outer atlas frame 3; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 1024,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "5391964a63d7e10a20dca4bb6f40d06c3c221987ef16a7c5fd502e60d09f793f",
+      "provenance": "authored high outer atlas frame 4; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 1280,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "fe388f394bb9a18e1fb47dcaeef1703c733f1a19d3f054cc7db4ac203bed04f7",
+      "provenance": "authored high outer atlas frame 5; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 0,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "e2505f76904388f2a46398cbb3ef5e0baf2e309b52cb756bd0767c301fcef137",
+      "provenance": "authored high outer atlas frame 6; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 256,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "61522cabe232fefa8e4fb4fa2600d95418222992dab0f30f29158f0e10663edd",
+      "provenance": "authored high outer atlas frame 7; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 512,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "dfda3098f0099ade336e34635bc7d66d43f75908bb350380917671041a166977",
+      "provenance": "authored high outer atlas frame 8; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 768,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "766e35d73abf2d8954407bfaf55ab4a3d2b0f98a9455ec19abdfbdff54c3d02b",
+      "provenance": "authored high outer atlas frame 9; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 1024,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "61901807c7f5eb4386d9b357d0cf97419b71e09aa45109da9141ee2f714d49b5",
+      "provenance": "authored high outer atlas frame 10; decoded RGBA crop from outer-high-v2.webp"
     },
     {
       "x": 1280,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "5b4e3dee28e2a223a112f0cf0705544be97e0ec39dff5745feab53dde011d6ff",
+      "provenance": "authored high outer atlas frame 11; decoded RGBA crop from outer-high-v2.webp"
     }
   ],
   "layer": "outer",

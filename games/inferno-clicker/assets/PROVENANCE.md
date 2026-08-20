@@ -13,9 +13,9 @@ not shipped as screens, crops or flattened backplates.
 | FL-MID-CORE / OUTER | flame/atlases/{core,outer}-mid-v2.webp | Two independent transparent 10-frame flame layers | preload at stage 2 progress 0.6; 10 fps |
 | FL-HIGH-CORE / OUTER | flame/atlases/{core,outer}-high-v2.webp | Two independent transparent 12-frame Inferno layers | preload at stage 5 progress 0.6; 11 fps |
 | FX-STAGE-FLARE | flame/transitions/stage-flare-v2.webp | Transparent 8-frame boundary flare | preload at stage 1 progress 0.6; 8 fps once; reverse downward |
-| CH-ASH-SERVANT | characters/ash-servant/ash-servant-states-v2.webp | Appearance, idle, inhale and blow rows, six frames each | preload at stage 2 progress 0.6 |
-| CH-DEMONESS | characters/demoness/demoness-states-v2.webp | Appearance, idle, cast and hold rows, six frames each | preload at stage 3 progress 0.6 |
-| CH-INFERNO-HOST | characters/character-inferno-host.webp | Transparent distant climax host plate | preload at stage 5 progress 0.6 |
+| CH-ASH-SERVANT | characters/ash-servant/ash-servant-states-v3.webp | Complete appearance, idle, inhale and blow figures repacked into stable-root 256×280 cells | preload at stage 2 progress 0.6 |
+| CH-DEMONESS | characters/demoness/demoness-states-v3.webp | Complete appearance, restrained idle/disapproval, cast and hold figures repacked into stable-root 256×280 cells | preload at stage 3 progress 0.6 |
+| CH-INFERNO-HOST | characters/character-inferno-host.webp + character-inferno-host-v3.json | Five non-overlapping authored spatial regions from the transparent climax host | preload at stage 5 progress 0.6; independent periods 5.5–8.9 s |
 
 The matching JSON files are the production clip metadata and preserve frame
 rectangles, loop mode, fps and shared pivots. Exact optimized byte sizes,
@@ -47,7 +47,23 @@ Character atlases have no baked environment or UI. Runtime procedural work is
 limited to compositing, light/reveal masks, bounded particles, glow, ash flow and
 cold ribbon effects; it does not synthesize a geometric flame or humanoid.
 
-The current bitmap registry decodes to 64,269,312 bytes (61.29 MiB) if every
+Cycle 04 losslessly repacked each complete source-space character cluster into
+`1536×1120` VP8L atlases with 24 `256×280` cells, an 8-pixel transparent gutter,
+bottom root at y=272 and centered body. Visible RGBA pixels and alpha are retained;
+no scale, redraw or ImageGen interpolation occurs in this repack. Per-cell pixel
+hashes, source ranges, root/centroid/edge metrics and sockets are recorded in the
+v3 metadata. All 48 cells have zero alpha on the outer four pixels, root span is
+at most two source pixels and the largest-body connected-component ratio is at
+least 0.998.
+
+An additional Cycle 04 ImageGen exploration for a revised Demoness Queen was
+reviewed but rejected because background-extraction passes left partially opaque
+matte blocks. None of those candidate PNGs or derived v4 atlases is shipped or
+referenced. The safe v3 identity remains the production bitmap while its runtime
+timing, selected poses, cold FX and recovery were rebuilt to the authoritative
+queen behavior contract.
+
+The current bitmap registry decodes to 65,448,960 bytes (62.42 MiB) if every
 stage asset is resident simultaneously. Startup-critical bitmaps are 818,566
 compressed bytes and 12,581,888 decoded bytes; the remaining atlases are loaded
 near their first use.

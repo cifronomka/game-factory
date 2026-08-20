@@ -7,7 +7,7 @@ function state(overrides = {}) {
     stage: 4, stageProgress: 0.2, emberCap: 12, smokeCap: 4, paused: false, reducedMotion: false, quality: 'high', flashesEnabled: true,
     flameHeight: 0.34, flameWidth: 0.16, outerColor: '#f05a24', coreColor: '#fff0c2',
     boostActive: false, boostEnding: false,
-    encounter: null, ...overrides,
+    encounters: [], ...overrides,
   };
 }
 
@@ -82,8 +82,46 @@ test('paused visual state freezes particle and pulse lifetimes', () => {
 
 test('beneficial Heat Window active cue uses its warm semantic pulse', () => {
   const rig = new FlameRig();
-  rig.setState(state({ encounter: { kind: 'heat-window', phase: 'active', progress: 0.5 } }));
+  rig.setState(state({ encounters: [{ kind: 'heat-window', phase: 'active', progress: 0.5 }] }));
   rig.handleEvent({ type: 'encounter-cue', kind: 'heat-window', phase: 'active' }, 0);
   assert.equal(rig.pulses.length, 1);
   assert.equal(rig.pulses[0].kind, 'heat');
+});
+
+test('phase-driven character reaction bends, cools and suppresses flame without resetting authored loops', () => {
+  const rig = new FlameRig();
+  rig.setState(state());
+  rig.update(0.05);
+  const frame = rig.getStats().assets.mid.coreFrame;
+  rig.setCharacterReaction({ bend: -0.58, suppression: 0.2, emberDrift: 0, cold: 1, source: 'demoness-hold' });
+  const reaction = rig.getStats().characterReaction;
+  assert.equal(reaction.source, 'demoness-hold');
+  assert.equal(reaction.cold, 1);
+  assert.equal(reaction.suppression, 0.2);
+  assert.equal(rig.getStats().assets.mid.coreFrame, frame);
+});
+
+test('Demoness cold visibly reduces accepted-tap and ambient embers', () => {
+  const warm = new FlameRig();
+  warm.setState(state({ emberCap: 80 }));
+  warm.handleEvent({ type: 'tap-accepted', critical: false });
+  const cold = new FlameRig();
+  cold.setState(state({ emberCap: 80 }));
+  cold.setCharacterReaction({ cold: 1, source: 'demoness-hold' });
+  cold.handleEvent({ type: 'tap-accepted', critical: false });
+  assert.equal(warm.getStats().embers, 7);
+  assert.equal(cold.getStats().embers, 3);
+});
+
+test('Stage 6 to 7 starts one bounded 1.5 second Inferno entry payoff', () => {
+  const rig = new FlameRig();
+  rig.setState(state({ stage: 6 }));
+  rig.setState(state({ stage: 7 }));
+  rig.handleEvent({ type: 'stage-changed', from: 6, to: 7 });
+  assert.equal(rig.getStats().infernoEntryProgress, 0);
+  assert.deepEqual(rig.getStats().infernoPayoff, { durationMs: 1_500, highFlameExpansion: true, emberBurst: true, runeWave: true, lightingPulse: true });
+  for (let index = 0; index < 15; index += 1) rig.update(0.05);
+  assert.equal(rig.getStats().infernoEntryProgress, 0.5);
+  for (let index = 0; index < 15; index += 1) rig.update(0.05);
+  assert.equal(rig.getStats().infernoEntryProgress, 1);
 });

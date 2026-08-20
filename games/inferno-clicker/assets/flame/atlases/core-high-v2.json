@@ -14,73 +14,109 @@
       "x": 0,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "a3cde151cff7711343ba2853b2a9277308827c23f14d719d7da69dc81209df61",
+      "provenance": "authored high core atlas frame 0; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 256,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "304a756722272b695d9597f4e0dcebe68cda50e9ca0f41a3ce8aa2087abe04bc",
+      "provenance": "authored high core atlas frame 1; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 512,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "fa2de68279320244121e148393076eb7ac07d12b4f6afee155fd75cc62db2cc9",
+      "provenance": "authored high core atlas frame 2; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 768,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "79ea37765e123ce2a6d2f5b5363b2ff8d1a145730901f2d71411c799abb7dbfe",
+      "provenance": "authored high core atlas frame 3; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 1024,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "8f6f61b73846b843af003209ab1fb7b8dfd27678b3b1d7f328ec773a2e317ffd",
+      "provenance": "authored high core atlas frame 4; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 1280,
       "y": 0,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "d20e18fc4498ed922311c6f9a382a9c94a6e2dd9764519137fdc52b9f0f1011c",
+      "provenance": "authored high core atlas frame 5; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 0,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "028915eda9cc1606484770456009fe1678874dad11209c3958088ae2c8eac6b9",
+      "provenance": "authored high core atlas frame 6; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 256,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "79dadf1b355c793d754d111a6f4ee9a36beb5add9773fe76cd1f978ce97d9873",
+      "provenance": "authored high core atlas frame 7; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 512,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "b2902447b791c3e43bd7609aadc13184e137ebe122f963eb8ed68ff198e3305c",
+      "provenance": "authored high core atlas frame 8; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 768,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "79767f6ab2938990677498431aa750f53c5b6074cfc5ed53bcc8de89026dbe1a",
+      "provenance": "authored high core atlas frame 9; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 1024,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "1fb323cf0647a59a4e9f31b6aad0d0fda4a0b4dd88ee0c01fb16d977961d53cb",
+      "provenance": "authored high core atlas frame 10; decoded RGBA crop from core-high-v2.webp"
     },
     {
       "x": 1280,
       "y": 640,
       "w": 256,
-      "h": 640
+      "h": 640,
+      "durationMs": 90.909,
+      "sha256": "0c2144ee9dcfdae30eb8c5b38e36326a6f2e214ee64166e3a5b4c6add77389d1",
+      "provenance": "authored high core atlas frame 11; decoded RGBA crop from core-high-v2.webp"
     }
   ],
   "layer": "core"

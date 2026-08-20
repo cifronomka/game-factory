@@ -1,0 +1,17 @@
+{
+  "name": "canonicalDirectBoostedV5",
+  "version": 5,
+  "firstTapMs": 0,
+  "intervalByRunHighestStageMs": [500, 500, 250, 250, 200, 140, 140],
+  "stopMs": 180000,
+  "rewardAtMs": 65000,
+  "rewardRequestId": "canonical-direct-v5",
+  "expected": {
+    "stageReachedAtMs": { "2": 9000, "3": 43500, "4": 64500, "5": 75750, "6": 83950, "7": 102710 },
+    "acceptedTaps": 944,
+    "score": 180220,
+    "heat": 936.94,
+    "currentInfernoHoldMs": 65950,
+    "runHighestStage": 7
+  }
+}

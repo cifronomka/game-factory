@@ -15,6 +15,8 @@
     "test": "node scripts/test.mjs",
     "test:e2e": "node scripts/e2e-smoke.mjs",
     "assets:audit": "node scripts/assets-audit.mjs",
+    "animation:audit": "node scripts/animation-assets-audit.mjs",
+    "evidence:validate": "node scripts/validate-animation-evidence.mjs",
     "release:audit": "node scripts/release-audit.mjs",
     "package": "node scripts/package.mjs"
   }

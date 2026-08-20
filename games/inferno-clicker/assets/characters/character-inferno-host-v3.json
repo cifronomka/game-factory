@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "atlasWidth": 1024,
+  "atlasHeight": 683,
+  "pivot": [
+    0.5,
+    0.72
+  ],
+  "semantic": "independent-spatial-regions-not-sequential-frames",
+  "regions": [
+    { "id": "left-wing", "x": 0, "y": 0, "w": 340, "h": 360, "role": "wing", "periodSeconds": 7.7, "phase": 0, "amplitude": 5 },
+    { "id": "left-watchers", "x": 0, "y": 360, "w": 340, "h": 323, "role": "watchers", "periodSeconds": 6.1, "phase": 1.2, "amplitude": 3.5 },
+    { "id": "crown", "x": 340, "y": 0, "w": 344, "h": 683, "role": "crown", "periodSeconds": 8.9, "phase": 2.4, "amplitude": 3 },
+    { "id": "right-wing", "x": 684, "y": 0, "w": 340, "h": 360, "role": "wing", "periodSeconds": 7.1, "phase": 3.6, "amplitude": 5 },
+    { "id": "right-watchers", "x": 684, "y": 360, "w": 340, "h": 323, "role": "watchers", "periodSeconds": 5.5, "phase": 4.8, "amplitude": 3.5 }
+  ],
+  "runtimeContract": {
+    "independentMotion": true,
+    "wholePlateOnly": false,
+    "entryDurationMs": 1500,
+    "minimumMovingRegionsPer5s": 2,
+    "reducedMotionFreezesRegionalTransforms": true
+  },
+  "clips": {
+    "ambient": {
+      "fps": 0.4,
+      "loop": true,
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 340,
+          "h": 360,
+          "durationMs": 2500,
+          "role": "left-wing",
+          "phase": 0,
+          "socket": [
+            0.5,
+            0.7
+          ],
+          "sha256": "fde3f65da6cfb942ab3e7603315a70e77f8a0626ee96ec1388b6cfb770af7adb",
+          "provenance": "authored spatial region left-wing cropped from character-inferno-host.webp; independently transformed at runtime; no duplicated frames"
+        },
+        {
+          "x": 0,
+          "y": 360,
+          "w": 340,
+          "h": 323,
+          "durationMs": 2500,
+          "role": "left-watchers",
+          "phase": 1.1,
+          "socket": [
+            0.5,
+            0.7
+          ],
+          "sha256": "dd833f5ca11ad90a1b699b126f5f12972df9ea520b9cd89fa0f9550fd72f5136",
+          "provenance": "authored spatial region left-watchers cropped from character-inferno-host.webp; independently transformed at runtime; no duplicated frames"
+        },
+        {
+          "x": 340,
+          "y": 0,
+          "w": 344,
+          "h": 683,
+          "durationMs": 2500,
+          "role": "crown",
+          "phase": 2.35,
+          "socket": [
+            0.5,
+            0.7
+          ],
+          "sha256": "a60d79efddd1fd3148c0b276c96b34b836d04f801e06d455d13067dc9b63c6a9",
+          "provenance": "authored spatial region crown cropped from character-inferno-host.webp; independently transformed at runtime; no duplicated frames"
+        },
+        {
+          "x": 684,
+          "y": 0,
+          "w": 340,
+          "h": 360,
+          "durationMs": 2500,
+          "role": "right-wing",
+          "phase": 3.4,
+          "socket": [
+            0.5,
+            0.7
+          ],
+          "sha256": "b4b9295f1a87bca745bfb08b96f1b62313cc7e4240bfae49fbbe3df2595948db",
+          "provenance": "authored spatial region right-wing cropped from character-inferno-host.webp; independently transformed at runtime; no duplicated frames"
+        },
+        {
+          "x": 684,
+          "y": 360,
+          "w": 340,
+          "h": 323,
+          "durationMs": 2500,
+          "role": "right-watchers",
+          "phase": 4.55,
+          "socket": [
+            0.5,
+            0.7
+          ],
+          "sha256": "c1212a6a76e91be93f87762ea0fa57a209540db5a178a8a0a4fb2191229bafaf",
+          "provenance": "authored spatial region right-watchers cropped from character-inferno-host.webp; independently transformed at runtime; no duplicated frames"
+        }
+      ]
+    }
+  }
+}

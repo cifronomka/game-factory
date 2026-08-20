@@ -4,8 +4,6 @@ export const FIXED_STEP_MS = 50;
 export const MAX_FRAME_DELTA_MS = 100;
 export const MAX_SCORE = 2_147_483_647;
 export const HEAT_MAX = 1_000;
-/** Highest reachable heat until the current run's Infernal Seal is broken. */
-export const SEAL_HEAT_CAP = 559;
 export const INITIAL_HEAT = 30;
 export const BASE_TAP_POWER = 3;
 /** Emergency protection for impossible synthetic floods, not a balance cap. */
@@ -14,6 +12,9 @@ export const FAIL_GRACE_MS = 2_000;
 export const REWARDED_DURATION_MS = 20_000;
 export const REWARDED_ELIGIBLE_RUN_MS = 45_000;
 export const REWARDED_SESSION_COOLDOWN_MS = 90_000;
+export const SERVANT_DECAY_FACTOR = 1.8;
+export const DEMONESS_DECAY_FACTOR = 1.5;
+export const ENEMY_DECAY_FACTOR_CAP = 2.5;
 
 /** @typedef {1|2|3|4|5|6|7} Stage */
 
@@ -53,7 +54,6 @@ export const HEAT_WINDOW_FIRST_MS = 6_000;
 export const HEAT_WINDOW_TELEGRAPH_MS = 750;
 export const HEAT_WINDOW_ACTIVE_MS = 1_500;
 export const HEAT_WINDOW_REPEAT_MS = Object.freeze([9_000, 11_000, 8_000, 10_000]);
-export const EVENT_GAP_MS = 1_000;
 
 /** @param {number} heat @returns {StageConfig} */
 export function stageForHeat(heat) {

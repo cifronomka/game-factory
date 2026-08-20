@@ -2,44 +2,193 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CharacterScene } from '../../src/presentation/scene/characterScene.js';
+import {
+  CharacterScene,
+  INFERNO_HOST_REGIONS,
+  demonessDisapprovalGesture,
+  demonessHandSocket,
+  demonessTemporalPhase,
+  hostMotionForRegion,
+  servantTemporalPhase,
+} from '../../src/presentation/scene/characterScene.js';
 
 function state(overrides = {}) {
-  return { stage: 1, stageProgress: 0, paused: false, servant: 'hidden', demoness: 'hidden', hostLevel: 0, ...overrides };
+  return { stage: 1, stageProgress: 0, paused: false, encounters: [], servant: 'hidden', demoness: 'hidden', hostLevel: 0, reducedMotion: false, ...overrides };
 }
 
 function advance(scene, seconds) {
   for (let elapsed = 0; elapsed < seconds; elapsed += 0.05) scene.update(0.05);
 }
 
-test('servant completes appearance before inhale-blow cause and effect states', () => {
+test('servant temporal curve exposes prepare, inhale hold, exhale ramp, peak and fade', () => {
+  assert.equal(servantTemporalPhase({ phase: 'telegraph', progress: 0.05 }).phase, 'prepare');
+  assert.equal(servantTemporalPhase({ phase: 'telegraph', progress: 0.8 }).phase, 'inhale-hold');
+  const start = servantTemporalPhase({ phase: 'active', progress: 0.05 });
+  const ramp = servantTemporalPhase({ phase: 'active', progress: 0.25 });
+  const peak = servantTemporalPhase({ phase: 'active', progress: 0.5 });
+  const fade = servantTemporalPhase({ phase: 'active', progress: 0.8 });
+  assert.equal(start.phase, 'exhale-start');
+  assert.ok(start.strength < ramp.strength);
+  assert.equal(peak.strength, 1);
+  assert.ok(fade.strength < peak.strength);
+});
+
+test('servant holds one world anchor and recovers after effect', () => {
   const scene = new CharacterScene();
-  scene.setState(state({ stage: 3, servant: 'inhale' }));
-  assert.equal(scene.getDiagnostics().servant.state, 'appearance');
-  advance(scene, 0.3);
-  scene.setState(state({ stage: 3, servant: 'blow' }));
-  assert.equal(scene.getDiagnostics().servant.state, 'appearance');
-  advance(scene, 0.35);
-  assert.equal(scene.getDiagnostics().servant.state, 'blow');
-  scene.setState(state({ stage: 3, servant: 'idle' }));
+  scene.setState(state({ stage: 3 }));
+  advance(scene, 0.65);
+  scene.setState(state({ stage: 3, encounters: [{ kind: 'servant', phase: 'active', progress: 0.5 }] }));
+  const active = scene.getDiagnostics();
+  assert.equal(active.servant.state, 'exhale-peak');
+  assert.equal(active.servant.strength, 1);
+  assert.deepEqual(active.servant.anchor, [300, 1_225]);
+  assert.equal(active.reaction.source, 'servant-blow');
+  scene.setState(state({ stage: 3 }));
+  assert.equal(scene.getDiagnostics().servant.state, 'recovery');
+  advance(scene, 0.5);
   assert.equal(scene.getDiagnostics().servant.state, 'idle');
 });
 
-test('demoness completes appearance before cast-hold states', () => {
+test('Demoness Stage 4 silhouette does not consume reveal and cast is restrained phase-driven', () => {
   const scene = new CharacterScene();
-  scene.setState(state({ stage: 5, demoness: 'cast' }));
+  scene.setState(state({ stage: 4 }));
+  advance(scene, 1.5);
+  assert.equal(scene.getDiagnostics().demoness.state, 'silhouette');
+  assert.equal(scene.getDiagnostics().demoness.revealed, false);
+  scene.setState(state({ stage: 5 }));
   assert.equal(scene.getDiagnostics().demoness.state, 'appearance');
-  advance(scene, 1.05);
-  assert.equal(scene.getDiagnostics().demoness.state, 'cast');
-  scene.setState(state({ stage: 5, demoness: 'hold' }));
-  assert.equal(scene.getDiagnostics().demoness.state, 'hold');
+  advance(scene, 0.65);
+  scene.setState(state({ stage: 5, encounters: [{ kind: 'demoness', phase: 'telegraph', progress: 0.5 }] }));
+  assert.equal(scene.getDiagnostics().demoness.state, 'arms-rise');
+  scene.setState(state({ stage: 5, encounters: [{ kind: 'demoness', phase: 'active', progress: 0.5 }] }));
+  assert.equal(scene.getDiagnostics().demoness.state, 'cold-hold');
+  assert.equal(scene.getDiagnostics().demoness.coldStrength, 1);
+  assert.equal(scene.getDiagnostics().reaction.source, 'demoness-hold');
+  scene.setState(state({ stage: 5 }));
+  assert.equal(scene.getDiagnostics().demoness.state, 'recovery');
+  advance(scene, 0.85);
+  assert.equal(scene.getDiagnostics().demoness.state, 'idle');
+});
+
+test('concurrent hazards combine presentation reaction without replacing either actor', () => {
+  const scene = new CharacterScene();
+  scene.setState(state({ stage: 6 }));
+  advance(scene, 0.65);
+  scene.setState(state({ stage: 6, encounters: [
+    { kind: 'servant', phase: 'active', progress: 0.5 },
+    { kind: 'demoness', phase: 'active', progress: 0.5 },
+  ] }));
+  const diagnostics = scene.getDiagnostics();
+  assert.equal(diagnostics.servant.state, 'exhale-peak');
+  assert.equal(diagnostics.demoness.state, 'cold-hold');
+  assert.equal(diagnostics.reaction.source, 'combined');
+  assert.ok(diagnostics.reaction.suppression > 0.2);
+});
+
+test('Inferno host regions use independent bounded clocks and stay calmly alive in reduced motion', () => {
+  assert.equal(INFERNO_HOST_REGIONS.length, 5);
+  const motions = INFERNO_HOST_REGIONS.map((region) => hostMotionForRegion(region, 3.25, false));
+  assert.ok(new Set(motions.map((motion) => motion.hover.toFixed(3))).size >= 3);
+  for (const motion of motions) {
+    assert.ok(Math.abs(motion.hover) <= 5);
+    assert.ok(Math.abs(motion.rotation) <= 0.0071);
+  }
+  const reduced = INFERNO_HOST_REGIONS.map((region) => hostMotionForRegion(region, 3.25, true));
+  assert.ok(reduced.some((motion) => Math.abs(motion.hover) > 0.01));
+  assert.ok(new Set(reduced.map((motion) => motion.hover.toFixed(3))).size >= 3);
+  for (let index = 0; index < reduced.length; index += 1) {
+    assert.ok(Math.abs(reduced[index].hover) <= INFERNO_HOST_REGIONS[index].amplitude * 0.22 + 1e-9);
+    assert.equal(reduced[index].rotation, 0);
+  }
+  const scene = new CharacterScene();
+  assert.deepEqual(scene.getDiagnostics().host, { asset: 'idle', regions: 5, wholePlateOnly: false, entryProgress: 1, entryDurationMs: 1_500 });
+});
+
+test('Demoness keeps a calm idle and performs one restrained disapproval gesture every 5-9 active seconds', () => {
+  const scene = new CharacterScene();
+  scene.setState(state({ stage: 5 }));
+  advance(scene, 0.65);
+  assert.equal(scene.getDiagnostics().demoness.state, 'idle');
+  advance(scene, 6.45);
+  assert.equal(scene.getDiagnostics().demoness.state, 'disapproval');
+  assert.equal(scene.getDiagnostics().demoness.clip, 'disapproval');
+  assert.equal(scene.getDiagnostics().demoness.frame, 0, 'body remains on one calm authored frame');
+  advance(scene, 2.05);
+  const recovered = scene.getDiagnostics().demoness;
+  assert.equal(recovered.state, 'idle');
+  assert.equal(recovered.disapprovalCount, 1);
+  assert.ok(recovered.nextDisapprovalMs >= 5_000 && recovered.nextDisapprovalMs <= 9_000);
+  assert.deepEqual(recovered.size, [600, 656]);
+});
+
+test('Demoness disapproval follows ordered gaze phases without a dance loop', () => {
+  assert.equal(demonessDisapprovalGesture(0.1).phase, 'look-left');
+  assert.equal(demonessDisapprovalGesture(0.6).phase, 'hold-left');
+  assert.equal(demonessDisapprovalGesture(1.0).phase, 'look-right');
+  assert.equal(demonessDisapprovalGesture(1.5).phase, 'hold-right');
+  assert.equal(demonessDisapprovalGesture(1.9).phase, 'return');
+});
+
+test('Demoness cold ribbon follows authored cast and hold hand sockets', () => {
+  assert.deepEqual(demonessHandSocket('cast', 0), [0.25, 0.32]);
+  assert.deepEqual(demonessHandSocket('cast', 5), [0.22, 0.26]);
+  assert.deepEqual(demonessHandSocket('hold', 0), [0.20, 0.29]);
+  assert.deepEqual(demonessHandSocket('hold', 4), [0.19, 0.28]);
+});
+
+test('stage-down waits for authored recovery before hiding or returning to silhouette', () => {
+  const scene = new CharacterScene();
+  scene.setState(state({ stage: 6 }));
+  advance(scene, 0.65);
+  scene.setState(state({ stage: 6, encounters: [
+    { kind: 'servant', phase: 'active', progress: 0.5 },
+    { kind: 'demoness', phase: 'active', progress: 0.5 },
+  ] }));
+  scene.setState(state({ stage: 2 }));
+  let diagnostics = scene.getDiagnostics();
+  assert.equal(diagnostics.servant.visible, true);
+  assert.equal(diagnostics.servant.state, 'recovery');
+  assert.equal(diagnostics.demoness.revealed, true);
+  assert.equal(diagnostics.demoness.state, 'recovery');
+  advance(scene, 0.5);
+  diagnostics = scene.getDiagnostics();
+  assert.equal(diagnostics.servant.visible, false);
+  assert.equal(diagnostics.servant.state, 'hidden');
+  advance(scene, 0.35);
+  diagnostics = scene.getDiagnostics();
+  assert.equal(diagnostics.demoness.visible, false);
+  assert.equal(diagnostics.demoness.state, 'hidden');
+
+  const silhouetteScene = new CharacterScene();
+  silhouetteScene.setState(state({ stage: 5 }));
+  advance(silhouetteScene, 0.65);
+  silhouetteScene.setState(state({ stage: 5, encounters: [{ kind: 'demoness', phase: 'active', progress: 0.5 }] }));
+  silhouetteScene.setState(state({ stage: 4 }));
+  assert.equal(silhouetteScene.getDiagnostics().demoness.state, 'recovery');
+  advance(silhouetteScene, 0.85);
+  assert.equal(silhouetteScene.getDiagnostics().demoness.state, 'silhouette');
+  assert.equal(silhouetteScene.getDiagnostics().demoness.revealed, false);
+});
+
+test('active Demoness effect remains revealed when heat falls back to Stage 4', () => {
+  const scene = new CharacterScene();
+  scene.setState(state({ stage: 5 }));
+  advance(scene, 0.65);
+  const active = [{ kind: 'demoness', phase: 'active', progress: 0.5 }];
+  scene.setState(state({ stage: 5, encounters: active }));
+  assert.equal(scene.getDiagnostics().demoness.state, 'cold-hold');
+  scene.setState(state({ stage: 4, encounters: active }));
+  const diagnostics = scene.getDiagnostics().demoness;
+  assert.equal(diagnostics.state, 'cold-hold');
+  assert.equal(diagnostics.revealed, true);
+  assert.equal(diagnostics.coldStrength, 1);
 });
 
 test('pause freezes character animation application clock', () => {
   const scene = new CharacterScene();
-  scene.setState(state({ stage: 3, servant: 'idle' }));
+  scene.setState(state({ stage: 3 }));
   advance(scene, 0.2);
-  scene.setState(state({ stage: 3, servant: 'idle', paused: true }));
+  scene.setState(state({ stage: 3, paused: true }));
   const before = scene.getDiagnostics().servant;
   advance(scene, 0.5);
   const after = scene.getDiagnostics().servant;
@@ -51,7 +200,7 @@ test('character atlases preload immediately before their stage dependencies', ()
   let created = 0;
   const imageFactory = () => {
     created += 1;
-    return { complete: true, naturalWidth: 1536, naturalHeight: 1024, decoding: 'auto', src: '', addEventListener() {} };
+    return { complete: true, naturalWidth: 1536, naturalHeight: 1120, decoding: 'auto', src: '', addEventListener() {} };
   };
   const scene = new CharacterScene({ imageFactory });
   assert.equal(created, 0);
@@ -61,4 +210,13 @@ test('character atlases preload immediately before their stage dependencies', ()
   assert.equal(created, 2);
   scene.setState(state({ stage: 5, stageProgress: 0.61 }));
   assert.equal(created, 3);
+});
+
+test('Demoness cold curve has deliberate look, gather, stable hold and release', () => {
+  assert.equal(demonessTemporalPhase({ phase: 'telegraph', progress: 0.1 }).phase, 'cast-look');
+  assert.equal(demonessTemporalPhase({ phase: 'telegraph', progress: 0.9 }).phase, 'cast-gather');
+  assert.equal(demonessTemporalPhase({ phase: 'active', progress: 0.5 }).phase, 'cold-hold');
+  const release = demonessTemporalPhase({ phase: 'active', progress: 0.9 });
+  assert.equal(release.phase, 'cold-release');
+  assert.ok(release.strength < 1);
 });

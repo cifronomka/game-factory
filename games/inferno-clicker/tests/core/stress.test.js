@@ -19,13 +19,11 @@ test('ten-minute active-time stress keeps every numeric and discrete invariant v
     for (const value of [state.heat, state.scoreAcc, state.score, state.multiplier, state.stageProgress, state.activeRunTimeMs]) {
       assert.equal(Number.isFinite(value), true);
     }
-    assert.ok(state.heat >= 0 && state.heat <= 559);
+    assert.ok(state.heat >= 0 && state.heat <= 1_000);
     assert.ok(state.stage >= 1 && state.stage <= 7);
     assert.ok(state.stageProgress >= 0 && state.stageProgress <= 1);
     assert.ok(state.multiplier >= 1 && state.multiplier <= 5);
   }
   assert.equal(engine.state.simulationTimeMs, 600_000);
-  assert.equal(engine.state.runHighestStage, 4);
-  assert.equal(engine.state.sealBroken, false);
-  assert.ok(engine.state.sealCapImpulses > 0);
+  assert.ok(engine.state.runHighestStage >= 5);
 });

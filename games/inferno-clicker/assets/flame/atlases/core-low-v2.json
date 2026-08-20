@@ -14,49 +14,73 @@
       "x": 0,
       "y": 0,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 100.0,
+      "sha256": "cd34b2a78fe0524d1c602514ff08fae514c7be7ff3ea099c200663a4c9b91144",
+      "provenance": "authored low core atlas frame 0; decoded RGBA crop from core-low-v2.webp"
     },
     {
       "x": 256,
       "y": 0,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 100.0,
+      "sha256": "1913cf3b38c82badaa0406e505433c44bf2a955ba26b7ce7cd2b386e4630b724",
+      "provenance": "authored low core atlas frame 1; decoded RGBA crop from core-low-v2.webp"
     },
     {
       "x": 512,
       "y": 0,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 100.0,
+      "sha256": "aa3f71534f50685b15932b0b4497175edcfb0e3557bb3586ec54676221360d75",
+      "provenance": "authored low core atlas frame 2; decoded RGBA crop from core-low-v2.webp"
     },
     {
       "x": 768,
       "y": 0,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 100.0,
+      "sha256": "cc29e888f742fd488975fe10359971d56fb636eece9c13d975817bc4267cf9fc",
+      "provenance": "authored low core atlas frame 3; decoded RGBA crop from core-low-v2.webp"
     },
     {
       "x": 0,
       "y": 512,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 100.0,
+      "sha256": "592f3b2ae61e7a103cbaec793e5288bd7d932b23d16de33dcd4ed763ec8921e3",
+      "provenance": "authored low core atlas frame 4; decoded RGBA crop from core-low-v2.webp"
     },
     {
       "x": 256,
       "y": 512,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 100.0,
+      "sha256": "29f2d5b62067764ce49368486fe64297c65bfe5ad48ed3f5e479b7af10eb0d71",
+      "provenance": "authored low core atlas frame 5; decoded RGBA crop from core-low-v2.webp"
     },
     {
       "x": 512,
       "y": 512,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 100.0,
+      "sha256": "c3407ccd2cc98d47ccc1cf4cd87b84e0ec2dabeb85670cd58cac64a88eb3b07b",
+      "provenance": "authored low core atlas frame 6; decoded RGBA crop from core-low-v2.webp"
     },
     {
       "x": 768,
       "y": 512,
       "w": 256,
-      "h": 512
+      "h": 512,
+      "durationMs": 100.0,
+      "sha256": "9815d730cf003da57c2b728e143b619a8bb0c3d2e098a17edabae28ba6cac5d1",
+      "provenance": "authored low core atlas frame 7; decoded RGBA crop from core-low-v2.webp"
     }
   ],
   "layer": "core"

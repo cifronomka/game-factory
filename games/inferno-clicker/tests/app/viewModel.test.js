@@ -18,10 +18,33 @@ test('maps a safe initial presentation snapshot', () => {
 
 test('maps encounter effect to active presentation phase with bounded progress', () => {
   const state = createInitialState();
-  state.encounter = { kind: 'servant', phase: 'effect', msLeft: 1_250 };
+  state.encounters = [{ kind: 'servant', phase: 'effect', msLeft: 1_250 }];
   const view = toPresentationViewModel(state, settings, capabilities);
-  assert.equal(view.encounter?.phase, 'active');
-  assert.equal(view.encounter?.progress, 0.5);
+  assert.equal(view.encounters[0]?.phase, 'active');
+  assert.equal(view.encounters[0]?.progress, 0.5);
+});
+
+test('maps concurrent enemy effects to separate sourced debuff rows', () => {
+  const state = createInitialState();
+  state.encounters = [
+    { kind: 'servant', phase: 'effect', msLeft: 1_250 },
+    { kind: 'demoness', phase: 'effect', msLeft: 3_200 },
+    { kind: 'heat-window', phase: 'effect', msLeft: 800 },
+  ];
+  state.decayFactor = 2.5;
+  const view = toPresentationViewModel(state, settings, capabilities);
+  assert.equal(view.encounters.length, 3);
+  assert.deepEqual(view.debuffs, [
+    {
+      kind: 'servant', sourceLabel: 'Пепельный слуга', effectLabel: 'Пепельный выдох',
+      decayFactor: 1.8, decayIncreasePercent: 80, remainingMs: 1_250,
+    },
+    {
+      kind: 'demoness', sourceLabel: 'Демонесса угасания', effectLabel: 'Холодное угасание',
+      decayFactor: 1.5, decayIncreasePercent: 50, remainingMs: 3_200,
+    },
+  ]);
+  assert.equal(view.combinedDecayFactor, 2.5);
 });
 
 test('maps domain feedback without leaking gameplay rules to presentation', () => {

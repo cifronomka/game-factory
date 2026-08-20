@@ -29,7 +29,9 @@
  * @property {number} bestScore
  * @property {number} multiplier
  * @property {number} infernoHoldMs
- * @property {EncounterViewModel|null} encounter
+ * @property {readonly EncounterViewModel[]} encounters
+ * @property {readonly {kind:'servant'|'demoness',sourceLabel:string,effectLabel:string,decayFactor:number,decayIncreasePercent:number,remainingMs:number}[]} debuffs
+ * @property {number} combinedDecayFactor
  * @property {BoostViewModel|null} boost
  * @property {boolean} paused
  * @property {boolean} muted
@@ -38,8 +40,6 @@
  * @property {boolean} rewardedAvailable
  * @property {boolean} rewardedSupported
  * @property {'yandex'|'test'|'unavailable'} rewardedProvider
- * @property {boolean} sealBroken
- * @property {boolean} sealLockedAtCap
  * @property {boolean} showTapHint
  */
 
@@ -55,8 +55,6 @@
  * @typedef {GameplayTapEvent|
  * {type:'stage-changed',from:StageId,to:StageId}|
  * {type:'encounter-cue',kind:EncounterKind,phase:EncounterPhase}|
- * {type:'seal-blocked'}|
- * {type:'seal-broken'}|
  * {type:'boost-changed',active:boolean}|
  * {type:'personal-best'}|
  * {type:'pause',reason:string}|

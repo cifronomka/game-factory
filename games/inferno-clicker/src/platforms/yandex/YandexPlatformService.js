@@ -258,7 +258,7 @@ export class YandexPlatformService {
     } finally { if (timer !== undefined) clearTimeout(timer); }
   }
 
-  /** @param {'inferno-seal'} placement */
+  /** @param {'inferno-seal'} placement Internal legacy-compatible id for the optional timed boost. */
   async showRewardedAd(placement) {
     const requestId = this.#requestId('rewarded');
     if (placement !== 'inferno-seal' || !this.sdk?.adv?.showRewardedVideo) {

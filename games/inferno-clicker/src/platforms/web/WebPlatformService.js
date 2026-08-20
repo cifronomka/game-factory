@@ -135,7 +135,7 @@ export class WebPlatformService {
     }]);
   }
 
-  /** @param {'inferno-seal'} placement */
+  /** @param {'inferno-seal'} placement Internal legacy-compatible id for the optional timed boost. */
   showRewardedAd(placement) {
     if (this.rewardedProvider === 'unavailable' || placement !== 'inferno-seal') {
       return Promise.resolve({

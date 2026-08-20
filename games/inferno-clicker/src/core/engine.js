@@ -2,11 +2,12 @@
 
 import {
   BASE_TAP_POWER,
+  DEMONESS_DECAY_FACTOR,
   DEMONESS_EFFECT_MS,
   DEMONESS_FIRST_MS,
   DEMONESS_REPEAT_MS,
   DEMONESS_TELEGRAPH_MS,
-  EVENT_GAP_MS,
+  ENEMY_DECAY_FACTOR_CAP,
   FAIL_GRACE_MS,
   FIXED_STEP_MS,
   HEAT_MAX,
@@ -21,7 +22,7 @@ import {
   REWARDED_DURATION_MS,
   REWARDED_ELIGIBLE_RUN_MS,
   REWARDED_SESSION_COOLDOWN_MS,
-  SEAL_HEAT_CAP,
+  SERVANT_DECAY_FACTOR,
   SERVANT_EFFECT_MS,
   SERVANT_FIRST_MS,
   SERVANT_REPEAT_MS,
@@ -80,19 +81,17 @@ export function createInitialState(records = createDefaultRecords(), runId = 1, 
     stage: 1,
     stageProgress: progressForStage(INITIAL_HEAT, 1),
     decayRate: 0.5,
+    decayFactor: 1,
     tapPower: BASE_TAP_POWER,
-    encounter: null,
+    encounters: [],
     encounterClocks: {
       servantMs: null,
       demonessMs: null,
       heatWindowMs: null,
       heatWindowSequenceIndex: 0,
-      globalGapMs: 0,
     },
     boost: null,
     queuedBoost: false,
-    sealBroken: false,
-    sealCapImpulses: 0,
     activeRunTimeMs: 0,
     currentInfernoHoldMs: 0,
     runLongestInfernoHoldMs: 0,
@@ -115,9 +114,10 @@ export function createInitialState(records = createDefaultRecords(), runId = 1, 
 
 /** @param {GameState} state @returns {GameState} */
 function cloneState(state) {
+  const encounters = state.encounters.map((encounter) => ({ ...encounter }));
   return {
     ...state,
-    encounter: state.encounter ? { ...state.encounter } : null,
+    encounters,
     encounterClocks: { ...state.encounterClocks },
     boost: state.boost ? { ...state.boost } : null,
     grantedStageBonuses: [...state.grantedStageBonuses],
@@ -148,20 +148,28 @@ function currentMultiplier(state) {
 
 /** @param {GameState} state */
 function enemyDecayFactor(state) {
-  if (!state.encounter || state.encounter.phase !== 'effect') return 1;
-  if (state.encounter.kind === 'servant') return 1.8;
-  if (state.encounter.kind === 'demoness') return 1.5;
-  return 1;
+  let factor = 1;
+  for (const encounter of state.encounters) {
+    if (encounter.phase !== 'effect') continue;
+    if (encounter.kind === 'servant') factor *= SERVANT_DECAY_FACTOR;
+    if (encounter.kind === 'demoness') factor *= DEMONESS_DECAY_FACTOR;
+  }
+  return Math.min(ENEMY_DECAY_FACTOR_CAP, factor);
 }
 
 /** @param {GameState} state */
 function isHeatWindowActive(state) {
-  return state.encounter?.kind === 'heat-window' && state.encounter.phase === 'effect';
+  return state.encounters.some((encounter) => encounter.kind === 'heat-window' && encounter.phase === 'effect');
 }
 
 /** @param {GameState} state */
 function derivedDecayRate(state) {
-  return configForStage(state.stage).decayPerSecond * Math.min(2.5, enemyDecayFactor(state));
+  return configForStage(state.stage).decayPerSecond * enemyDecayFactor(state);
+}
+
+/** @param {GameState} state @param {import('./contracts.js').EncounterKind} kind */
+function encounterFor(state, kind) {
+  return state.encounters.find((encounter) => encounter.kind === kind) ?? null;
 }
 
 /** @param {GameState} state */
@@ -169,6 +177,7 @@ function refreshDerived(state) {
   state.stage = stageForHeat(state.heat).stage;
   state.stageProgress = progressForStage(state.heat, state.stage);
   state.multiplier = currentMultiplier(state);
+  state.decayFactor = enemyDecayFactor(state);
   state.decayRate = derivedDecayRate(state);
   state.scoreAcc = capScore(state.scoreAcc);
   state.score = Math.floor(state.scoreAcc);
@@ -184,11 +193,11 @@ function emit(events, state, type, data) {
 /** @param {GameState} state @param {Stage} stage */
 function ensureEncounterEligibility(state, stage) {
   const clocks = state.encounterClocks;
-  if (stage >= 3 && clocks.servantMs === null && !(state.encounter?.kind === 'servant')) clocks.servantMs = SERVANT_FIRST_MS;
+  if (stage >= 3 && clocks.servantMs === null && !encounterFor(state, 'servant')) clocks.servantMs = SERVANT_FIRST_MS;
   if (stage < 3) clocks.servantMs = null;
-  if (stage >= 5 && clocks.demonessMs === null && !(state.encounter?.kind === 'demoness')) clocks.demonessMs = DEMONESS_FIRST_MS;
-  if (stage < 5 && !(state.encounter?.kind === 'demoness' && state.encounter.phase === 'effect')) clocks.demonessMs = null;
-  if (stage >= 6 && clocks.heatWindowMs === null && !(state.encounter?.kind === 'heat-window')) clocks.heatWindowMs = HEAT_WINDOW_FIRST_MS;
+  if (stage >= 5 && clocks.demonessMs === null && !encounterFor(state, 'demoness')) clocks.demonessMs = DEMONESS_FIRST_MS;
+  if (stage < 5) clocks.demonessMs = null;
+  if (stage >= 6 && clocks.heatWindowMs === null && !encounterFor(state, 'heat-window')) clocks.heatWindowMs = HEAT_WINDOW_FIRST_MS;
   if (stage < 6) {
     clocks.heatWindowMs = null;
     clocks.heatWindowSequenceIndex = 0;
@@ -208,9 +217,9 @@ function applyStageChange(state, events, previousStage) {
   if (previousStage === 7 && nextStage < 7) emit(events, state, 'infernoExited');
 
   if (nextStage < previousStage) {
-    if (nextStage < 3 && state.encounter?.kind === 'servant') cancelEncounter(state, events, 'servant');
-    if (nextStage < 5 && state.encounter?.kind === 'demoness' && state.encounter.phase === 'telegraph') cancelEncounter(state, events, 'demoness');
-    if (nextStage < 6 && state.encounter?.kind === 'heat-window') cancelEncounter(state, events, 'heat-window');
+    if (nextStage < 3) cancelEncounter(state, events, 'servant');
+    if (nextStage < 5 && encounterFor(state, 'demoness')?.phase === 'telegraph') cancelEncounter(state, events, 'demoness');
+    if (nextStage < 6) cancelEncounter(state, events, 'heat-window');
   }
 
   state.stage = nextStage;
@@ -219,9 +228,8 @@ function applyStageChange(state, events, previousStage) {
 
 /** @param {GameState} state @param {DomainEvent[]} events @param {import('./contracts.js').EncounterKind} kind */
 function cancelEncounter(state, events, kind) {
-  if (state.encounter?.kind !== kind) return;
-  state.encounter = null;
-  state.encounterClocks.globalGapMs = EVENT_GAP_MS;
+  if (!encounterFor(state, kind)) return;
+  state.encounters = state.encounters.filter((encounter) => encounter.kind !== kind);
   if (kind === 'servant') state.encounterClocks.servantMs = null;
   if (kind === 'demoness') state.encounterClocks.demonessMs = null;
   if (kind === 'heat-window') state.encounterClocks.heatWindowMs = null;
@@ -230,8 +238,7 @@ function cancelEncounter(state, events, kind) {
 
 /** @param {GameState} state @param {DomainEvent[]} events @param {import('./contracts.js').EncounterKind} kind */
 function finishEncounter(state, events, kind) {
-  state.encounter = null;
-  state.encounterClocks.globalGapMs = EVENT_GAP_MS;
+  state.encounters = state.encounters.filter((encounter) => encounter.kind !== kind);
   if (kind === 'servant') state.encounterClocks.servantMs = state.stage >= 3 ? SERVANT_REPEAT_MS : null;
   if (kind === 'demoness') state.encounterClocks.demonessMs = state.stage >= 5 ? DEMONESS_REPEAT_MS : null;
   if (kind === 'heat-window') {
@@ -243,21 +250,21 @@ function finishEncounter(state, events, kind) {
 }
 
 /** @param {GameState} state @param {DomainEvent[]} events */
-function startDueEncounter(state, events) {
+function startDueEncounters(state, events) {
   const clocks = state.encounterClocks;
-  /** @type {import('./contracts.js').EncounterKind|null} */
-  let kind = null;
-  if (clocks.demonessMs !== null && clocks.demonessMs <= 0 && state.stage >= 5) kind = 'demoness';
-  else if (clocks.servantMs !== null && clocks.servantMs <= 0 && state.stage >= 3) kind = 'servant';
-  else if (clocks.heatWindowMs !== null && clocks.heatWindowMs <= 0 && state.stage >= 6) kind = 'heat-window';
-  if (!kind) return;
-
-  if (kind === 'servant') clocks.servantMs = null;
-  if (kind === 'demoness') clocks.demonessMs = null;
-  if (kind === 'heat-window') clocks.heatWindowMs = null;
-  const msLeft = kind === 'servant' ? SERVANT_TELEGRAPH_MS : kind === 'demoness' ? DEMONESS_TELEGRAPH_MS : HEAT_WINDOW_TELEGRAPH_MS;
-  state.encounter = { kind, phase: 'telegraph', msLeft };
-  emit(events, state, 'encounterStarted', { kind });
+  /** @type {readonly import('./contracts.js').EncounterKind[]} */
+  const order = ['demoness', 'servant', 'heat-window'];
+  for (const kind of order) {
+    const clock = kind === 'servant' ? clocks.servantMs : kind === 'demoness' ? clocks.demonessMs : clocks.heatWindowMs;
+    const eligible = kind === 'servant' ? state.stage >= 3 : kind === 'demoness' ? state.stage >= 5 : state.stage >= 6;
+    if (clock === null || clock > 0 || !eligible || encounterFor(state, kind)) continue;
+    if (kind === 'servant') clocks.servantMs = null;
+    if (kind === 'demoness') clocks.demonessMs = null;
+    if (kind === 'heat-window') clocks.heatWindowMs = null;
+    const msLeft = kind === 'servant' ? SERVANT_TELEGRAPH_MS : kind === 'demoness' ? DEMONESS_TELEGRAPH_MS : HEAT_WINDOW_TELEGRAPH_MS;
+    state.encounters.push({ kind, phase: 'telegraph', msLeft });
+    emit(events, state, 'encounterStarted', { kind });
+  }
 }
 
 /** @param {GameState} state */
@@ -265,14 +272,11 @@ function nextTimerBoundaryMs(state) {
   /** @type {number[]} */
   const values = [];
   if (state.boost) values.push(state.boost.msLeft);
-  if (state.encounter) values.push(state.encounter.msLeft);
-  else if (state.encounterClocks.globalGapMs > 0) values.push(state.encounterClocks.globalGapMs);
-  else {
-    const clocks = state.encounterClocks;
-    if (clocks.servantMs !== null && state.stage >= 3) values.push(clocks.servantMs);
-    if (clocks.demonessMs !== null && state.stage >= 5) values.push(clocks.demonessMs);
-    if (clocks.heatWindowMs !== null && state.stage >= 6) values.push(clocks.heatWindowMs);
-  }
+  for (const encounter of state.encounters) values.push(encounter.msLeft);
+  const clocks = state.encounterClocks;
+  if (clocks.servantMs !== null && state.stage >= 3) values.push(clocks.servantMs);
+  if (clocks.demonessMs !== null && state.stage >= 5) values.push(clocks.demonessMs);
+  if (clocks.heatWindowMs !== null && state.stage >= 6) values.push(clocks.heatWindowMs);
   return values.length > 0 ? Math.max(0, Math.min(...values)) : Number.POSITIVE_INFINITY;
 }
 
@@ -282,14 +286,7 @@ function decrementTimers(state, elapsedMs) {
   state.sessionRewardCooldownMs = Math.max(0, state.sessionRewardCooldownMs - elapsedMs);
 
   const clocks = state.encounterClocks;
-  if (state.encounter) {
-    state.encounter.msLeft = Math.max(0, state.encounter.msLeft - elapsedMs);
-    return;
-  }
-  if (clocks.globalGapMs > 0) {
-    clocks.globalGapMs = Math.max(0, clocks.globalGapMs - elapsedMs);
-    return;
-  }
+  for (const encounter of state.encounters) encounter.msLeft = Math.max(0, encounter.msLeft - elapsedMs);
   if (clocks.servantMs !== null && state.stage >= 3) clocks.servantMs -= elapsedMs;
   if (clocks.demonessMs !== null && state.stage >= 5) clocks.demonessMs -= elapsedMs;
   if (clocks.heatWindowMs !== null && state.stage >= 6) clocks.heatWindowMs -= elapsedMs;
@@ -301,17 +298,18 @@ function settleTimers(state, events) {
     state.boost = null;
     emit(events, state, 'boostEnded');
   }
-  if (state.encounter && state.encounter.msLeft <= 0) {
-    const encounter = state.encounter;
-    if (encounter.phase === 'telegraph') {
-      const effectMs = encounter.kind === 'servant' ? SERVANT_EFFECT_MS : encounter.kind === 'demoness' ? DEMONESS_EFFECT_MS : HEAT_WINDOW_ACTIVE_MS;
-      state.encounter = { ...encounter, phase: 'effect', msLeft: effectMs };
-      emit(events, state, 'encounterEffect', { kind: encounter.kind });
-    } else {
-      finishEncounter(state, events, encounter.kind);
-    }
+  for (const encounter of [...state.encounters]) {
+    if (encounter.msLeft > 0 || encounter.phase !== 'effect') continue;
+    finishEncounter(state, events, encounter.kind);
   }
-  if (!state.encounter && state.encounterClocks.globalGapMs <= 0) startDueEncounter(state, events);
+  for (const encounter of state.encounters) {
+    if (encounter.msLeft > 0 || encounter.phase !== 'telegraph') continue;
+    const effectMs = encounter.kind === 'servant' ? SERVANT_EFFECT_MS : encounter.kind === 'demoness' ? DEMONESS_EFFECT_MS : HEAT_WINDOW_ACTIVE_MS;
+    encounter.phase = 'effect';
+    encounter.msLeft = effectMs;
+    emit(events, state, 'encounterEffect', { kind: encounter.kind });
+  }
+  startDueEncounters(state, events);
 }
 
 /**
@@ -324,7 +322,7 @@ function applyDecay(state, elapsedMs) {
   let remainingSeconds = elapsedMs / 1_000;
   let infernoSeconds = 0;
   let zeroSeconds = 0;
-  const enemyFactor = Math.min(2.5, enemyDecayFactor(state));
+  const enemyFactor = enemyDecayFactor(state);
 
   while (remainingSeconds > 1e-12) {
     const config = stageForHeat(state.heat);
@@ -422,18 +420,7 @@ function processTap(state, events, atMs) {
   const tapPower = BASE_TAP_POWER * heatWindowFactor * rewardedFactor;
   state.tapPower = tapPower;
   const previousStage = state.stage;
-  const attemptedHeat = state.heat + tapPower;
-  const heatCap = state.sealBroken ? HEAT_MAX : SEAL_HEAT_CAP;
-  state.heat = Math.min(heatCap, attemptedHeat);
-  if (!state.sealBroken && attemptedHeat > SEAL_HEAT_CAP) {
-    state.sealCapImpulses += 1;
-    emit(events, state, 'sealBlocked', {
-      cap: SEAL_HEAT_CAP,
-      attemptedHeat,
-      appliedHeat: state.heat,
-      impulse: state.sealCapImpulses,
-    });
-  }
+  state.heat = Math.min(HEAT_MAX, state.heat + tapPower);
   applyStageChange(state, events, previousStage);
 
   if (state.stage > state.runHighestStage) state.runHighestStage = state.stage;
@@ -533,9 +520,8 @@ export function canOfferRewarded(state) {
     && state.activeRunTimeMs >= REWARDED_ELIGIBLE_RUN_MS
     && state.sessionRewardCooldownMs <= 0
     && !state.rewardedUsedThisRun
-    && !state.sealBroken
     && !state.boost
-    && !state.encounter
+    && state.encounters.length === 0
     && !state.activeRewardRequestId;
 }
 
@@ -650,10 +636,6 @@ export class GameEngine {
     if (this.#state.activeRewardRequestId !== requestId) return false;
     this.#state.activeRewardRequestId = null;
     if (outcome === 'rewarded' && !this.#state.rewardedUsedThisRun) {
-      if (!this.#state.sealBroken) {
-        this.#state.sealBroken = true;
-        emit(this.#events, this.#state, 'sealBroken', { requestId });
-      }
       this.#state.rewardedUsedThisRun = true;
       this.#state.boostUsed = true;
       this.#state.queuedBoost = true;

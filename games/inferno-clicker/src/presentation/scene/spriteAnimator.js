@@ -64,18 +64,19 @@ export class SpriteAnimator {
  * @param {CanvasRenderingContext2D} context
  * @param {HTMLImageElement} image
  * @param {SpriteFrame} frame
- * @param {{anchorX:number,anchorY:number,width:number,height:number,pivot?:readonly [number,number],alpha?:number,filter?:string,scaleX?:number,scaleY?:number}} placement
+ * @param {{anchorX:number,anchorY:number,width:number,height:number,pivot?:readonly [number,number],alpha?:number,filter?:string,scaleX?:number,scaleY?:number,rotation?:number,skewX?:number}} placement
  */
 export function drawSpriteFrame(context, image, frame, placement) {
   const pivot = placement.pivot ?? [0.5, 1];
   const width = placement.width * (placement.scaleX ?? 1);
   const height = placement.height * (placement.scaleY ?? 1);
-  const x = placement.anchorX - width * pivot[0];
-  const y = placement.anchorY - height * pivot[1];
   context.save();
   context.globalAlpha *= placement.alpha ?? 1;
   context.filter = placement.filter ?? 'none';
-  context.drawImage(image, frame.x, frame.y, frame.w, frame.h, x, y, width, height);
+  context.translate(placement.anchorX, placement.anchorY);
+  if (placement.rotation) context.rotate(placement.rotation);
+  if (placement.skewX) context.transform(1, 0, placement.skewX, 1, 0, 0);
+  context.drawImage(image, frame.x, frame.y, frame.w, frame.h, -width * pivot[0], -height * pivot[1], width, height);
   context.restore();
 }
 

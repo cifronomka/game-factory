@@ -1,0 +1,738 @@
+{
+  "schemaVersion": 1,
+  "atlasWidth": 1536,
+  "atlasHeight": 1120,
+  "frameWidth": 256,
+  "frameHeight": 280,
+  "pivot": [
+    0.5,
+    0.971429
+  ],
+  "transparentGutterPixels": 8,
+  "packing": "six complete spatial clusters per row, centered and bottom-aligned; no scale, redraw or foreign pixels",
+  "sourceAtlas": "demoness-states-v2.webp",
+  "atlasSha256": "15f31821b37b3d991f0aa003495e994ec339b4fa5fb6ab2a7034b85851f3989a",
+  "visibleRgbaLossless": true,
+  "clips": {
+    "appearance": {
+      "fps": 10,
+      "loop": false,
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "7b94684dbf6cc9845460cc49cc0258c282d7d639710e7502869235462ffdb0df",
+          "provenance": "Demoness source demoness-states-v2.webp; appearance frame 0; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.28,
+              0.5
+            ]
+          },
+          "alphaBBox": [
+            27,
+            6,
+            227,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 124.84,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99838
+        },
+        {
+          "x": 256,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "017b068b79398e25844d7a79afc1efbd9b5ad172511fd1e7d4cbeabb8214b459",
+          "provenance": "Demoness source demoness-states-v2.webp; appearance frame 1; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.28,
+              0.42
+            ]
+          },
+          "alphaBBox": [
+            20,
+            11,
+            235,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 127.49,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99831
+        },
+        {
+          "x": 512,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "600b4270598243d9202a2d8965a3623a0a57ba16d4ac5f6a53cb49c3be62ad44",
+          "provenance": "Demoness source demoness-states-v2.webp; appearance frame 2; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.27,
+              0.35
+            ]
+          },
+          "alphaBBox": [
+            23,
+            10,
+            230,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 128.41,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99943
+        },
+        {
+          "x": 768,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "dc09cc3030aae9aa8357fc4c049a0fd734a9d008ad3c49726cefd793034c32f5",
+          "provenance": "Demoness source demoness-states-v2.webp; appearance frame 3; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.27,
+              0.3
+            ]
+          },
+          "alphaBBox": [
+            33,
+            11,
+            221,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 128.14,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99924
+        },
+        {
+          "x": 1024,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "84a3b0b0556c9fed8881eeaf57f16b5866d3305a7e309b3eb4a6def90e3ef6f2",
+          "provenance": "Demoness source demoness-states-v2.webp; appearance frame 4; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.27,
+              0.29
+            ]
+          },
+          "alphaBBox": [
+            36,
+            11,
+            218,
+            268
+          ],
+          "rootY": 268,
+          "centroidX": 127.0,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99978
+        },
+        {
+          "x": 1280,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "ec9d02346e8d28efd9a7a94011e1e70969c653e1c526805ef57b12a499d0af59",
+          "provenance": "Demoness source demoness-states-v2.webp; appearance frame 5; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.27,
+              0.29
+            ]
+          },
+          "alphaBBox": [
+            41,
+            11,
+            214,
+            268
+          ],
+          "rootY": 268,
+          "centroidX": 126.23,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99982
+        }
+      ]
+    },
+    "idle": {
+      "fps": 8,
+      "loop": true,
+      "frames": [
+        {
+          "x": 0,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "ef88c9a1ca527f155c2a7a935bc42e31a6e20e6e4a5a116140a8f6c4dd5d499e",
+          "provenance": "Demoness source demoness-states-v2.webp; idle frame 0; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.27,
+              0.3
+            ]
+          },
+          "alphaBBox": [
+            31,
+            17,
+            221,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 126.67,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99973
+        },
+        {
+          "x": 256,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "21fcf1d5b1ab00acdb94fbf56260bf5686a039a67432b3ad0a6024fff3916569",
+          "provenance": "Demoness source demoness-states-v2.webp; idle frame 1; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.27,
+              0.3
+            ]
+          },
+          "alphaBBox": [
+            36,
+            17,
+            227,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 131.64,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99996
+        },
+        {
+          "x": 512,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "93f45c29b37a4dca1a428b5e1c693e5228b44b9c14da4cf752bce5f4ae5d01a3",
+          "provenance": "Demoness source demoness-states-v2.webp; idle frame 2; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.27,
+              0.3
+            ]
+          },
+          "alphaBBox": [
+            35,
+            16,
+            225,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 129.03,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99974
+        },
+        {
+          "x": 768,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "b9f571efddab8948917d16284e2f3921ab674d906b56e187eb59517c9b7dc53c",
+          "provenance": "Demoness source demoness-states-v2.webp; idle frame 3; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.27,
+              0.3
+            ]
+          },
+          "alphaBBox": [
+            32,
+            17,
+            223,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 129.08,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99964
+        },
+        {
+          "x": 1024,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "75feecfe212a1d0b8705ea1b2674e32fa7ade44ca09460869e0e1a5fb4ac63a5",
+          "provenance": "Demoness source demoness-states-v2.webp; idle frame 4; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.27,
+              0.3
+            ]
+          },
+          "alphaBBox": [
+            38,
+            17,
+            224,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 132.46,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99974
+        },
+        {
+          "x": 1280,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "46031646928719a1138918fd5e1112bafff9f49f5ce03552cbd0b510b2a20683",
+          "provenance": "Demoness source demoness-states-v2.webp; idle frame 5; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.27,
+              0.3
+            ]
+          },
+          "alphaBBox": [
+            33,
+            16,
+            221,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 127.35,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99972
+        }
+      ]
+    },
+    "cast": {
+      "fps": 10,
+      "loop": false,
+      "frames": [
+        {
+          "x": 0,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "1b08976ec1cac05c0c4280795a5c4c798487671636369e96663af27bd155607a",
+          "provenance": "Demoness source demoness-states-v2.webp; cast frame 0; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.25,
+              0.32
+            ]
+          },
+          "alphaBBox": [
+            34,
+            38,
+            217,
+            268
+          ],
+          "rootY": 268,
+          "centroidX": 126.65,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99827
+        },
+        {
+          "x": 256,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "ea46df8fe955e1b77f82cb0cdae618fe9d8232e69dec2eae8328a1a716b1c9ba",
+          "provenance": "Demoness source demoness-states-v2.webp; cast frame 1; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.24,
+              0.3
+            ]
+          },
+          "alphaBBox": [
+            33,
+            39,
+            218,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 125.55,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99948
+        },
+        {
+          "x": 512,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "3ec8e572a199b287038d1018dd5f69ac9cdfd6160691ac22c97091bc7c305532",
+          "provenance": "Demoness source demoness-states-v2.webp; cast frame 2; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.23,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            34,
+            37,
+            220,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 128.69,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99975
+        },
+        {
+          "x": 768,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "eb06962e69d2e94aa50b077ae5fe25040062e5347ccdc0b4c9acf4653906abc6",
+          "provenance": "Demoness source demoness-states-v2.webp; cast frame 3; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.22,
+              0.27
+            ]
+          },
+          "alphaBBox": [
+            39,
+            38,
+            218,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 129.75,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.9985
+        },
+        {
+          "x": 1024,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "a8222f29eb9abb64150b2c851d3044bd76e18bebb1e5f517ca4d72228b066fc6",
+          "provenance": "Demoness source demoness-states-v2.webp; cast frame 4; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.22,
+              0.26
+            ]
+          },
+          "alphaBBox": [
+            35,
+            38,
+            217,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 126.16,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99954
+        },
+        {
+          "x": 1280,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "9392aa171bed3fd0e577d796cc962b5c9f4aa87e3312bd439b6d54a0911ccad5",
+          "provenance": "Demoness source demoness-states-v2.webp; cast frame 5; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.22,
+              0.26
+            ]
+          },
+          "alphaBBox": [
+            37,
+            39,
+            218,
+            268
+          ],
+          "rootY": 268,
+          "centroidX": 128.5,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99953
+        }
+      ]
+    },
+    "hold": {
+      "fps": 10,
+      "loop": true,
+      "frames": [
+        {
+          "x": 0,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "77d4aa32fc80ecee9d15dc366692d05bf0471020580171ca26b03a5ad239b8d7",
+          "provenance": "Demoness source demoness-states-v2.webp; hold frame 0; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.2,
+              0.29
+            ]
+          },
+          "alphaBBox": [
+            29,
+            49,
+            225,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 130.9,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99865
+        },
+        {
+          "x": 256,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "6d0ad54283e0607d2bf1ece70696bfcd787c10286828e9f540b74b3fc595af69",
+          "provenance": "Demoness source demoness-states-v2.webp; hold frame 1; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.2,
+              0.29
+            ]
+          },
+          "alphaBBox": [
+            30,
+            49,
+            219,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 129.4,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99845
+        },
+        {
+          "x": 512,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "8bb6d339e4f688b2b107f532dbf1cff051b49e79109b74e2c31098f36d3c0384",
+          "provenance": "Demoness source demoness-states-v2.webp; hold frame 2; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.19,
+              0.29
+            ]
+          },
+          "alphaBBox": [
+            31,
+            50,
+            223,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 132.89,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99995
+        },
+        {
+          "x": 768,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "843ec5c3c40a47fa1d2290460ee8f229ebd9ffe26b4c3288b91d1d8aa8d5fc71",
+          "provenance": "Demoness source demoness-states-v2.webp; hold frame 3; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.19,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            30,
+            51,
+            223,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 132.44,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99976
+        },
+        {
+          "x": 1024,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "4562e43aa7fc92a93bf1a91fa64670d000b9ca137f76949106f0c946a70d6660",
+          "provenance": "Demoness source demoness-states-v2.webp; hold frame 4; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.19,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            34,
+            50,
+            219,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 131.39,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99969
+        },
+        {
+          "x": 1280,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "2dcd201e45b0ec7df7a9f719b3a00b6301c42cba4ebedb6a031b2f41a99d5573",
+          "provenance": "Demoness source demoness-states-v2.webp; hold frame 5; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "castHand": [
+              0.2,
+              0.29
+            ]
+          },
+          "alphaBBox": [
+            35,
+            50,
+            218,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 131.24,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99969
+        }
+      ]
+    }
+  }
+}

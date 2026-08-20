@@ -3,68 +3,69 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { replayCanonicalSeal } from '../fixtures/canonical-seal.js';
+import { replayCanonicalDirect, replayTapRateScenario } from '../fixtures/canonical-direct.js';
 
-const noBoostUrl = new URL('../fixtures/seal-no-boost-canonical.json', import.meta.url);
-const boostedUrl = new URL('../fixtures/seal-boosted-canonical.json', import.meta.url);
-/** @type {import('../fixtures/canonical-seal.js').CanonicalSealTraceConfig} */
-const noBoost = JSON.parse(readFileSync(noBoostUrl, 'utf8'));
-/** @type {import('../fixtures/canonical-seal.js').CanonicalSealTraceConfig} */
-const boosted = JSON.parse(readFileSync(boostedUrl, 'utf8'));
+/** @type {import('../fixtures/canonical-direct.js').DirectTraceConfig} */
+const noReward = JSON.parse(readFileSync(new URL('../fixtures/direct-no-reward-canonical.json', import.meta.url), 'utf8'));
+/** @type {import('../fixtures/canonical-direct.js').DirectTraceConfig} */
+const boosted = JSON.parse(readFileSync(new URL('../fixtures/direct-boosted-canonical.json', import.meta.url), 'utf8'));
+/** @type {{name:string,version:number,scenarios:import('../fixtures/canonical-direct.js').TapRateScenario[]}} */
+const rateMatrix = JSON.parse(readFileSync(new URL('../fixtures/tap-rate-matrix.json', import.meta.url), 'utf8'));
 
-test('paired canonical fixtures share the committed V3 input algorithm', () => {
-  assert.equal(noBoost.name, 'canonicalSealNoBoostV3');
-  assert.equal(boosted.name, 'canonicalSealBoostedV3');
-  assert.equal(noBoost.version, 3);
-  assert.equal(boosted.version, 3);
-  assert.equal(noBoost.firstTapMs, 0);
-  assert.deepEqual(noBoost.intervalByRunHighestStageMs, [500, 500, 250, 250, 200, 140, 140]);
-  assert.deepEqual(boosted.intervalByRunHighestStageMs, noBoost.intervalByRunHighestStageMs);
-  assert.equal(noBoost.stopMs, 117_000);
-  assert.equal(boosted.stopMs, 117_000);
-  assert.equal(boosted.rewardAtMs, 102_000);
+/** @param {ReturnType<typeof replayCanonicalDirect>} run @param {import('../fixtures/canonical-direct.js').ExpectedTrace} expected */
+function assertCanonical(run, expected) {
+  assert.deepEqual(run.stageReachedAtMs, expected.stageReachedAtMs);
+  assert.equal(run.acceptedTaps, expected.acceptedTaps);
+  assert.equal(run.state.score, expected.score);
+  assert.ok(Math.abs(run.state.heat - expected.heat) <= 0.01);
+  assert.ok(Math.abs(run.state.currentInfernoHoldMs - expected.currentInfernoHoldMs) <= 0.01);
+  assert.equal(run.state.runHighestStage, expected.runHighestStage);
+}
+
+test('paired canonical fixtures use the committed concurrent-event direct-tap V5 algorithm', () => {
+  assert.equal(noReward.name, 'canonicalDirectNoRewardV5');
+  assert.equal(boosted.name, 'canonicalDirectBoostedV5');
+  assert.equal(noReward.version, 5);
+  assert.equal(boosted.version, 5);
+  assert.equal(noReward.firstTapMs, 0);
+  assert.deepEqual(noReward.intervalByRunHighestStageMs, [500, 500, 250, 250, 200, 140, 140]);
+  assert.deepEqual(boosted.intervalByRunHighestStageMs, noReward.intervalByRunHighestStageMs);
+  assert.equal(noReward.stopMs, 180_000);
+  assert.equal(boosted.stopMs, 180_000);
+  assert.equal(boosted.rewardAtMs, 65_000);
 });
 
-test('canonical no-boost trace hits the Stage 4 seal identically at 60, 30 and 15 FPS', () => {
-  const runs = /** @type {const} */ ([60, 30, 15]).map((fps) => replayCanonicalSeal(noBoost, fps));
-  const baseline = runs[0];
-  assert.ok(baseline);
-  for (const run of runs) {
-    assert.equal(run.state.runHighestStage, noBoost.expectedRunHighestStage);
-    assert.equal(run.state.sealBroken, false);
-    assert.equal(run.state.sealCapImpulses, noBoost.expectedSealCapImpulses);
-    assert.equal(run.sealBlockedCount, noBoost.expectedSealCapImpulses);
-    assert.equal(run.firstSealBlockedAtMs, noBoost.expectedFirstSealBlockedAtMs);
-    assert.equal(run.maxHeat, noBoost.expectedMaxHeat);
-    assert.deepEqual(run.stageReachedAtMs, baseline.stageReachedAtMs);
-    assert.equal(run.state.score, baseline.state.score);
-    assert.equal(run.acceptedTaps, baseline.acceptedTaps);
-    assert.deepEqual(run.stageReachedAtMs, noBoost.expectedStageReachedAtMs);
-    assert.equal(run.state.score, noBoost.expectedFinalScore);
-    assert.equal(run.acceptedTaps, noBoost.expectedAcceptedTaps);
-    assert.ok(Math.abs(run.state.heat - noBoost.expectedFinalHeat) <= 0.01);
-    assert.equal('5' in run.stageReachedAtMs, false);
-  }
-});
+for (const [label, fixture] of /** @type {const} */ ([['no-reward', noReward], ['boosted', boosted]])) {
+  test(`canonical direct ${label} trace has exact 60/30/15 FPS parity`, () => {
+    const runs = /** @type {const} */ ([60, 30, 15]).map((fps) => replayCanonicalDirect(fixture, fps));
+    for (const run of runs) assertCanonical(run, fixture.expected);
+    assert.deepEqual(runs[1], runs[0]);
+    assert.deepEqual(runs[2], runs[0]);
+  });
+}
 
-test('canonical rewarded trace breaks the seal and reaches Inferno identically at 60, 30 and 15 FPS', () => {
-  const runs = /** @type {const} */ ([60, 30, 15]).map((fps) => replayCanonicalSeal(boosted, fps));
-  const baseline = runs[0];
-  assert.ok(baseline);
-  for (const run of runs) {
-    assert.equal(run.state.runHighestStage, boosted.expectedRunHighestStage);
-    assert.equal(run.state.sealBroken, true);
-    assert.equal(run.state.sealCapImpulses, boosted.expectedSealCapImpulses);
-    assert.equal(run.sealBlockedCount, boosted.expectedSealCapImpulses);
-    assert.equal(run.firstSealBlockedAtMs, boosted.expectedFirstSealBlockedAtMs);
-    assert.deepEqual(run.stageReachedAtMs, baseline.stageReachedAtMs);
-    assert.equal(run.state.score, baseline.state.score);
-    assert.equal(run.acceptedTaps, baseline.acceptedTaps);
-    assert.deepEqual(run.stageReachedAtMs, boosted.expectedStageReachedAtMs);
-    assert.equal(run.state.score, boosted.expectedFinalScore);
-    assert.equal(run.acceptedTaps, boosted.expectedAcceptedTaps);
-    assert.ok(Math.abs(run.state.heat - boosted.expectedFinalHeat) <= 0.01);
-    assert.equal(run.state.boost?.msLeft, boosted.expectedBoostMsLeft);
-    assert.ok(Math.abs(run.state.currentInfernoHoldMs - (boosted.expectedCurrentInfernoHoldMs ?? 0)) < 1e-6);
+test('tap-rate matrix has exact slow/normal/fast/very-fast/boosted parity at 60/30/15 FPS', () => {
+  assert.equal(rateMatrix.name, 'tapRateMatrixV2');
+  assert.deepEqual(rateMatrix.scenarios.map((scenario) => scenario.name), [
+    'slow', 'normal', 'fast', 'very-fast', 'boosted-normal',
+  ]);
+  for (const scenario of rateMatrix.scenarios) {
+    const runs = /** @type {const} */ ([60, 30, 15]).map((fps) => replayTapRateScenario(scenario, fps));
+    for (const run of runs) {
+      assert.deepEqual(run.stageReachedAtMs, scenario.expected.stageReachedAtMs, scenario.name);
+      assert.equal(run.acceptedTaps, scenario.expected.acceptedTaps, scenario.name);
+      assert.equal(run.state.score, scenario.expected.score, scenario.name);
+      assert.ok(Math.abs(run.state.heat - scenario.expected.heat) <= 0.01, scenario.name);
+      assert.ok(Math.abs(run.maxHeat - scenario.expected.maxHeat) <= 0.5, scenario.name);
+      assert.equal(run.state.currentInfernoHoldMs, scenario.expected.currentInfernoHoldMs, scenario.name);
+      assert.equal(run.state.runHighestStage, scenario.expected.runHighestStage, scenario.name);
+      assert.equal(run.state.stage, scenario.expected.finalStage, scenario.name);
+    }
+    for (const run of runs.slice(1)) {
+      assert.deepEqual(run.state, runs[0]?.state, scenario.name);
+      assert.deepEqual(run.stageReachedAtMs, runs[0]?.stageReachedAtMs, scenario.name);
+      assert.equal(run.acceptedTaps, runs[0]?.acceptedTaps, scenario.name);
+      assert.ok(Math.abs(run.maxHeat - (runs[0]?.maxHeat ?? 0)) <= 0.5, scenario.name);
+    }
   }
 });

@@ -87,11 +87,38 @@ export class EnvironmentScene {
     });
   }
 
-  /** @param {CanvasRenderingContext2D} context @param {any} state @param {number} timeSeconds */
-  drawRitual(context, state, timeSeconds) {
+  /** @param {CanvasRenderingContext2D} context @param {any} state @param {number} timeSeconds @param {number=} infernoEntryProgress */
+  drawRitual(context, state, timeSeconds, infernoEntryProgress = 1) {
     const pulse = state.reducedMotion ? 1 : 0.94 + Math.sin(timeSeconds * 1.6) * 0.06;
     revealRegion(context, this.background, state.environment.ritual * 0.28 * pulse, () => context.ellipse(CENTER_X, HEARTH_Y + 45, 450, 310, 0, 0, Math.PI * 2), 'brightness(1.3) saturate(1.3)');
     revealRegion(context, this.background, state.environment.runes * 0.24 * pulse, () => context.ellipse(CENTER_X, HEARTH_Y + 45, 370, 245, 0, 0, Math.PI * 2), 'brightness(1.48) saturate(1.45)');
+    if (state.stage === 7 && infernoEntryProgress < 1) {
+      const entry = clamp01(infernoEntryProgress);
+      const waveAlpha = Math.sin(entry * Math.PI) * (state.reducedMotion ? 0.36 : 0.72);
+      const radiusX = 120 + entry * 340;
+      const radiusY = 72 + entry * 210;
+      context.save();
+      context.globalCompositeOperation = 'screen';
+      context.strokeStyle = `rgba(255,178,79,${waveAlpha})`;
+      context.lineWidth = 4 + entry * 5;
+      context.beginPath();
+      context.ellipse(CENTER_X, HEARTH_Y + 45, radiusX, radiusY, 0, 0, Math.PI * 2);
+      context.stroke();
+      context.lineWidth = 2.5;
+      for (let index = 0; index < 16; index += 1) {
+        const angle = index / 16 * Math.PI * 2;
+        const x = CENTER_X + Math.cos(angle) * radiusX;
+        const y = HEARTH_Y + 45 + Math.sin(angle) * radiusY;
+        const tangentX = -Math.sin(angle) * 12;
+        const tangentY = Math.cos(angle) * 8;
+        context.beginPath();
+        context.moveTo(x - tangentX, y - tangentY);
+        context.lineTo(x + tangentX, y + tangentY);
+        context.lineTo(x + Math.cos(angle) * 10, y + Math.sin(angle) * 7);
+        context.stroke();
+      }
+      context.restore();
+    }
   }
 
   /** @param {CanvasRenderingContext2D} context @param {any} state */

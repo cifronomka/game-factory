@@ -70,8 +70,6 @@ test('confirmed reward waits for valid resume, lasts 20 active seconds, and is i
   engine.beginRewarded('reward-1');
   engine.pause('visibility');
   assert.equal(engine.resolveRewarded('reward-1', 'rewarded'), true);
-  assert.equal(engine.state.sealBroken, true);
-  assert.equal(engine.drainEvents().filter((event) => event.type === 'sealBroken').length, 1);
   assert.equal(engine.state.phase, 'PAUSED');
   assert.equal(engine.state.boost, null);
   assert.equal(engine.state.queuedBoost, true);
@@ -92,7 +90,6 @@ test('rewarded heat is doubled but assisted heat is excluded from direct tap sco
   const state = eligibleState();
   state.boost = { msLeft: REWARDED_DURATION_MS };
   state.rewardedUsedThisRun = true;
-  state.sealBroken = true;
   const engine = new GameEngine(state);
   const beforeHeat = engine.state.heat;
   engine.queueTap(45_000);
@@ -112,29 +109,36 @@ for (const outcome of /** @type {const} */ (['closed', 'unavailable', 'error']))
     assert.equal(engine.state.boost, null);
     assert.equal(engine.state.rewardedUsedThisRun, false);
     assert.equal(engine.state.sessionRewardCooldownMs, 0);
-    assert.equal(engine.state.sealBroken, false);
   });
 }
 
-test('seal requires stage 4, breaks once on terminal reward, and relocks on restart and reload', () => {
-  const belowGate = eligibleState();
-  belowGate.runHighestStage = 3;
-  assert.equal(canOfferRewarded(belowGate), false);
-
+test('optional boost requires stage 4, is single-use per run, and never controls progression permission', () => {
   const engine = new GameEngine(eligibleState());
   assert.equal(engine.openRewardSheet(), true);
-  assert.equal(engine.beginRewarded('seal-break'), true);
-  assert.equal(engine.resolveRewarded('seal-break', 'rewarded'), true);
-  assert.equal(engine.state.sealBroken, true);
+  assert.equal(engine.beginRewarded('optional-boost'), true);
+  assert.equal(engine.resolveRewarded('optional-boost', 'rewarded'), true);
   assert.equal(canOfferRewarded(engine.state), false);
-  assert.equal(engine.resolveRewarded('seal-break', 'rewarded'), false);
-  assert.equal(engine.drainEvents().filter((event) => event.type === 'sealBroken').length, 1);
+  assert.equal(engine.resolveRewarded('optional-boost', 'rewarded'), false);
+  assert.equal(engine.drainEvents().filter((event) => event.type === 'boostStarted').length, 1);
 
   engine.pause('menu');
   assert.equal(engine.abandonRun(), true);
   const records = engine.recordSnapshot();
   assert.equal(engine.restart(), true);
-  assert.equal(engine.state.sealBroken, false);
-  assert.equal(engine.state.sealCapImpulses, 0);
-  assert.equal(createInitialState(records).sealBroken, false);
+  assert.equal(engine.state.rewardedUsedThisRun, false);
+  assert.equal(createInitialState(records).rewardedUsedThisRun, false);
+});
+
+test('stage 5 crossing never requires rewarded state', () => {
+  const state = eligibleState();
+  state.heat = 558;
+  state.scoreAcc = 0;
+  state.score = 0;
+  const engine = new GameEngine(state);
+  engine.queueTap(45_000, 'direct-stage-five');
+  engine.advanceSteps(1);
+  assert.equal(engine.state.stage, 5);
+  assert.equal(engine.state.runHighestStage, 5);
+  assert.equal(engine.state.rewardedUsedThisRun, false);
+  assert.deepEqual(engine.state.grantedStageBonuses, [2, 3, 4, 5]);
 });

@@ -1,0 +1,738 @@
+{
+  "schemaVersion": 1,
+  "atlasWidth": 1536,
+  "atlasHeight": 1120,
+  "frameWidth": 256,
+  "frameHeight": 280,
+  "pivot": [
+    0.5,
+    0.971429
+  ],
+  "transparentGutterPixels": 8,
+  "packing": "six complete spatial clusters per row, centered and bottom-aligned; no scale, redraw or foreign pixels",
+  "sourceAtlas": "ash-servant-states-v2.webp",
+  "atlasSha256": "98b44ac403ffa1a3310a051af4d7011be96f671ff08b56f60669d1b1882001cc",
+  "visibleRgbaLossless": true,
+  "clips": {
+    "appearance": {
+      "fps": 10,
+      "loop": false,
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "8d1f7ec6fd7838b20e7e11a12385ce9d75d6d7450650426558849d5c2beb0f9b",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; appearance frame 0; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.66,
+              0.73
+            ]
+          },
+          "alphaBBox": [
+            33,
+            153,
+            220,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 132.06,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99993
+        },
+        {
+          "x": 256,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "4219323749e7579557d8df26eb30c3de3da440a6063fc2a2648b971e13da6c05",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; appearance frame 1; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.66
+            ]
+          },
+          "alphaBBox": [
+            37,
+            139,
+            216,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 131.0,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 512,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "a7380b723207bc09c152e359be5e858021b9cf371d39b6b9a00c77e7f993961e",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; appearance frame 2; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.53
+            ]
+          },
+          "alphaBBox": [
+            33,
+            100,
+            220,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 131.42,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 768,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "b2c041789fd35b6fca84fbacca02d1b9f8168758a8865df3fda5d0f9efe43ae5",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; appearance frame 3; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.39
+            ]
+          },
+          "alphaBBox": [
+            52,
+            62,
+            202,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 127.95,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 1024,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "2f88eb02effcfc963beb89c2fec3c20fff6db3c0da5c77605a5107fff0e7266e",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; appearance frame 4; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.31
+            ]
+          },
+          "alphaBBox": [
+            50,
+            41,
+            203,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 129.77,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 1280,
+          "y": 0,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "b8190a4a7d55192f9c99487690ff83736329615e3d48788f50c50922da5dafe2",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; appearance frame 5; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            35,
+            32,
+            219,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 135.87,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        }
+      ]
+    },
+    "idle": {
+      "fps": 8,
+      "loop": true,
+      "frames": [
+        {
+          "x": 0,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "0a378ec7af0f07e3563e893c16116a334aa8a7984b9f9f84993789fbfab7711c",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; idle frame 0; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.31
+            ]
+          },
+          "alphaBBox": [
+            44,
+            58,
+            209,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 128.37,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 256,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "ce63aea942650af64fed843af42b18c94c44b84e11b49992bffaa3b58a2d26c7",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; idle frame 1; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.31
+            ]
+          },
+          "alphaBBox": [
+            48,
+            59,
+            206,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 128.19,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 512,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "7700ebcdc6e5197bf2b7e602297429c714bfe758ea000cecca4d8afdba05c9fb",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; idle frame 2; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.31
+            ]
+          },
+          "alphaBBox": [
+            43,
+            60,
+            211,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 128.36,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 768,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "2100c6a54e5d60f3363fe83975eae02f588a1924250ec58a988c38da808099b0",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; idle frame 3; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.31
+            ]
+          },
+          "alphaBBox": [
+            40,
+            59,
+            213,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 125.19,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 1024,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "06f278533de2b988c3beb62b85e4954083c975173e2c5a66f2299f2015a9a854",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; idle frame 4; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.31
+            ]
+          },
+          "alphaBBox": [
+            33,
+            60,
+            220,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 130.17,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99995
+        },
+        {
+          "x": 1280,
+          "y": 280,
+          "w": 256,
+          "h": 280,
+          "durationMs": 125.0,
+          "sha256": "a7161563c2a74713eed67130ae03dee93f76e842ae15861aafef1d88c86bc245",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; idle frame 5; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.31
+            ]
+          },
+          "alphaBBox": [
+            30,
+            56,
+            223,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 133.7,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        }
+      ]
+    },
+    "inhale": {
+      "fps": 10,
+      "loop": false,
+      "frames": [
+        {
+          "x": 0,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "4953365776dfb644bb59540ce207ac01e2a4cb47dd2ca2b3f6593b8beb91061a",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; inhale frame 0; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.64,
+              0.3
+            ]
+          },
+          "alphaBBox": [
+            33,
+            63,
+            221,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 121.46,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 256,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "dcdb0c831545357f4279ef905e03f510838facc6d87056db73e37fc369535efb",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; inhale frame 1; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.64,
+              0.29
+            ]
+          },
+          "alphaBBox": [
+            33,
+            63,
+            221,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 121.02,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 512,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "e2703c06779f27fca96205104d4fc08334bb2f47b02021ecc96d77565f795c82",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; inhale frame 2; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            31,
+            59,
+            222,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 116.0,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 768,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "cfa1e69db6b2484226f0bda87a3efe1046da8801d44547f0a99d907350f6299b",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; inhale frame 3; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.65,
+              0.27
+            ]
+          },
+          "alphaBBox": [
+            36,
+            59,
+            218,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 125.62,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 1024,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "027dce6ade1fec6a71143cae9462205a354cc3c5b299e4e2d5f151eea549244e",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; inhale frame 4; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.66,
+              0.27
+            ]
+          },
+          "alphaBBox": [
+            37,
+            56,
+            217,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 126.34,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 1280,
+          "y": 560,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "bee3e27128cac7114907b27612bb46a5079cc48523264a911cdc8a964f107cb8",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; inhale frame 5; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.66,
+              0.27
+            ]
+          },
+          "alphaBBox": [
+            36,
+            56,
+            218,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 127.12,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        }
+      ]
+    },
+    "blow": {
+      "fps": 10,
+      "loop": true,
+      "frames": [
+        {
+          "x": 0,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "37b783293f37786fdc15ca55944463c2521ae249eb5cc9b3922085583e152ad0",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; blow frame 0; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.66,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            11,
+            70,
+            243,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 127.59,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99995
+        },
+        {
+          "x": 256,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "08ec44e3b0b287a8b312bd318915ad23a726661755b652ad3da0e8b4b8932814",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; blow frame 1; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.66,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            21,
+            71,
+            233,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 128.79,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99995
+        },
+        {
+          "x": 512,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "0ae64f40a98cf52f261c6fd07136f29018d523f2c9730f69ec28ec6c31caa984",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; blow frame 2; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.67,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            21,
+            72,
+            232,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 126.53,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 768,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "929c53872f15138d66a77d84a6bf50eb46b8baa7c469fb18f2ee121c89dca112",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; blow frame 3; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.67,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            18,
+            73,
+            235,
+            270
+          ],
+          "rootY": 270,
+          "centroidX": 127.73,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 1024,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "1f92d41838a7b03240f64ef141278774ca33d88738506a4a954433b8640d93ac",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; blow frame 4; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.67,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            14,
+            68,
+            239,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 123.63,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        },
+        {
+          "x": 1280,
+          "y": 840,
+          "w": 256,
+          "h": 280,
+          "durationMs": 100.0,
+          "sha256": "8b456fd9311bce7cda99884ed01e77c0fb498a8c62ad732c9876051d72ad4576",
+          "provenance": "Ash Servant source ash-servant-states-v2.webp; blow frame 5; lossless visible RGBA cluster copy, centered and bottom-aligned",
+          "sockets": {
+            "root": [
+              0.5,
+              0.971429
+            ],
+            "mouth": [
+              0.66,
+              0.28
+            ]
+          },
+          "alphaBBox": [
+            16,
+            69,
+            238,
+            269
+          ],
+          "rootY": 269,
+          "centroidX": 124.55,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1.0
+        }
+      ]
+    }
+  }
+}

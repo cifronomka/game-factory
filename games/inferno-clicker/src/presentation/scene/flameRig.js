@@ -30,7 +30,7 @@ export const STAGE_FLARE_URL = new URL('../../../assets/flame/transitions/stage-
 
 /** @typedef {'low'|'mid'|'high'} FlameFamily */
 /** @typedef {{x:number,y:number,vx:number,vy:number,age:number,life:number,size:number,kind:'ember'|'smoke'}} Particle */
-/** @typedef {{x:number,y:number,age:number,life:number,kind:'tap'|'stage-up'|'stage-down'|'heat'|'seal'}} Pulse */
+/** @typedef {{x:number,y:number,age:number,life:number,kind:'tap'|'stage-up'|'stage-down'|'heat'}} Pulse */
 
 class Random {
   constructor() { this.seed = 0x51f15e; }
@@ -42,6 +42,8 @@ class Random {
 
 /** @param {number} value @param {number} low @param {number} high */
 function clamp(value, low, high) { return Math.max(low, Math.min(high, value)); }
+/** @param {number} value */
+function smoothstep(value) { const progress = clamp(value, 0, 1); return progress * progress * (3 - 2 * progress); }
 /** @param {number} stage @returns {FlameFamily} */
 function familyForStage(stage) { return stage >= 6 ? 'high' : stage >= 3 ? 'mid' : 'low'; }
 
@@ -84,6 +86,8 @@ export class FlameRig {
     this.random = new Random();
     this.impulse = 0;
     this.stageFlash = 0;
+    this.characterReaction = Object.freeze({ bend: 0, suppression: 0, emberDrift: 0, cold: 0, source: 'none' });
+    this.infernoEntryAge = Number.POSITIVE_INFINITY;
   }
 
   async prepareCriticalAssets() {
@@ -128,12 +132,24 @@ export class FlameRig {
     family.outerBitmap.startLoad();
   }
 
+  /** @param {{bend?:number,suppression?:number,emberDrift?:number,cold?:number,source?:string}} reaction */
+  setCharacterReaction(reaction) {
+    this.characterReaction = Object.freeze({
+      bend: clamp(Number(reaction.bend) || 0, -1, 1),
+      suppression: clamp(Number(reaction.suppression) || 0, 0, 0.3),
+      emberDrift: clamp(Number(reaction.emberDrift) || 0, 0, 1),
+      cold: clamp(Number(reaction.cold) || 0, 0, 1),
+      source: reaction.source ?? 'none',
+    });
+  }
+
   /** @param {import('../types.js').PresentationEvent} event */
   handleEvent(event) {
     if (event.type === 'tap-accepted') {
       if (!this.state?.reducedMotion) this.impulse = Math.min(1.55, this.impulse + (event.critical ? 0.52 : 0.31));
       this.addPulse({ x: event.x ?? HEARTH_X, y: event.y ?? HEARTH_Y, age: 0, life: 0.3, kind: 'tap' });
-      this.spawnEmbers(event.critical ? 14 : 7);
+      const coldScale = 1 - this.characterReaction.cold * 0.65;
+      this.spawnEmbers(Math.ceil((event.critical ? 14 : 7) * coldScale));
     } else if (event.type === 'stage-changed') {
       this.flareBitmap.startLoad();
       this.stageFlash = this.state?.flashesEnabled ? (event.to > event.from ? 1 : 0.32) : 0;
@@ -142,14 +158,9 @@ export class FlameRig {
       this.flareActive = true;
       this.addPulse({ x: HEARTH_X, y: HEARTH_Y - 110, age: 0, life: 0.9, kind: event.to > event.from ? 'stage-up' : 'stage-down' });
       this.spawnEmbers(event.to === 7 ? 28 : 15);
+      if (event.from === 6 && event.to === 7) this.infernoEntryAge = 0;
     } else if (event.type === 'encounter-cue' && event.kind === 'heat-window' && event.phase === 'active') {
       this.addPulse({ x: HEARTH_X, y: HEARTH_Y - 100, age: 0, life: 1.1, kind: 'heat' });
-    } else if (event.type === 'seal-blocked') {
-      this.addPulse({ x: HEARTH_X, y: HEARTH_Y - 120, age: 0, life: 0.48, kind: 'seal' });
-    } else if (event.type === 'seal-broken') {
-      this.stageFlash = this.state?.flashesEnabled ? 0.7 : 0;
-      this.spawnEmbers(18);
-      this.addPulse({ x: HEARTH_X, y: HEARTH_Y - 120, age: 0, life: 0.9, kind: 'heat' });
     }
   }
 
@@ -198,9 +209,14 @@ export class FlameRig {
     }
     this.impulse = Math.max(0, this.impulse - step * 2.65);
     this.stageFlash = Math.max(0, this.stageFlash - step * 1.75);
-    const targetEmbers = Math.floor(this.state.emberCap * (0.2 + this.state.stage * 0.08));
+    if (this.infernoEntryAge < 1.5) {
+      this.infernoEntryAge = Math.min(1.5, this.infernoEntryAge + step);
+      if (this.random.next() < step * 30) this.spawnEmbers(2);
+    }
+    const coldEmberScale = 1 - this.characterReaction.cold * 0.68;
+    const targetEmbers = Math.floor(this.state.emberCap * (0.2 + this.state.stage * 0.08) * coldEmberScale);
     const targetSmoke = Math.floor(this.state.smokeCap * 0.66);
-    if (this.random.next() < step * 18 && this.embers.length < targetEmbers) this.spawnEmbers(1);
+    if (this.random.next() < step * 18 * (1 - this.characterReaction.cold * 0.8) && this.embers.length < targetEmbers) this.spawnEmbers(1);
     if (this.random.next() < step * 4.2 && this.smoke.length < targetSmoke) {
       this.smoke.push({ x: HEARTH_X + (this.random.next() - 0.5) * 125, y: HEARTH_Y - 155, vx: (this.random.next() - 0.5) * 26, vy: -34 - this.random.next() * 48, age: 0, life: 2.2 + this.random.next() * 1.8, size: 32 + this.random.next() * 58, kind: 'smoke' });
     }
@@ -209,7 +225,10 @@ export class FlameRig {
         particle.age += step;
         particle.x += particle.vx * step;
         particle.y += particle.vy * step;
-        if (particle.kind === 'ember') particle.vx += Math.sin(particle.age * 8.2) * step * 19;
+        if (particle.kind === 'ember') {
+          particle.vx += Math.sin(particle.age * 8.2) * step * 19;
+          particle.vx += this.characterReaction.emberDrift * step * 210;
+        }
       }
     }
     this.embers = this.embers.filter((particle) => particle.age < particle.life);
@@ -223,13 +242,18 @@ export class FlameRig {
     const family = this.families[name];
     const outerImage = family.outerBitmap.image;
     const coreImage = family.coreBitmap.image;
+    const reaction = this.characterReaction;
+    const reactionHeight = 1 - reaction.suppression;
+    const anchorShift = reaction.bend * box.width * 0.14;
+    const rotation = reaction.bend * 0.13;
+    const coldFilter = reaction.cold > 0.02 ? `hue-rotate(${Math.round(150 * reaction.cold)}deg) saturate(${(1 - reaction.cold * 0.28).toFixed(2)}) brightness(${(1 - reaction.cold * 0.16).toFixed(2)})` : null;
     if (outerImage && family.outerBitmap.isReady()) drawSpriteFrame(context, outerImage, family.outerAnimator.getFrame(), {
-      anchorX: HEARTH_X, anchorY: HEARTH_Y, width: box.width * 1.18, height: box.height * 1.03, pivot: [0.5, 0.965], alpha: alpha * 0.8,
-      filter: this.state.boostActive ? 'hue-rotate(245deg) saturate(1.28) brightness(1.05)' : 'saturate(1.08)',
+      anchorX: HEARTH_X + anchorShift, anchorY: HEARTH_Y, width: box.width * 1.18, height: box.height * 1.03 * reactionHeight, pivot: [0.5, 0.965], alpha: alpha * (0.8 - reaction.cold * 0.12), rotation, skewX: reaction.bend * 0.1,
+      filter: this.state.boostActive ? 'hue-rotate(245deg) saturate(1.28) brightness(1.05)' : coldFilter ?? 'saturate(1.08)',
     });
     if (coreImage && family.coreBitmap.isReady()) drawSpriteFrame(context, coreImage, family.coreAnimator.getFrame(), {
-      anchorX: HEARTH_X, anchorY: HEARTH_Y, width: box.width * 0.72, height: box.height * 0.94, pivot: [0.5, 0.965], alpha: alpha * 0.94,
-      filter: this.state.boostActive ? 'hue-rotate(275deg) saturate(1.15) brightness(1.22)' : 'brightness(1.08)',
+      anchorX: HEARTH_X + anchorShift * 0.72, anchorY: HEARTH_Y, width: box.width * 0.72, height: box.height * 0.94 * reactionHeight, pivot: [0.5, 0.965], alpha: alpha * (0.94 - reaction.cold * 0.18), rotation: rotation * 0.72, skewX: reaction.bend * 0.07,
+      filter: this.state.boostActive ? 'hue-rotate(275deg) saturate(1.15) brightness(1.22)' : coldFilter ?? 'brightness(1.08)',
     });
     if (this.impulse > 0.02 && coreImage && family.coreBitmap.isReady()) drawSpriteFrame(context, coreImage, family.coreAnimator.getFrame(), {
       anchorX: HEARTH_X, anchorY: HEARTH_Y - box.height * this.impulse * 0.025, width: box.width * 0.82, height: box.height * (0.98 + this.impulse * 0.04), pivot: [0.5, 0.965], alpha: alpha * Math.min(0.38, this.impulse * 0.25), filter: 'brightness(1.34) saturate(1.1)',
@@ -278,22 +302,33 @@ export class FlameRig {
       context.save();
       context.translate(ember.x, ember.y);
       context.rotate(Math.atan2(ember.vy, ember.vx) + Math.PI / 2);
-      context.fillStyle = this.state.boostActive ? `rgba(255,221,121,${life})` : `rgba(255,119,39,${life})`;
+      const coldAlpha = 1 - this.characterReaction.cold * 0.45;
+      context.fillStyle = this.state.boostActive ? `rgba(255,221,121,${life * coldAlpha})` : `rgba(255,119,39,${life * coldAlpha})`;
       context.fillRect(-ember.size * 0.35, -ember.size * 1.5, ember.size * 0.7, ember.size * 3);
       context.restore();
     }
 
     for (const pulse of this.pulses) {
       const progress = pulse.age / pulse.life;
-      const radius = (pulse.kind === 'tap' ? 60 : pulse.kind === 'seal' ? 110 : 170) * (0.5 + progress * 1.2);
+      const radius = (pulse.kind === 'tap' ? 60 : 170) * (0.5 + progress * 1.2);
       const alpha = (1 - progress) * (pulse.kind === 'heat' ? 0.55 : 0.42);
-      const color = pulse.kind === 'stage-down' ? '90,170,180' : pulse.kind === 'seal' ? '168,118,224' : pulse.kind === 'heat' ? '255,204,91' : '255,137,49';
+      const color = pulse.kind === 'stage-down' ? '90,170,180' : pulse.kind === 'heat' ? '255,204,91' : '255,137,49';
       const flare = context.createRadialGradient(pulse.x, pulse.y, 0, pulse.x, pulse.y, radius);
       flare.addColorStop(0, `rgba(${color},${alpha})`);
       flare.addColorStop(0.35, `rgba(${color},${alpha * 0.45})`);
       flare.addColorStop(1, `rgba(${color},0)`);
       context.fillStyle = flare;
       context.fillRect(pulse.x - radius, pulse.y - radius, radius * 2, radius * 2);
+    }
+
+    if (this.infernoEntryAge < 1.5) {
+      const progress = this.infernoEntryAge / 1.5;
+      const alpha = Math.sin(progress * Math.PI) * (this.state.flashesEnabled ? 0.48 : 0.24);
+      context.strokeStyle = `rgba(255,171,76,${alpha})`;
+      context.lineWidth = 8 + progress * 18;
+      context.beginPath();
+      context.arc(HEARTH_X, HEARTH_Y - 45, 120 + progress * 610, 0, Math.PI * 2);
+      context.stroke();
     }
 
     if (this.flareActive && this.flareBitmap.image && this.flareBitmap.isReady()) {
@@ -308,8 +343,9 @@ export class FlameRig {
 
     if (this.state.stage === 7) {
       const high = this.families.high;
+      const entry = smoothstep(this.infernoEntryAge < 1.5 ? this.infernoEntryAge / 1.5 : 1);
       if (high.coreBitmap.image && high.coreBitmap.isReady()) drawSpriteFrame(context, high.coreBitmap.image, high.coreAnimator.getFrame(), {
-        anchorX: HEARTH_X, anchorY: HEARTH_Y, width: 500, height: 1_310, pivot: [0.5, 0.965], alpha: 0.38 + this.stageFlash * 0.12,
+        anchorX: HEARTH_X, anchorY: HEARTH_Y, width: 430 + entry * 110, height: 1_180 + entry * 190, pivot: [0.5, 0.965], alpha: entry * (0.38 + this.stageFlash * 0.12),
         filter: this.state.boostActive ? 'hue-rotate(258deg) saturate(1.18) brightness(1.08)' : 'brightness(1.35)',
       });
     }
@@ -327,6 +363,9 @@ export class FlameRig {
       family: this.currentFamily,
       previousFamily: this.previousFamily,
       transitionProgress: this.previousFamily ? clamp(this.transitionAge / this.transitionDuration, 0, 1) : 1,
+      characterReaction: this.characterReaction,
+      infernoEntryProgress: this.infernoEntryAge < 1.5 ? Math.round(this.infernoEntryAge / 1.5 * 1_000_000) / 1_000_000 : 1,
+      infernoPayoff: Object.freeze({ durationMs: 1_500, highFlameExpansion: true, emberBurst: true, runeWave: true, lightingPulse: true }),
       flareActive: this.flareActive,
       assets: Object.freeze({ ...familyAssets, flare: this.flareBitmap.status }),
     });
