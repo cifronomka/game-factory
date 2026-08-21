@@ -49,6 +49,46 @@ export class SpriteAnimator {
   /** @returns {SpriteFrame} */
   getFrame() { return this.clip.frames[this.getFrameIndex()]; }
 
+  getCycleProgress() {
+    const { frames, fps } = this.clip;
+    if (frames.length === 0 || fps <= 0) return 0;
+    const cycles = this.elapsed * fps / frames.length;
+    return cycles - Math.floor(cycles);
+  }
+
+  /** @param {number} progress */
+  setCycleProgress(progress) {
+    const { frames, fps } = this.clip;
+    if (frames.length === 0 || fps <= 0) return;
+    this.elapsed = clamp01(progress) * frames.length / fps;
+  }
+
+  /**
+   * Returns adjacent authored cells and a smooth normalized blend. Rendering
+   * both with complementary alpha raises temporal resolution to render FPS
+   * without changing the authored animation clock or duplicating bitmap data.
+   */
+  getBlendSample() {
+    const { frames, fps, loop } = this.clip;
+    if (frames.length === 0) return Object.freeze({ current: undefined, next: undefined, currentIndex: 0, nextIndex: 0, mix: 0, seam: false });
+    const measuredPosition = Math.max(0, this.elapsed * fps);
+    const nearestCell = Math.round(measuredPosition);
+    const position = Math.abs(measuredPosition - nearestCell) < 1e-8 ? nearestCell : measuredPosition;
+    const rawIndex = Math.floor(position + 1e-9);
+    const currentIndex = loop ? rawIndex % frames.length : Math.min(frames.length - 1, rawIndex);
+    const nextIndex = loop ? (currentIndex + 1) % frames.length : Math.min(frames.length - 1, currentIndex + 1);
+    const linear = currentIndex === nextIndex ? 0 : clamp01(position - Math.floor(position));
+    const mix = linear * linear * linear * (linear * (linear * 6 - 15) + 10);
+    return Object.freeze({
+      current: frames[currentIndex],
+      next: frames[nextIndex],
+      currentIndex,
+      nextIndex,
+      mix,
+      seam: loop && currentIndex === frames.length - 1 && nextIndex === 0,
+    });
+  }
+
   isComplete() {
     const { frames, fps, loop } = this.clip;
     return !loop && this.elapsed + 1e-9 >= frames.length / fps;
@@ -58,6 +98,9 @@ export class SpriteAnimator {
     return Object.freeze({ clip: this.clipName, frame: this.getFrameIndex(), elapsed: this.elapsed, complete: this.isComplete(), paused: this.paused });
   }
 }
+
+/** @param {number} value */
+function clamp01(value) { return Math.max(0, Math.min(1, value)); }
 
 /**
  * Draws one atlas cell into a pivot-anchored destination rectangle.

@@ -1,8 +1,8 @@
 # Art Direction — «Зажги»
 
-## Corrective Cycle 04
+## Corrective Cycle 05
 
-Пользовательский review 2026-08-20 установил новый baseline: огонь должен читаться как движущиеся языки пламени, а не как деформируемая статичная карточка; смена стадий должна быть анимирована; Пепельный слуга и Демонесса угасания должны иметь появление, живой idle и отдельное тушащее действие.
+Пользовательский review Cycle 05 установил final visual-polish baseline: существующий образ огня сохраняется, но authored cells должны восприниматься как непрерывно горящие языки без кадровых скачков; Ash Servant остаётся принятым; Demoness полностью пересобирается по newest user reference как спокойная властная Inferno Queen с ясным hand→flame cast и реакцией огня только после контакта.
 
 Concept art из `visual-references/` задаёт mood, palette, fixed hearth/camera и путь darkness → Inferno. Его нельзя использовать как fullscreen screen или копировать пиксели в production. Persistent world, characters, flame layers, particles, runes, glow, smoke, overlays, HUD и transition FX остаются раздельными.
 
@@ -37,7 +37,7 @@ Concept art из `visual-references/` задаёт mood, palette, fixed hearth/c
 - Family switch crossfade: 1.05 s; вход Stage 7: 1.5 s.
 - Stage flare: 8 frames, 8 fps one-shot, forward upward / reverse + cool tint downward.
 
-Кадры меняют silhouette, развилки, отрывы и negative spaces. Tint/opacity/scale/glow не засчитываются как authored frame variation. Geometric flame, moving crop, slice deformation и static-card fallback запрещены. Procedural остаются только glow/light masks, embers, smoke/haze, bounded tap/stage impulses и синхронизированная реакция на персонажей.
+Кадры меняют silhouette, развилки, отрывы и negative spaces. Tint/opacity/scale/glow не засчитываются как authored frame variation. Runtime между соседними authored cells использует complementary temporal blend с quintic timing; core/outer сохраняют независимую phase, tap не сбрасывает clocks, loop seam смешивается тем же способом. Geometric flame, moving crop, slice deformation и static-card fallback запрещены. Procedural остаются только glow/light masks, embers, smoke/haze, bounded tap/stage impulses и синхронизированная реакция на персонажей.
 
 Tap не выбирает кадр и не ускоряет animation loop. Height/brightness impulse визуально подтверждает раздувание и ограничивается presentation cap; gameplay принимает taps независимо.
 
@@ -52,13 +52,14 @@ Tap не выбирает кадр и не ускоряет animation loop. Heig
 
 ### Demoness
 
-- Закрытый 12+ redesign, никакой сексуализации concept pose.
-- `appearance`: 6 frames at 10 fps, once.
-- `idle`: спокойная выборка authored frames; каждые 5–9 active секунд seeded gesture `look → pause → one slow negative head movement → return`.
-- Telegraph: `cast-look → arms-rise → cast-gather`; effect: `cold-ramp → cold-hold → cold-release`; recovery ≤800 ms.
-- Отдельная cold ribbon связывает hand/action lane с hearth, а тот же `coldStrength` управляет холодным краем и подавлением пламени.
+- Reference: `visual-references/stage-references/stage-5-demoness-reference-view.jpg`, SHA-256 закреплён в atlas metadata/provenance. Сохраняются лицо, crown/hair, infernal silhouette и soot/ember palette; костюм закрыт high-neck armor для 12+.
+- V4 atlas: 28 transparent cells `192×288`: appearance 4, calm idle 4, restrained disapproval 4, cast 8, hold 4, recovery 4; root drift≤0.5 source px, edge alpha=0.
+- Idle loop длится примерно 6.67 s: дыхание/плечи и вторичные hair/cloth детали едва движутся, feet/root неподвижны. Каждые 5–9 active секунд: `look at flame → restrained disapproval → one slow head shake → return`; whole-body dance/fidget запрещены.
+- Telegraph: `cast-look → arms-rise → hands-to-flame → cast-gather`; effect: `cold-travel → contact → cold-hold → cold-release`; recovery ≤800 ms.
+- Cold ribbon начинается у текущего authored hand socket, идёт к текущей видимой точке flame и имеет отдельные `spellReach` и `impactStrength`. Bend/height/brightness/glow/sparks огня не реагируют до contact.
+- Demoness rendered bbox минимум в 1.25 раза выше Ash Servant, но не перекрывает HUD и центральный flame target.
 
-После effect state machine возвращается в `idle`; recovery использует обратный порядок уже authored action frames, без дубликата bitmap. Pause замораживает application clock. Персонаж не перекрывает центральный tap target и остаётся отдельным от flame/environment. Servant и Demoness могут действовать одновременно: каждый сохраняет собственный таймер, позу и FX.
+После effect state machine возвращается в `idle` через отдельный authored recovery. Pause замораживает application clock. Персонаж не перекрывает центральный tap target и остаётся отдельным от flame/environment. Servant и Demoness могут действовать одновременно: каждый сохраняет собственный таймер, позу и FX.
 
 ### Inferno host
 
@@ -84,4 +85,4 @@ PASS требует exact-build evidence:
 
 ## Remaining risk
 
-Автоматические atlas/state/pause/preload tests проходят, но они не доказывают субъективную плавность. Дефектные ImageGen v4-кандидаты Demoness с baked matte отклонены; production сохраняет coherent v3 bitmap и новый queen-like timing/FX. Главные открытые риски: frame-to-frame flame flicker и близость worst decoded residency `62.42 MiB` к hard limit `64 MiB`. До release нужны browser motion capture, quantitative frame comparison и два независимых visual reviewer.
+Автоматические atlas/state/pause/preload tests проверяют механику, но не доказывают субъективную плавность. Cycle 05 v4 использует новые просторные source strips и mechanical alpha/root repack; ранние baked-matte candidates не входят в repo. Первый `390×844` Human-Eye pass уже перенёс effect cards из зоны рук/пламени вниз и усилил 0.8 s hand→flame ribbon после blind finding о слабой читаемости траектории. Открытые риски до exact sign-off: perceptual ghosting при blend далёких hand poses и близость worst decoded residency `62.60 MiB` к hard limit `64 MiB`; production-browser normal/0.25× evidence и независимый regression остаются обязательными.

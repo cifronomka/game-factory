@@ -36,6 +36,7 @@ const CSS = `
 .inferno-hud button{min-width:48px;min-height:48px;border:1px solid #80513f;border-radius:12px;background:#211921e8;color:#fff3df;padding:8px 13px;font:inherit;cursor:pointer}.inferno-hud button:focus-visible{outline:3px solid #ffd370;outline-offset:2px}.inferno-hud button:disabled{opacity:.45;cursor:not-allowed}
 .inferno-hud__tap-hint{position:absolute;left:50%;top:64%;transform:translate(-50%,-50%);min-width:96px;min-height:96px;border:1px dashed #e17c4688;border-radius:50%;display:grid;place-items:center;color:#ffd4a288;pointer-events:none}
 .inferno-hud__tap-hint[hidden]{display:none}
+@media (max-width:899px) and (orientation:portrait){.inferno-hud__signals{align-self:end;margin:0 0 8px}.inferno-hud__debuffs{width:min(330px,92vw)}}
 @media (min-width:900px) and (orientation:landscape){.inferno-hud{grid-template-columns:minmax(230px,1fr) minmax(360px,760px) minmax(230px,1fr);grid-template-rows:1fr}.inferno-hud__top{grid-column:1;align-self:start;width:auto}.inferno-hud__signals{grid-column:3;align-self:center;width:100%;min-width:0}.inferno-hud__debuffs{width:100%}.inferno-hud__controls{grid-column:1;align-self:end}.inferno-hud__tap-hint{bottom:12%}}
 @media (orientation:landscape) and (max-height:419px){.inferno-presentation{min-height:0}.inferno-hud{padding:10px}.inferno-hud__top{padding:5px 12px}.inferno-hud__stage{font-size:16px}.inferno-hud__score{font-size:16px}.inferno-hud__controls{gap:6px}.inferno-hud button{padding:6px 10px}}
 `;

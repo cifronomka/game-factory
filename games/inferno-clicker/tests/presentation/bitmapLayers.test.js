@@ -24,7 +24,7 @@ function fakeImage(width, height) {
 test('asset URLs remain relative to the copied src/assets dist layout', () => {
   assert.match(INFERNAL_CHAMBER_URL, /\/assets\/backgrounds\/bg-infernal-chamber-production\.webp$/);
   assert.match(ASH_SERVANT_ATLAS_URL, /\/assets\/characters\/ash-servant\/ash-servant-states-v3\.webp$/);
-  assert.match(DEMONESS_ATLAS_URL, /\/assets\/characters\/demoness\/demoness-states-v3\.webp$/);
+  assert.match(DEMONESS_ATLAS_URL, /\/assets\/characters\/demoness\/demoness-states-v4\.webp$/);
   assert.match(INFERNO_HOST_URL, /\/assets\/characters\/character-inferno-host\.webp$/);
   assert.match(FLAME_ATLAS_URLS.low.core, /\/assets\/flame\/atlases\/core-low-v2\.webp$/);
   assert.match(FLAME_ATLAS_URLS.low.outer, /\/assets\/flame\/atlases\/outer-low-v2\.webp$/);

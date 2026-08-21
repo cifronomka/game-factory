@@ -135,6 +135,7 @@ export class InfernoScene {
     context.fillRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
     const transform = sceneTransform(this.canvas.clientWidth, this.canvas.clientHeight);
     const flameStats = this.flame.getStats();
+    this.characters.setFlameTarget(flameStats.targetAnchor);
     const entry = flameStats.infernoEntryProgress;
     const impulseWindow = state.stage === 7 && !state.reducedMotion && entry < 0.32 ? 1 - entry / 0.32 : 0;
     this.screenImpulse = Object.freeze({

@@ -14,7 +14,7 @@ not shipped as screens, crops or flattened backplates.
 | FL-HIGH-CORE / OUTER | flame/atlases/{core,outer}-high-v2.webp | Two independent transparent 12-frame Inferno layers | preload at stage 5 progress 0.6; 11 fps |
 | FX-STAGE-FLARE | flame/transitions/stage-flare-v2.webp | Transparent 8-frame boundary flare | preload at stage 1 progress 0.6; 8 fps once; reverse downward |
 | CH-ASH-SERVANT | characters/ash-servant/ash-servant-states-v3.webp | Complete appearance, idle, inhale and blow figures repacked into stable-root 256×280 cells | preload at stage 2 progress 0.6 |
-| CH-DEMONESS | characters/demoness/demoness-states-v3.webp | Complete appearance, restrained idle/disapproval, cast and hold figures repacked into stable-root 256×280 cells | preload at stage 3 progress 0.6 |
+| CH-DEMONESS | characters/demoness/demoness-states-v4.webp | Cycle 05 Inferno Queen: appearance, calm idle, restrained disapproval, 8-pose cast, hold and recovery in stable-root 192×288 cells | preload at stage 3 progress 0.6 |
 | CH-INFERNO-HOST | characters/character-inferno-host.webp + character-inferno-host-v3.json | Five non-overlapping authored spatial regions from the transparent climax host | preload at stage 5 progress 0.6; independent periods 5.5–8.9 s |
 
 The matching JSON files are the production clip metadata and preserve frame
@@ -35,6 +35,10 @@ exports can be traced back without shipping the large PNG masters:
 | Ash Servant state sequence | `exec-9f80d3c6-4232-4948-8745-11033de0acad.png` |
 | Demoness state sequence | `exec-86104605-2285-459d-96ba-f6131a8e98b5.png` |
 | stage flare sequence | `exec-65226e28-0b1d-4787-8306-2777cb371876.png` |
+| Cycle 05 Demoness idle/disapproval | `exec-00aba88d-53bf-4cd7-acc0-32fa817f3d83.png` |
+| Cycle 05 Demoness prepare | `exec-b496bce4-cde7-48cc-8f28-e714aa533761.png` |
+| Cycle 05 Demoness cast/hold | `exec-95bc3866-463d-4f7f-a360-c4108501e277.png` |
+| Cycle 05 Demoness recovery | `exec-5631088d-5ad8-4f6f-b17d-0e7b87a0f757.png` |
 
 Deterministic post-processing used Sharp only for grid crop/resize, removal of
 the generated white/checker preview background into real alpha, WebP encoding,
@@ -56,14 +60,19 @@ v3 metadata. All 48 cells have zero alpha on the outer four pixels, root span is
 at most two source pixels and the largest-body connected-component ratio is at
 least 0.998.
 
-An additional Cycle 04 ImageGen exploration for a revised Demoness Queen was
-reviewed but rejected because background-extraction passes left partially opaque
-matte blocks. None of those candidate PNGs or derived v4 atlases is shipped or
-referenced. The safe v3 identity remains the production bitmap while its runtime
-timing, selected poses, cold FX and recovery were rebuilt to the authoritative
-queen behavior contract.
+Cycle 05 replaces that rejected exploration with four newly generated, spacious
+four-pose strips. The authoritative reference is
+`visual-references/stage-references/stage-5-demoness-reference-view.jpg`, SHA-256
+`6bdc58df781ed898a35d98d05dc5f8b47e38f0e79c018e2d1da3afe48eb740a1`.
+The generated design keeps its face, crown/hair, soot/ember palette and sovereign
+silhouette, while applying the mandatory closed high-neck 12+ costume. Mechanical
+post-processing removes only the uniform near-white chroma field, retains the
+largest connected full-body cluster, defringes the alpha edge, scales uniformly
+and aligns the skirt root. It neither paints new anatomy nor borrows reference
+pixels. The final v4 atlas contains 28 cells with zero edge-alpha pixels and at
+most 0.5 source-pixel root drift.
 
-The current bitmap registry decodes to 65,448,960 bytes (62.42 MiB) if every
+The current bitmap registry decodes to 65,645,568 bytes (62.60 MiB) if every
 stage asset is resident simultaneously. Startup-critical bitmaps are 818,566
 compressed bytes and 12,581,888 decoded bytes; the remaining atlases are loaded
 near their first use.

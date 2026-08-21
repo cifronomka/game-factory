@@ -189,8 +189,8 @@
     },
     {
       "id": "CH-DEMONESS",
-      "path": "assets/characters/demoness/demoness-states-v3.webp",
-      "metadata": "assets/characters/demoness/demoness-states-v3.json",
+      "path": "assets/characters/demoness/demoness-states-v4.webp",
+      "metadata": "assets/characters/demoness/demoness-states-v4.json",
       "kind": "character-state-atlas",
       "stages": [
         4,
@@ -199,14 +199,14 @@
         7
       ],
       "width": 1536,
-      "height": 1120,
-      "bytes": 1012390,
+      "height": 1152,
+      "bytes": 737940,
       "transparent": true,
       "critical": false,
       "preload": "stage 3 progress >= 0.6",
-      "animation": "appearance 6f/10fps once; calm idle/disapproval 6f/1.2fps; phase-driven cast/cold hold/release; authored reverse recovery",
-      "sha256": "15f31821b37b3d991f0aa003495e994ec339b4fa5fb6ab2a7034b85851f3989a",
-      "metadataSha256": "8b8d8403fbb9768ad1565dd48133e008302c1d964a978fd1f2c9d52ea90ac44b"
+      "animation": "Cycle 05 Inferno Queen: appearance 4f; calm idle 4f/0.6fps; disapproval 4f; cast 8f with temporal interpolation; hold 4f; recovery 4f; dynamic hand-to-flame contact",
+      "sha256": "d9a4530495b7379d1b864aa508af203b5146bc2a03c52dbf37b342480999cab0",
+      "metadataSha256": "5b19ac8e14bc2c7cf4f51f09329814ab3f233afa4d71e984dc6e9a81d57559d9"
     },
     {
       "id": "CH-INFERNO-HOST",
@@ -363,11 +363,11 @@
     ],
     "demoness": [
       "silhouette does not consume reveal",
-      "appearance:6f@10fps once",
-      "idle/disapproval:6f@1.2fps restrained loop",
-      "cast/gather:6 authored phase-selected frames",
-      "cold hold/release:6 authored phase-selected frames",
-      "recovery: authored reverse, 800ms"
+      "appearance:4f@6fps once",
+      "idle:4f@0.6fps calm loop; disapproval:4f@2fps once",
+      "cast/gather:8 authored poses with sub-frame interpolation",
+      "cold hold/release:4 authored poses with dynamic actual-flame target",
+      "recovery:4 authored poses, 800ms"
     ],
     "inferno-host": [
       "left-wing:7.7s",

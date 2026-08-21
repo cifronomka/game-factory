@@ -6,7 +6,7 @@
 
 ## Статус и владелец
 
-- Этап: Corrective Cycle 04; direct-tap V5/concurrent-hazard и presentation polish находятся в implementation, прежние exact-build visual reports не закрывают новый temporal gate.
+- Этап: Corrective Cycle 05; direct-tap V5/concurrent-hazard gameplay заморожен, visual animation polish находится в exact-browser QA, прежние visual reports не закрывают новый temporal/semantic gate.
 - Владелец: Game Architect.
 - Primary runtime: браузер внутри Yandex Games.
 - Architecture rule: ни один модуль `src/core/` не импортирует Yandex SDK, VK Bridge, Android API, DOM или renderer.
@@ -132,14 +132,15 @@ Core является единственным владельцем `stage` и `
 7. `flame-stage-fx` — один authored 8-frame flare atlas: forward для upward, reverse + cool tint для downward boundary; на family boundaries он совмещён с root-locked crossfade;
 8. `flame-fan-response` — bounded brightness/height/ember impulse, запускаемый presentation event и не влияющий на core taps; отдельный fan-response bitmap в этом candidate не заявляется.
 
-Размер, цвет и интенсивность каждого подслоя выводятся из `SceneVisualState`; character animation и environment reveal не зависят от flame animation timeline. `SpriteAnimator` выбирает atlas frame по application animation clock, фиксированному `fps`, `loop` и clip state; pause замораживает clock без catch-up. Reduced Motion сохраняет спокойный authored loop с пониженным fps, off фиксирует authored poster frame; static-card warp и geometric flame fallback не допускаются. Assets загружаются ahead-of-need, но сохраняются до teardown: worst full decoded residency `64,269,312 B / 61.29 MiB` учитывается целиком и остаётся ниже hard `64 MiB`.
+Размер, цвет и интенсивность каждого подслоя выводятся из `SceneVisualState`; character animation и environment reveal не зависят от flame animation timeline. `SpriteAnimator` выбирает adjacent authored cells по application animation clock и отдаёт quintic `current/next/mix`; Canvas2D рисует complementary weights, включая loop seam. Family position является непрерывным reversible scalar, поэтому одновременно видимы максимум две соседние families; tap не меняет clip clocks. Pause замораживает clock без catch-up. Reduced Motion сохраняет спокойный authored loop с пониженным fps, off фиксирует authored poster frame; static-card warp и geometric flame fallback не допускаются. Assets загружаются ahead-of-need, но сохраняются до teardown: worst full decoded residency `65,645,568 B / 62.60 MiB` учитывается целиком и остаётся ниже hard `64 MiB`.
 
 ### Character animation contract
 
 `CharacterScene` использует atlas clips и phase interpolation, а не один cutout с whole-body dance/warp. Core отдаёт независимые `encounters[]`; presentation derives phase progress from each source timer and never changes hazard timing.
 
 - Ash Servant keeps one stationary hearth-side root. The 1.0 s telegraph is split into prepare, inhale ramp and hold; the 2.5 s effect is split into exhale start/ramp/peak/fade/end followed by a 450 ms presentation-only recovery. One normalized `exhaleStrength` drives ash-stream reach/opacity, lateral ember velocity and flame bend/suppression, so cause and reaction grow and recover together.
-- Demoness is a larger restrained actor with silhouette/reveal, slow idle, seeded presentation-only disapproval look/head-shake, deliberate arms-rise/gather, 4.0 s cold ramp/hold/release and 800 ms recovery. `coldStrength` drives hand-to-hearth ribbon, cold haze and flame height/brightness/spark suppression. Whole-body rhythmic rocking and detached components are forbidden.
+- Demoness v4 is a larger restrained actor (`520×780` logical placement versus Servant `540×590`) with silhouette/reveal, 6.67 s calm idle, seeded presentation-only disapproval, 8-pose arms-rise/gather, 4-pose hold and 4-pose recovery. The reference path/SHA, 28 frame hashes, alpha/root geometry and hand sockets are versioned in atlas metadata.
+- `coldStrength` controls only visible hand energy; `spellReach` advances a sampled cold curve from the current rendered hand socket to `FlameRig.getTargetAnchor()`. `impactStrength` stays zero until leading effect contact and alone drives flame bend/height/brightness/glow/spark suppression. Target coordinates include current heat, tap impulse, bend and suppression, so a fixed hearth miss is impossible. Whole-body rhythmic rocking and detached components are forbidden.
 - Servant and Demoness may animate attacks simultaneously. HUD receives a vertical `debuffs[]` list with source, effect, factor and remaining time for each; combined core factor is displayed only as an optional total and never replaces source rows.
 - Stage-7 host is split into at least five separately addressable spatial regions with different deterministic phase offsets/periods. Stage 6→7 adds one bounded 1.5 s entry sequence; ambient host/flame/runes/particles continue afterward. Reduced Motion removes the camera impulse and lowers particle cost without making the scene static.
 
@@ -151,7 +152,7 @@ Core публикует typed domain events `tapAccepted`, `tapRejected`, `stage
 
 - Headless core и deterministic clock позволяют unit/property simulations без DOM, Canvas, audio или SDK; отдельный seeded harness проверяет только несмысловые presentation/audio variations и не входит в gameplay state.
 - `SceneVisualStateMapper` проверяется table-driven snapshot tests для семи stages, all single/concurrent encounter combinations and boost without launching Canvas.
-- Renderer integration tests проверяют atlas bounds/hash, frame selection, phase-strength curves, stable roots, layer order, unique passes/emitters, reversible transitions, asynchronous host regions, pause freeze and cleanup; a managed production browser records temporal evidence on the exact build.
+- Renderer integration tests проверяют atlas bounds/hash/reference SHA, frame selection/interpolation, phase-strength/reach/contact curves, stable roots, dynamic hand→visible-flame target, zero pre-contact reaction, layer order, reversible transitions, asynchronous host regions, pause freeze and cleanup; a managed production browser records temporal evidence on the exact build.
 - Character state machines используют domain events и asset states из `ASSET_PLAN.md`; hit testing остаётся только у центральной gameplay zone и DOM controls.
 
 ## Input

@@ -46,6 +46,68 @@ function clamp(value, low, high) { return Math.max(low, Math.min(high, value)); 
 function smoothstep(value) { const progress = clamp(value, 0, 1); return progress * progress * (3 - 2 * progress); }
 /** @param {number} stage @returns {FlameFamily} */
 function familyForStage(stage) { return stage >= 6 ? 'high' : stage >= 3 ? 'mid' : 'low'; }
+/** @param {FlameFamily} family */
+function positionForFamily(family) { return family === 'high' ? 2 : family === 'mid' ? 1 : 0; }
+/** @param {number} position @returns {FlameFamily} */
+function familyForPosition(position) { return position >= 1.5 ? 'high' : position >= 0.5 ? 'mid' : 'low'; }
+
+/** Complementary weights ensure no family becomes a full-opacity ghost copy. */
+export function familyWeights(position) {
+  const value = clamp(position, 0, 2);
+  if (value <= 1) return Object.freeze({ low: 1 - value, mid: value, high: 0 });
+  return Object.freeze({ low: 0, mid: 2 - value, high: value - 1 });
+}
+
+/** Continuous heat mapping used by scale-adjacent flame presentation channels. */
+export function heatVisualProfile(flameHeight) {
+  const heat = clamp(Number(flameHeight) || 0, 0, 1);
+  return Object.freeze({
+    heat,
+    brightness: 1.02 + heat * 0.2,
+    glowAlpha: 0.22 + heat * 0.34,
+    glowRadius: 1.35 + heat * 0.52,
+    outerAlpha: 0.68 + heat * 0.14,
+    emberRatio: 0.12 + heat * 0.76,
+    smokeRatio: 0.35 + heat * 0.45,
+  });
+}
+
+/** @param {CanvasRenderingContext2D} context @param {HTMLImageElement} image @param {SpriteAnimator} animator @param {any} placement */
+function drawTemporalSample(context, image, sample, placement) {
+  if (!sample.current) return;
+  const alpha = placement.alpha ?? 1;
+  if (!sample.next || sample.mix <= 0.001) {
+    drawSpriteFrame(context, image, sample.current, placement);
+    return;
+  }
+  if (sample.mix >= 0.999) {
+    drawSpriteFrame(context, image, sample.next, placement);
+    return;
+  }
+  drawSpriteFrame(context, image, sample.current, { ...placement, alpha: alpha * (1 - sample.mix) });
+  drawSpriteFrame(context, image, sample.next, { ...placement, alpha: alpha * sample.mix });
+}
+
+/** @param {CanvasRenderingContext2D} context @param {HTMLImageElement} image @param {SpriteAnimator} animator @param {any} placement */
+function drawTemporalSprite(context, image, animator, placement) {
+  drawTemporalSample(context, image, animator.getBlendSample(), placement);
+}
+
+/** @param {SpriteAnimator} animator @param {number} direction */
+function directionalSample(animator, direction) {
+  const sample = animator.getBlendSample();
+  if (direction >= 0) return sample;
+  const frames = animator.clip.frames;
+  const currentIndex = frames.length - 1 - sample.currentIndex;
+  const nextIndex = frames.length - 1 - sample.nextIndex;
+  return Object.freeze({
+    ...sample,
+    current: frames[currentIndex],
+    next: frames[nextIndex],
+    currentIndex,
+    nextIndex,
+  });
+}
 
 /** @param {FlameFamily} name @param {{imageFactory?:(()=>HTMLImageElement|null)}} options */
 function createFamily(name, options) {
@@ -77,8 +139,15 @@ export class FlameRig {
     this.flareDirection = 1;
     /** @type {FlameFamily} */ this.currentFamily = 'low';
     /** @type {FlameFamily|null} */ this.previousFamily = null;
+    this.familyMix = 0;
+    this.familyMixFrom = 0;
+    this.familyMixTarget = 0;
     this.transitionAge = 0;
     this.transitionDuration = 1.05;
+    this.boundaryAge = Number.POSITIVE_INFINITY;
+    this.boundaryDuration = 1.05;
+    this.boundaryFrom = 1;
+    this.boundaryTo = 1;
     /** @type {any} */ this.state = null;
     /** @type {Particle[]} */ this.embers = [];
     /** @type {Particle[]} */ this.smoke = [];
@@ -110,8 +179,14 @@ export class FlameRig {
     if ((state.stage === 2 && state.stageProgress >= 0.6) || state.stage > 2) this.ensureFamilyLoaded('mid');
     if ((state.stage === 5 && state.stageProgress >= 0.6) || state.stage > 5) this.ensureFamilyLoaded('high');
     if (targetFamily !== this.currentFamily) {
-      this.previousFamily = this.currentFamily;
+      const source = this.families[this.currentFamily];
+      const target = this.families[targetFamily];
+      target.coreAnimator.setCycleProgress(source.coreAnimator.getCycleProgress());
+      target.outerAnimator.setCycleProgress(source.outerAnimator.getCycleProgress());
+      this.previousFamily = familyForPosition(this.familyMix);
       this.currentFamily = targetFamily;
+      this.familyMixFrom = this.familyMix;
+      this.familyMixTarget = positionForFamily(targetFamily);
       this.transitionAge = 0;
       this.transitionDuration = state.stage === 7 ? 1.5 : 1.05;
     }
@@ -159,6 +234,10 @@ export class FlameRig {
       this.addPulse({ x: HEARTH_X, y: HEARTH_Y - 110, age: 0, life: 0.9, kind: event.to > event.from ? 'stage-up' : 'stage-down' });
       this.spawnEmbers(event.to === 7 ? 28 : 15);
       if (event.from === 6 && event.to === 7) this.infernoEntryAge = 0;
+      this.boundaryAge = 0;
+      this.boundaryDuration = event.from === 6 && event.to === 7 ? 1.5 : 1.05;
+      this.boundaryFrom = event.from;
+      this.boundaryTo = event.to;
     } else if (event.type === 'encounter-cue' && event.kind === 'heat-window' && event.phase === 'active') {
       this.addPulse({ x: HEARTH_X, y: HEARTH_Y - 100, age: 0, life: 1.1, kind: 'heat' });
     }
@@ -193,7 +272,9 @@ export class FlameRig {
   update(dt) {
     if (!this.state || this.state.paused) return;
     const step = clamp(dt, 0, 0.05);
-    const activeFamilies = new Set([this.currentFamily, this.previousFamily].filter(Boolean));
+    const weights = familyWeights(this.familyMix);
+    const activeFamilies = new Set(Object.entries(weights).filter(([, weight]) => weight > 0.0001).map(([name]) => name));
+    activeFamilies.add(this.currentFamily);
     for (const name of activeFamilies) {
       const family = this.families[/** @type {FlameFamily} */ (name)];
       family.coreAnimator.update(step);
@@ -205,18 +286,25 @@ export class FlameRig {
     }
     if (this.previousFamily) {
       this.transitionAge += step;
-      if (this.transitionAge >= this.transitionDuration) this.previousFamily = null;
+      const progress = clamp(this.transitionAge / this.transitionDuration, 0, 1);
+      this.familyMix = this.familyMixFrom + (this.familyMixTarget - this.familyMixFrom) * smoothstep(progress);
+      if (progress >= 1) {
+        this.familyMix = this.familyMixTarget;
+        this.previousFamily = null;
+      }
     }
+    if (this.boundaryAge < this.boundaryDuration) this.boundaryAge = Math.min(this.boundaryDuration, this.boundaryAge + step);
     this.impulse = Math.max(0, this.impulse - step * 2.65);
     this.stageFlash = Math.max(0, this.stageFlash - step * 1.75);
     if (this.infernoEntryAge < 1.5) {
       this.infernoEntryAge = Math.min(1.5, this.infernoEntryAge + step);
       if (this.random.next() < step * 30) this.spawnEmbers(2);
     }
+    const profile = heatVisualProfile(this.state.flameHeight);
     const coldEmberScale = 1 - this.characterReaction.cold * 0.68;
-    const targetEmbers = Math.floor(this.state.emberCap * (0.2 + this.state.stage * 0.08) * coldEmberScale);
-    const targetSmoke = Math.floor(this.state.smokeCap * 0.66);
-    if (this.random.next() < step * 18 * (1 - this.characterReaction.cold * 0.8) && this.embers.length < targetEmbers) this.spawnEmbers(1);
+    const targetEmbers = Math.floor(this.state.emberCap * profile.emberRatio * coldEmberScale);
+    const targetSmoke = Math.floor(this.state.smokeCap * profile.smokeRatio);
+    if (this.random.next() < step * (8 + profile.heat * 14) * (1 - this.characterReaction.cold * 0.8) && this.embers.length < targetEmbers) this.spawnEmbers(1);
     if (this.random.next() < step * 4.2 && this.smoke.length < targetSmoke) {
       this.smoke.push({ x: HEARTH_X + (this.random.next() - 0.5) * 125, y: HEARTH_Y - 155, vx: (this.random.next() - 0.5) * 26, vy: -34 - this.random.next() * 48, age: 0, life: 2.2 + this.random.next() * 1.8, size: 32 + this.random.next() * 58, kind: 'smoke' });
     }
@@ -246,17 +334,31 @@ export class FlameRig {
     const reactionHeight = 1 - reaction.suppression;
     const anchorShift = reaction.bend * box.width * 0.14;
     const rotation = reaction.bend * 0.13;
-    const coldFilter = reaction.cold > 0.02 ? `hue-rotate(${Math.round(150 * reaction.cold)}deg) saturate(${(1 - reaction.cold * 0.28).toFixed(2)}) brightness(${(1 - reaction.cold * 0.16).toFixed(2)})` : null;
-    if (outerImage && family.outerBitmap.isReady()) drawSpriteFrame(context, outerImage, family.outerAnimator.getFrame(), {
-      anchorX: HEARTH_X + anchorShift, anchorY: HEARTH_Y, width: box.width * 1.18, height: box.height * 1.03 * reactionHeight, pivot: [0.5, 0.965], alpha: alpha * (0.8 - reaction.cold * 0.12), rotation, skewX: reaction.bend * 0.1,
-      filter: this.state.boostActive ? 'hue-rotate(245deg) saturate(1.28) brightness(1.05)' : coldFilter ?? 'saturate(1.08)',
+    const profile = heatVisualProfile(this.state.flameHeight);
+    const coldFilter = reaction.cold > 0.02 ? `hue-rotate(${Math.round(150 * reaction.cold)}deg) saturate(${(1 - reaction.cold * 0.28).toFixed(2)}) brightness(${((1 - reaction.cold * 0.16) * profile.brightness).toFixed(3)})` : null;
+    if (outerImage && family.outerBitmap.isReady()) drawTemporalSprite(context, outerImage, family.outerAnimator, {
+      anchorX: HEARTH_X + anchorShift, anchorY: HEARTH_Y, width: box.width * 1.18, height: box.height * 1.03 * reactionHeight, pivot: [0.5, 0.965], alpha: alpha * (profile.outerAlpha - reaction.cold * 0.12), rotation, skewX: reaction.bend * 0.1,
+      filter: this.state.boostActive ? `hue-rotate(245deg) saturate(1.28) brightness(${(profile.brightness * 1.05).toFixed(3)})` : coldFilter ?? `saturate(1.08) brightness(${profile.brightness.toFixed(3)})`,
     });
-    if (coreImage && family.coreBitmap.isReady()) drawSpriteFrame(context, coreImage, family.coreAnimator.getFrame(), {
+    if (coreImage && family.coreBitmap.isReady()) drawTemporalSprite(context, coreImage, family.coreAnimator, {
       anchorX: HEARTH_X + anchorShift * 0.72, anchorY: HEARTH_Y, width: box.width * 0.72, height: box.height * 0.94 * reactionHeight, pivot: [0.5, 0.965], alpha: alpha * (0.94 - reaction.cold * 0.18), rotation: rotation * 0.72, skewX: reaction.bend * 0.07,
-      filter: this.state.boostActive ? 'hue-rotate(275deg) saturate(1.15) brightness(1.22)' : coldFilter ?? 'brightness(1.08)',
+      filter: this.state.boostActive ? `hue-rotate(275deg) saturate(1.15) brightness(${(profile.brightness * 1.16).toFixed(3)})` : coldFilter ?? `brightness(${(profile.brightness * 1.05).toFixed(3)})`,
     });
-    if (this.impulse > 0.02 && coreImage && family.coreBitmap.isReady()) drawSpriteFrame(context, coreImage, family.coreAnimator.getFrame(), {
+    if (this.impulse > 0.02 && coreImage && family.coreBitmap.isReady()) drawTemporalSprite(context, coreImage, family.coreAnimator, {
       anchorX: HEARTH_X, anchorY: HEARTH_Y - box.height * this.impulse * 0.025, width: box.width * 0.82, height: box.height * (0.98 + this.impulse * 0.04), pivot: [0.5, 0.965], alpha: alpha * Math.min(0.38, this.impulse * 0.25), filter: 'brightness(1.34) saturate(1.1)',
+    });
+  }
+
+  /** Current rendered flame aim point, including tap impulse and character bend/suppression. */
+  getTargetAnchor() {
+    if (!this.state) return Object.freeze({ x: HEARTH_X, y: HEARTH_Y - 180 });
+    const baseHeight = 72 + 1170 * this.state.flameHeight;
+    const height = baseHeight * (1 + this.impulse * 0.105) * (1 - this.characterReaction.suppression);
+    const width = height * (0.42 + this.state.flameHeight * 0.12) * (1 + this.impulse * 0.06);
+    const anchorShift = this.characterReaction.bend * width * 0.14;
+    return Object.freeze({
+      x: HEARTH_X + anchorShift * 0.82,
+      y: HEARTH_Y - height * 0.3,
     });
   }
 
@@ -267,19 +369,23 @@ export class FlameRig {
     const height = baseHeight * (1 + this.impulse * 0.105);
     const width = height * (0.42 + this.state.flameHeight * 0.12) * (1 + this.impulse * 0.06);
     const box = { x: HEARTH_X - width / 2, y: HEARTH_Y - height, width, height };
+    const profile = heatVisualProfile(this.state.flameHeight);
+    const boundaryProgress = this.boundaryAge < this.boundaryDuration ? clamp(this.boundaryAge / this.boundaryDuration, 0, 1) : 1;
+    const boundaryEnvelope = boundaryProgress < 1 ? Math.sin(boundaryProgress * Math.PI) : 0;
 
     context.save();
     context.globalCompositeOperation = 'screen';
-    const glow = context.createRadialGradient(HEARTH_X, HEARTH_Y - height * 0.3, 10, HEARTH_X, HEARTH_Y - height * 0.25, width * 1.7);
-    glow.addColorStop(0, this.state.boostActive ? 'rgba(188,113,255,.34)' : `rgba(255,111,35,${0.28 + this.state.flameHeight * 0.26})`);
+    const glow = context.createRadialGradient(HEARTH_X, HEARTH_Y - height * 0.3, 10, HEARTH_X, HEARTH_Y - height * 0.25, width * profile.glowRadius);
+    glow.addColorStop(0, this.state.boostActive ? 'rgba(188,113,255,.34)' : `rgba(255,111,35,${profile.glowAlpha + boundaryEnvelope * 0.08})`);
     glow.addColorStop(0.45, 'rgba(255,72,20,.15)');
     glow.addColorStop(1, 'rgba(255,45,8,0)');
     context.fillStyle = glow;
     context.fillRect(0, 210, 1080, 1280);
 
-    const progress = this.previousFamily ? clamp(this.transitionAge / this.transitionDuration, 0, 1) : 1;
-    if (this.previousFamily) this.drawFamily(context, this.previousFamily, 1 - progress, box);
-    this.drawFamily(context, this.currentFamily, progress, box);
+    const weights = familyWeights(this.familyMix);
+    for (const [name, weight] of Object.entries(weights)) {
+      if (weight > 0.0001) this.drawFamily(context, /** @type {FlameFamily} */ (name), weight, box);
+    }
     context.restore();
   }
 
@@ -332,10 +438,7 @@ export class FlameRig {
     }
 
     if (this.flareActive && this.flareBitmap.image && this.flareBitmap.isReady()) {
-      const frames = this.flareAnimator.clip.frames;
-      const forwardIndex = this.flareAnimator.getFrameIndex();
-      const frame = frames[this.flareDirection > 0 ? forwardIndex : frames.length - 1 - forwardIndex];
-      drawSpriteFrame(context, this.flareBitmap.image, frame, {
+      drawTemporalSample(context, this.flareBitmap.image, directionalSample(this.flareAnimator, this.flareDirection), {
         anchorX: HEARTH_X, anchorY: HEARTH_Y, width: 560, height: 920, pivot: [0.5, 0.965], alpha: 0.62 + this.stageFlash * 0.2,
         filter: this.flareDirection > 0 ? 'brightness(1.18) saturate(1.08)' : 'brightness(.8) hue-rotate(145deg) saturate(.72)',
       });
@@ -344,7 +447,7 @@ export class FlameRig {
     if (this.state.stage === 7) {
       const high = this.families.high;
       const entry = smoothstep(this.infernoEntryAge < 1.5 ? this.infernoEntryAge / 1.5 : 1);
-      if (high.coreBitmap.image && high.coreBitmap.isReady()) drawSpriteFrame(context, high.coreBitmap.image, high.coreAnimator.getFrame(), {
+      if (high.coreBitmap.image && high.coreBitmap.isReady()) drawTemporalSprite(context, high.coreBitmap.image, high.coreAnimator, {
         anchorX: HEARTH_X, anchorY: HEARTH_Y, width: 430 + entry * 110, height: 1_180 + entry * 190, pivot: [0.5, 0.965], alpha: entry * (0.38 + this.stageFlash * 0.12),
         filter: this.state.boostActive ? 'hue-rotate(258deg) saturate(1.18) brightness(1.08)' : 'brightness(1.35)',
       });
@@ -354,8 +457,14 @@ export class FlameRig {
 
   getStats() {
     const familyAssets = Object.fromEntries(Object.entries(this.families).map(([name, family]) => [name, Object.freeze({
-      core: family.coreBitmap.status, outer: family.outerBitmap.status, coreFrame: family.coreAnimator.getFrameIndex(), outerFrame: family.outerAnimator.getFrameIndex(),
+      core: family.coreBitmap.status,
+      outer: family.outerBitmap.status,
+      coreFrame: family.coreAnimator.getFrameIndex(),
+      outerFrame: family.outerAnimator.getFrameIndex(),
+      coreTemporal: family.coreAnimator.getBlendSample(),
+      outerTemporal: family.outerAnimator.getBlendSample(),
     })]));
+    const boundaryProgress = this.boundaryAge < this.boundaryDuration ? clamp(this.boundaryAge / this.boundaryDuration, 0, 1) : 1;
     return Object.freeze({
       embers: this.embers.length,
       smoke: this.smoke.length,
@@ -363,10 +472,22 @@ export class FlameRig {
       family: this.currentFamily,
       previousFamily: this.previousFamily,
       transitionProgress: this.previousFamily ? clamp(this.transitionAge / this.transitionDuration, 0, 1) : 1,
+      familyMix: this.familyMix,
+      familyWeights: familyWeights(this.familyMix),
+      boundaryTransition: Object.freeze({
+        active: boundaryProgress < 1,
+        from: this.boundaryFrom,
+        to: this.boundaryTo,
+        durationMs: Math.round(this.boundaryDuration * 1_000),
+        progress: Math.round(boundaryProgress * 1_000_000) / 1_000_000,
+      }),
+      heatVisuals: heatVisualProfile(this.state?.flameHeight ?? 0),
+      targetAnchor: this.getTargetAnchor(),
       characterReaction: this.characterReaction,
       infernoEntryProgress: this.infernoEntryAge < 1.5 ? Math.round(this.infernoEntryAge / 1.5 * 1_000_000) / 1_000_000 : 1,
       infernoPayoff: Object.freeze({ durationMs: 1_500, highFlameExpansion: true, emberBurst: true, runeWave: true, lightingPulse: true }),
       flareActive: this.flareActive,
+      flareTemporal: directionalSample(this.flareAnimator, this.flareDirection),
       assets: Object.freeze({ ...familyAssets, flare: this.flareBitmap.status }),
     });
   }
