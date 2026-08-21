@@ -57,7 +57,8 @@ Gameplay balance, V5 fixtures, reward/platform rules, audio assets/mix и enviro
 
 - **H-05-01 — fixed:** on `390×844`, the original top-aligned debuff cards covered the cast origin and upper flame. Portrait signals now use the lower safe lane; source, trajectory and target remain unobstructed.
 - **H-05-02 — fixed after blind first observations:** the first cold ribbon was mathematically correct but too thin to identify without relying on the already-cold flame. Hand charge, dark separation halo, two luminous moving strands, motes and a leading contact point make the travel legible; travel was lengthened from 0.5 s to 0.8 s without changing gameplay timing.
-- Flame bitmap design, balance and audio remained unchanged while fixing both findings.
+- **H-05-03 — fixed in cross-viewport regression:** the original `800×360` crop kept the flame visible but clipped the Queen's face and cast-hand socket. The short-landscape scene focus moved from logical `y=1225` to `y=1110`, keeping gaze, hand, ribbon and flame base inside the viewport without changing portrait composition or gameplay coordinates.
+- Flame bitmap design, balance and audio remained unchanged while fixing all three findings.
 
 ## Three required QA passes
 
