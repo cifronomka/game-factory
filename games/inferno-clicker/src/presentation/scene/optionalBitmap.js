@@ -16,6 +16,7 @@ export class OptionalBitmap {
     this.url = url;
     this.imageFactory = options.imageFactory ?? browserImageFactory;
     this.attempts = 0;
+    this.generation = 0;
     /** @type {'idle'|'loading'|'ready'|'failed'|'unavailable'} */
     this.status = options.autoLoad === false ? 'idle' : 'unavailable';
     /** @type {HTMLImageElement|null} */
@@ -31,11 +32,18 @@ export class OptionalBitmap {
     try { image = this.imageFactory(); } catch { this.status = 'unavailable'; return this.settled; }
     if (!image) { this.status = 'unavailable'; return this.settled; }
     this.attempts += 1;
+    const generation = ++this.generation;
     this.image = image;
     this.status = 'loading';
     this.settled = new Promise((resolve) => {
-      image.addEventListener('load', () => { this.status = 'ready'; resolve('ready'); }, { once: true });
-      image.addEventListener('error', () => { this.status = 'failed'; resolve('failed'); }, { once: true });
+      image.addEventListener('load', () => {
+        if (generation === this.generation) this.status = 'ready';
+        resolve(generation === this.generation ? 'ready' : 'unavailable');
+      }, { once: true });
+      image.addEventListener('error', () => {
+        if (generation === this.generation) this.status = 'failed';
+        resolve(generation === this.generation ? 'failed' : 'unavailable');
+      }, { once: true });
     });
     image.decoding = 'async';
     image.src = this.url;
@@ -57,6 +65,16 @@ export class OptionalBitmap {
     if (this.attempts >= 2) return false;
     this.startLoad();
     return (await this.whenSettled(timeoutMs)) === 'ready';
+  }
+
+  /** Release a non-critical decoded image so another clip can use the texture budget. */
+  release() {
+    this.generation += 1;
+    if (this.image) this.image.src = '';
+    this.image = null;
+    this.status = 'idle';
+    this.attempts = 0;
+    this.settled = Promise.resolve('unavailable');
   }
 
   isReady() { return this.status === 'ready' && Boolean(this.image?.naturalWidth && this.image?.naturalHeight); }

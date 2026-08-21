@@ -23,8 +23,12 @@ export function sceneTransform(width, height) {
 }
 
 export class InfernoScene {
-  /** @param {HTMLCanvasElement} canvas @param {(input:{x:number,y:number,timestampMs:number})=>void} onGameplayTap */
-  constructor(canvas, onGameplayTap) {
+  /**
+   * @param {HTMLCanvasElement} canvas
+   * @param {(input:{x:number,y:number,timestampMs:number})=>void} onGameplayTap
+   * @param {(sample:{atMs:number,workMs:number,paused:boolean})=>void=} onPerformanceSample
+   */
+  constructor(canvas, onGameplayTap, onPerformanceSample = () => {}) {
     const context = canvas.getContext('2d', { alpha: false });
     if (!context) throw new Error('Canvas 2D is unavailable');
     this.canvas = canvas;
@@ -34,6 +38,7 @@ export class InfernoScene {
     this.flame = new FlameRig();
     /** @type {any} */ this.state = null;
     this.onGameplayTap = onGameplayTap;
+    this.onPerformanceSample = onPerformanceSample;
     this.running = false;
     this.frameId = 0;
     this.lastFrame = 0;
@@ -114,6 +119,7 @@ export class InfernoScene {
   /** @param {number} now */
   frame(now) {
     if (!this.running) return;
+    const workStartedAt = performance.now();
     const delta = Math.min(0.05, Math.max(0, (now - this.lastFrame) / 1000));
     this.lastFrame = now;
     if (!this.state?.paused) this.elapsed += delta;
@@ -121,6 +127,11 @@ export class InfernoScene {
     this.flame.setCharacterReaction(this.characters.getFlameReaction());
     this.flame.update(delta);
     this.render();
+    this.onPerformanceSample({
+      atMs: now,
+      workMs: Math.max(0, performance.now() - workStartedAt),
+      paused: Boolean(this.state?.paused),
+    });
     this.frameId = requestAnimationFrame((time) => this.frame(time));
   }
 
@@ -152,7 +163,10 @@ export class InfernoScene {
       else if (layer === 'ritual-plane') this.environment.drawRitual(context, state, this.elapsed, entry);
       else if (layer === 'characters') this.characters.draw(context, state, this.elapsed);
       else if (layer === 'flame-rig') this.flame.drawFlame(context, this.elapsed);
-      else if (layer === 'lighting-fx') this.flame.drawFx(context, this.elapsed);
+      else if (layer === 'lighting-fx') {
+        this.flame.drawFx(context, this.elapsed);
+        this.characters.drawImpactFx(context, this.elapsed, Boolean(state.reducedMotion));
+      }
       else if (layer === 'foreground') this.environment.drawForeground(context, state, this.elapsed);
     }
     context.restore();

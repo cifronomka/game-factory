@@ -10,8 +10,8 @@ async function bytes(path) { return readFile(new URL(path, root)); }
 function sha(buffer) { return createHash('sha256').update(buffer).digest('hex'); }
 
 for (const spec of [
-  { id: 'CH-ASH-SERVANT', version: 'v3', metadata: 'assets/characters/ash-servant/ash-servant-states-v3.json', dimensions: [1536, 1120, 256, 280], gutter: 8, centroid: 12, minimumComponent: 0.999 },
-  { id: 'CH-DEMONESS', version: 'v4', metadata: 'assets/characters/demoness/demoness-states-v4.json', dimensions: [1536, 1152, 192, 288], gutter: 4, centroid: 12, minimumComponent: 0.998 },
+  ...['idle', 'inhale', 'blow', 'recovery'].map((clip) => ({ id: `CH-ASH-SERVANT-${clip.toUpperCase()}-C06`, version: 'v4', metadata: `assets/characters/ash-servant/ash-servant-${clip}-v4.json`, dimensions: [1024, 640, 256, 320], gutter: 6, centroid: clip === 'recovery' ? 22 : 16, minimumComponent: 0.999 })),
+  ...['idle', 'cast', 'hold', 'recovery'].map((clip) => ({ id: `CH-DEMONESS-${clip.toUpperCase()}-C06`, version: 'v5', metadata: `assets/characters/demoness/demoness-${clip}-v5.json`, dimensions: [1600, 1200, 400, 600], gutter: 6, centroid: 16, minimumComponent: 0.999 })),
 ]) {
   test(`${spec.id} ${spec.version} cells preserve root, gutter, anatomy and metadata hashes`, async () => {
     const [manifestBuffer, metadataBuffer] = await Promise.all([bytes('assets/assets-manifest.json'), bytes(spec.metadata)]);
@@ -39,13 +39,37 @@ for (const spec of [
   });
 }
 
-test('Inferno host metadata exposes five real non-overlapping spatial regions', async () => {
-  const metadata = JSON.parse((await bytes('assets/characters/character-inferno-host-v3.json')).toString());
-  assert.equal(metadata.semantic, 'independent-spatial-regions-not-sequential-frames');
-  assert.equal(metadata.clips.ambient.frames.length, 5);
-  assert.equal(new Set(metadata.clips.ambient.frames.map((frame) => frame.sha256)).size, 5);
-  for (const frame of metadata.clips.ambient.frames) {
-    assert.match(frame.sha256, /^[a-f0-9]{64}$/);
-    assert.ok(frame.provenance.includes('spatial region'));
+test('Servant blow-to-recovery boundary preserves the final forward pose before settling', async () => {
+  const [blow, recovery] = await Promise.all([
+    bytes('assets/characters/ash-servant/ash-servant-blow-v4.json').then((value) => JSON.parse(value.toString())),
+    bytes('assets/characters/ash-servant/ash-servant-recovery-v4.json').then((value) => JSON.parse(value.toString())),
+  ]);
+  const before = blow.clips.blow.frames.at(-1);
+  const after = recovery.clips.recovery.frames[0];
+  assert.ok(Math.abs(before.rootY - after.rootY) <= 2);
+  assert.ok(Math.abs(before.centroidX - after.centroidX) <= 12);
+  assert.ok(Math.abs(before.alphaBBox[2] - after.alphaBBox[2]) <= 12, 'extended hand silhouette remains continuous at the clip boundary');
+});
+
+test('Inferno host main and sentinel expose independently renderable clean authored states', async () => {
+  const manifest = JSON.parse((await bytes('assets/assets-manifest.json')).toString());
+  for (const part of ['main', 'sentinel']) {
+    const metadataBuffer = await bytes(`assets/characters/character-inferno-host-${part}-v4.json`);
+    const metadata = JSON.parse(metadataBuffer.toString());
+    const entry = manifest.assets.find((item) => item.id === `CH-INFERNO-HOST-${part.toUpperCase()}-C06`);
+    assert.equal(entry.metadataSha256, sha(metadataBuffer));
+    assert.equal(metadata.clips.ambient.frames.length, 5);
+    assert.equal(new Set(metadata.clips.ambient.frames.map((frame) => frame.sha256)).size, 5);
+    const roots = metadata.clips.ambient.frames.map((frame) => frame.rootY);
+    const centroids = metadata.clips.ambient.frames.map((frame) => frame.centroidX);
+    const widths = metadata.clips.ambient.frames.map((frame) => frame.alphaBBox[2] - frame.alphaBBox[0]);
+    assert.ok(Math.max(...roots) - Math.min(...roots) <= 1, `${part} root is unstable`);
+    assert.ok(Math.max(...centroids) - Math.min(...centroids) <= 4, `${part} identity centroid jumps`);
+    assert.ok(Math.max(...widths) - Math.min(...widths) <= 22, `${part} silhouette changes identity`);
+    for (const frame of metadata.clips.ambient.frames) {
+      assert.match(frame.sha256, /^[a-f0-9]{64}$/);
+      assert.equal(frame.edgeAlphaPixels, 0);
+      assert.ok(frame.provenance.includes('authored frame'));
+    }
   }
 });

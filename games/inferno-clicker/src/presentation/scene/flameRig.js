@@ -207,6 +207,15 @@ export class FlameRig {
     family.outerBitmap.startLoad();
   }
 
+  /** At steady state only the active family remains decoded; a transition may keep two. */
+  releaseInactiveFamilies() {
+    for (const [name, family] of Object.entries(this.families)) {
+      if (name === this.currentFamily) continue;
+      family.coreBitmap.release();
+      family.outerBitmap.release();
+    }
+  }
+
   /** @param {{bend?:number,suppression?:number,emberDrift?:number,cold?:number,source?:string}} reaction */
   setCharacterReaction(reaction) {
     this.characterReaction = Object.freeze({
@@ -291,6 +300,7 @@ export class FlameRig {
       if (progress >= 1) {
         this.familyMix = this.familyMixTarget;
         this.previousFamily = null;
+        this.releaseInactiveFamilies();
       }
     }
     if (this.boundaryAge < this.boundaryDuration) this.boundaryAge = Math.min(this.boundaryDuration, this.boundaryAge + step);

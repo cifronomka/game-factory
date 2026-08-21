@@ -2,7 +2,7 @@
 
 ## Authored visual registry
 
-The runtime visual set was reviewed on 2026-08-20. Visual references were used as
+The runtime visual set was reviewed on 2026-08-22. Visual references were used as
 concept-art guidance for mood, palette, silhouette and composition only. They are
 not shipped as screens, crops or flattened backplates.
 
@@ -13,9 +13,9 @@ not shipped as screens, crops or flattened backplates.
 | FL-MID-CORE / OUTER | flame/atlases/{core,outer}-mid-v2.webp | Two independent transparent 10-frame flame layers | preload at stage 2 progress 0.6; 10 fps |
 | FL-HIGH-CORE / OUTER | flame/atlases/{core,outer}-high-v2.webp | Two independent transparent 12-frame Inferno layers | preload at stage 5 progress 0.6; 11 fps |
 | FX-STAGE-FLARE | flame/transitions/stage-flare-v2.webp | Transparent 8-frame boundary flare | preload at stage 1 progress 0.6; 8 fps once; reverse downward |
-| CH-ASH-SERVANT | characters/ash-servant/ash-servant-states-v3.webp | Complete appearance, idle, inhale and blow figures repacked into stable-root 256×280 cells | preload at stage 2 progress 0.6 |
-| CH-DEMONESS | characters/demoness/demoness-states-v4.webp | Cycle 05 Inferno Queen: appearance, calm idle, restrained disapproval, 8-pose cast, hold and recovery in stable-root 192×288 cells | preload at stage 3 progress 0.6 |
-| CH-INFERNO-HOST | characters/character-inferno-host.webp + character-inferno-host-v3.json | Five non-overlapping authored spatial regions from the transparent climax host | preload at stage 5 progress 0.6; independent periods 5.5–8.9 s |
+| CH-ASH-SERVANT-*-C06 | characters/ash-servant/ash-servant-{idle,inhale,blow,recovery}-v4.webp | Four disposable clip atlases, each with 8 clean stable-root 256×320 authored cells | idle plus one imminent clip retained; deterministic release after commit |
+| CH-DEMONESS-*-C06 | characters/demoness/demoness-{idle,cast,hold,recovery}-v5.webp | High-resolution Inferno Queen clips, each with 8 clean stable-root 400×600 authored cells | idle plus one imminent clip retained; deterministic release after commit |
+| CH-INFERNO-HOST-{MAIN,SENTINEL}-C06 | characters/character-inferno-host-{main,sentinel}-v4.webp | Two separately decoded five-frame actors with independent animation phases | preload at stage 5 progress 0.6; 2 fps after the accepted 1.5 s entry |
 
 The matching JSON files are the production clip metadata and preserve frame
 rectangles, loop mode, fps and shared pivots. Exact optimized byte sizes,
@@ -39,6 +39,16 @@ exports can be traced back without shipping the large PNG masters:
 | Cycle 05 Demoness prepare | `exec-b496bce4-cde7-48cc-8f28-e714aa533761.png` |
 | Cycle 05 Demoness cast/hold | `exec-95bc3866-463d-4f7f-a360-c4108501e277.png` |
 | Cycle 05 Demoness recovery | `exec-5631088d-5ad8-4f6f-b17d-0e7b87a0f757.png` |
+| Cycle 06 Ash Servant clean reference | `exec-4d9991c0-a0e5-4c31-aab0-08104946fe77.png` |
+| Cycle 06 Ash Servant 4×10 state sheet | `exec-8fd887e2-2501-4d1c-bf09-e986e7136b44.png` |
+| Cycle 06 Demoness idle | `exec-2ff961c0-e5c5-4342-964d-0a8c9f1bfcb3.png` |
+| Cycle 06 Demoness cast | `exec-65acdc74-e439-4b3a-bbd9-cab8ac687d5f.png` |
+| Cycle 06 Demoness hold | `exec-642603ec-9513-47bf-987a-a533c52656f1.png` |
+| Cycle 06 Demoness recovery | `exec-6e9fd541-0c73-49b7-950c-c5804f519edb.png` |
+| Cycle 06 Inferno host (boundary-corrected) | `exec-0fc7dd6d-4093-4188-a269-ec3cd1c7001a.png` |
+| Cycle 06 Ash Servant recovery continuity replacement | `exec-80ff85fc-c3ce-4e4c-bbac-793433d3eb19.png` |
+| Cycle 06 stable Inferno sentinel loop | `exec-b056f60f-d8b1-4abb-b5e9-2eeb2a6f3afa.png` |
+| Cycle 06 stable crowned Inferno host loop | `exec-f928b29e-3dc9-4eec-acc8-53b07e739bc6.png` |
 
 Deterministic post-processing used Sharp only for grid crop/resize, removal of
 the generated white/checker preview background into real alpha, WebP encoding,
@@ -48,8 +58,20 @@ outer layers. It did not invent new silhouettes or copy reference pixels.
 All authored atlas cells use real alpha. Flame core and outer cells share the
 same root pivot [0.5, 0.965], so family crossfades do not jump at the hearth.
 Character atlases have no baked environment or UI. Runtime procedural work is
-limited to compositing, light/reveal masks, bounded particles, glow, ash flow and
-cold ribbon effects; it does not synthesize a geometric flame or humanoid.
+limited to compositing, light/reveal masks, bounded particles, glow, scarlet
+snowflakes, conical ice shards and contact steam; it does not synthesize a
+geometric flame or humanoid. Full-pose character dissolve is not used.
+
+Cycle 06 sources are retained under `visual-references/cycle-06-sources/`. The
+servant prompt requested four forward-authored rows (idle, inhale, exhale and
+recovery) with consistent identity and root. The Demoness prompts requested
+separate idle, cast, hold and recovery sheets at higher source resolution. The
+final host correction prompts required one stable crowned host and one stable
+sentinel across six self-contained cells; the first five cells of each loop are
+shipped on independently phased clocks. Sharp performs only
+checker/near-white alpha extraction, component cleanup, defringe, uniform fit,
+metadata measurement and high-quality WebP encoding via
+`scripts/build-cycle06-character-assets.mjs`.
 
 Cycle 04 losslessly repacked each complete source-space character cluster into
 `1536×1120` VP8L atlases with 24 `256×280` cells, an 8-pixel transparent gutter,
@@ -72,10 +94,12 @@ and aligns the skirt root. It neither paints new anatomy nor borrows reference
 pixels. The final v4 atlas contains 28 cells with zero edge-alpha pixels and at
 most 0.5 source-pixel root drift.
 
-The current bitmap registry decodes to 65,645,568 bytes (62.60 MiB) if every
-stage asset is resident simultaneously. Startup-critical bitmaps are 818,566
-compressed bytes and 12,581,888 decoded bytes; the remaining atlases are loaded
-near their first use.
+Cycle 06 character clips are mutually disposable residency groups. The manifest
+records both physical decoded bytes and the runtime group bound; the audit uses
+the two largest members of each group because the currently rendered and one
+imminent decoded clip may overlap. Superseded resources are released on commit.
+Startup-critical bitmaps remain 818,566 compressed bytes and 12,581,888 decoded
+bytes.
 
 ## Authored audio
 

@@ -58,6 +58,7 @@ async function bootstrap() {
   const engine = new GameEngine(createInitialState(recordsFromSave(persisted)));
   let disposed = false;
   let unloaded = false;
+  let performanceMonitoringReady = false;
   let lastFrame = performance.now();
   let previousPauseReasons = new Set();
   let rewardSequence = 0;
@@ -87,6 +88,12 @@ async function bootstrap() {
   let gameplayTapSequence = 0;
   const presentation = createPresentation({
     host: shell,
+    onPerformanceSample: ({ atMs, workMs, paused }) => {
+      if (performanceQuality.observe(atMs, workMs, {
+        visible: document.visibilityState !== 'hidden',
+        paused: paused || !performanceMonitoringReady,
+      })) settings.quality = settings.quality === 'high' ? 'low' : 'off';
+    },
     callbacks: {
       onGameplayTap: () => {
         if (engine.state.phase === 'READY') void platform.resumeGame('menu');
@@ -273,10 +280,6 @@ async function bootstrap() {
     if (disposed) return;
     const delta = Math.min(100, Math.max(0, now - lastFrame));
     lastFrame = now;
-    if (performanceQuality.observe(now, delta)) {
-      settings.quality = settings.quality === 'high' ? 'low' : 'off';
-      showToast('Эффекты снижены для плавной игры');
-    }
     engine.advanceFrame(delta);
     processEvents();
     presentation.update(toPresentationViewModel(engine.state, settings, capabilities));
@@ -294,10 +297,12 @@ async function bootstrap() {
   boot.remove();
   await platform.markReady();
   shell.dataset.appState = 'ready';
+  performanceMonitoringReady = true;
   globalThis.__INFERNO_DIAGNOSTICS__ = () => ({
     build: document.querySelector('meta[name="build-id"]')?.getAttribute('content') ?? 'development',
     state: engine.state,
     presentation: presentation.getDiagnostics(),
+    performance: performanceQuality.getDiagnostics(),
     platform: capabilities,
   });
   requestAnimationFrame(frame);

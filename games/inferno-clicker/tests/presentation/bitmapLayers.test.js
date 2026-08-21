@@ -4,9 +4,12 @@ import { OptionalBitmap } from '../../src/presentation/scene/optionalBitmap.js';
 import { EnvironmentScene, INFERNAL_CHAMBER_URL } from '../../src/presentation/scene/environmentScene.js';
 import {
   ASH_SERVANT_ATLAS_URL,
+  ASH_SERVANT_ATLAS_URLS,
   CharacterScene,
   DEMONESS_ATLAS_URL,
+  DEMONESS_ATLAS_URLS,
   INFERNO_HOST_URL,
+  INFERNO_HOST_URLS,
 } from '../../src/presentation/scene/characterScene.js';
 import { FLAME_ATLAS_URLS, STAGE_FLARE_URL } from '../../src/presentation/scene/flameRig.js';
 
@@ -23,9 +26,12 @@ function fakeImage(width, height) {
 
 test('asset URLs remain relative to the copied src/assets dist layout', () => {
   assert.match(INFERNAL_CHAMBER_URL, /\/assets\/backgrounds\/bg-infernal-chamber-production\.webp$/);
-  assert.match(ASH_SERVANT_ATLAS_URL, /\/assets\/characters\/ash-servant\/ash-servant-states-v3\.webp$/);
-  assert.match(DEMONESS_ATLAS_URL, /\/assets\/characters\/demoness\/demoness-states-v4\.webp$/);
-  assert.match(INFERNO_HOST_URL, /\/assets\/characters\/character-inferno-host\.webp$/);
+  assert.match(ASH_SERVANT_ATLAS_URL, /\/assets\/characters\/ash-servant\/ash-servant-idle-v4\.webp$/);
+  assert.match(ASH_SERVANT_ATLAS_URLS.recovery, /\/assets\/characters\/ash-servant\/ash-servant-recovery-v4\.webp$/);
+  assert.match(DEMONESS_ATLAS_URL, /\/assets\/characters\/demoness\/demoness-idle-v5\.webp$/);
+  assert.match(DEMONESS_ATLAS_URLS.cast, /\/assets\/characters\/demoness\/demoness-cast-v5\.webp$/);
+  assert.match(INFERNO_HOST_URL, /\/assets\/characters\/character-inferno-host-main-v4\.webp$/);
+  assert.match(INFERNO_HOST_URLS.sentinel, /\/assets\/characters\/character-inferno-host-sentinel-v4\.webp$/);
   assert.match(FLAME_ATLAS_URLS.low.core, /\/assets\/flame\/atlases\/core-low-v2\.webp$/);
   assert.match(FLAME_ATLAS_URLS.low.outer, /\/assets\/flame\/atlases\/outer-low-v2\.webp$/);
   assert.match(FLAME_ATLAS_URLS.mid.core, /\/assets\/flame\/atlases\/core-mid-v2\.webp$/);
@@ -53,6 +59,19 @@ test('lazy optional bitmap does not allocate Image until explicitly requested', 
   bitmap.startLoad();
   assert.equal(bitmap.status, 'ready');
   assert.equal(factories, 1);
+});
+
+test('optional bitmap release drops the decoded image and permits a clean reload', () => {
+  let factories = 0;
+  const bitmap = new OptionalBitmap('asset.png', { autoLoad: false, imageFactory: () => { factories += 1; return fakeImage(64, 64); } });
+  bitmap.startLoad();
+  assert.equal(bitmap.status, 'ready');
+  bitmap.release();
+  assert.equal(bitmap.status, 'idle');
+  assert.equal(bitmap.image, null);
+  bitmap.startLoad();
+  assert.equal(bitmap.status, 'ready');
+  assert.equal(factories, 2);
 });
 
 test('critical bitmap exposes one bounded explicit retry', async () => {

@@ -1,16 +1,16 @@
-# QA Plan — «Зажги», corrective cycle 05 visual polish
+# QA Plan — «Зажги», corrective cycle 06 character polish
 
-Case IDs этого документа квалифицируются как `QA:<ID>`, acceptance IDs — как `AC:<ID>`. Cycle 05 проверяет только качество flame/Demoness animation и отсутствие regression у принятого Ash Servant. Gameplay, reward, platform и audio contracts не переоткрываются и не меняются; они проходят соседнюю regression на неизменность.
+Case IDs этого документа квалифицируются как `QA:<ID>`, acceptance IDs — как `AC:<ID>`. Cycle 06 проверяет silent adaptive quality, Ash Servant/Demoness authored motion and attack causality, alpha edges, Inferno-host life и bounded clip residency. Gameplay, reward, platform, flame/environment design и audio не переоткрываются; они проходят fingerprint regression на неизменность.
 
-DONE разрешён только для одного clean exact build после ровно трёх проходов. Evidence Cycle 02–04 не может дать PASS новым Cycle 05 условиям и помечается `SUPERSEDED` для flame temporal polish, новой Demoness, spatial targeting и Human-Eye Semantic QA. Single still, contact sheet, headless renderer и координатное равенство без просмотра browser render не являются temporal/semantic evidence.
+DONE разрешён только для одного clean exact build после ровно трёх проходов. Evidence Cycle 02–05 не может дать PASS новым Cycle 06 условиям. Single still, contact sheet, headless renderer и координатное равенство без просмотра browser render не доказывают temporal/semantic quality.
 
-## Неподвижные правила Cycle 05
+## Неподвижные правила Cycle 06
 
-- Принятый Ash Servant сохраняется: внешний вид, размер, placement, фазы и причинно-следственная реакция не перерабатываются. Допустим только доказанный технический fix clipping/frame glitch без смены образа.
+- Принятые identity/key poses, size, placement и gameplay phases Ash Servant сохраняются; bytes/frame count меняются для genuine in-betweens, clean alpha, stable no-flicker motion и scarlet mouth snowflakes.
 - Сохраняются текущие bitmap form, palette, glow, sparks, embers, lighting и progression flame. Нельзя заменять flame геометрическим/SVG/CSS/programmer-art вариантом или скрывать pop чрезмерным blur.
-- Demoness полностью пересобирается по новейшему пользовательскому reference. Reference SHA-256 и provenance фиксируются до review; лицо, силуэт, костюм, пропорции и характер должны быть стабильны между кадрами.
-- Gameplay balance, V5 fixtures, direct-tap/reward rules и audio assets/mix не меняются. Для audio достаточно fingerprint equality и нового lifecycle smoke; несовпадение fingerprint открывает отдельный audio review и не маскируется Cycle 05.
-- Видимый pop, hard image swap, morph, teleport, dance-like movement, spell miss либо реакция fire до контакта — бинарный FAIL независимо от формально зелёных метрик.
+- Demoness сохраняет newest-reference identity, но получает high-resolution source, more unique authored frames, blue conical ice shards и evaporation/steam. Legacy cold ribbon запрещён.
+- Gameplay balance, V5 fixtures, direct-tap/reward rules и audio assets/mix не меняются. Для audio достаточно fingerprint equality и lifecycle smoke; несовпадение fingerprint открывает отдельный audio review и не маскируется Cycle 06.
+- Flicker, full-pose double exposure, white matte, blur from upscale>1.25×, morph, teleport, static host, ribbon residue, spell miss, steam before contact или fire reaction before contact — binary FAIL независимо от формальных метрик.
 
 ## Среды и identity
 
@@ -21,7 +21,7 @@ DONE разрешён только для одного clean exact build пос�
 | ENV-P3 | Production Chromium exact `dist/`, 800×360 touch emulation | Landscape clipping/targeting regression |
 | ENV-R1 | Firefox stable, 1366×768 | Pass 3 cross-browser temporal regression |
 | ENV-R2 | Safari stable, 390×844 DPR2 | Pass 3 cross-browser layout/temporal regression |
-| ENV-Y1/Y2 | Yandex test console desktop/mobile | Existing platform lifecycle regression; не источник Cycle 05 visual truth |
+| ENV-Y1/Y2 | Yandex test console desktop/mobile | Existing platform lifecycle regression; не источник Cycle 06 visual truth |
 
 Каждая browser запись хранит Build ID, full commit, source/asset/reference fingerprints, browser/version, OS, viewport, DPR, input type, monotonic capture timestamps, heat/stage и console log. Directory name обязан равняться exact clean Build ID `0.1.0+<12 hex>`; `working.*` запрещён.
 
@@ -32,18 +32,19 @@ DONE разрешён только для одного clean exact build пос�
 Владелец — implementation owner; этот pass не является независимым sign-off.
 
 1. На clean checkout выполнить текущие `typecheck`, `lint`, full tests, asset/animation audits, build, static browser smoke и release audit; exit code 0, skipped 0.
-2. Зафиксировать `assets-manifest.json`: baseline/current fingerprints Ash Servant, flame design lineage, Demoness reference SHA/provenance, каждый authored/interpolated state, dimensions/anchor/hand sockets и decoded memory.
+2. Зафиксировать `assets-manifest.json`: retained-key-pose lineage, Demoness reference SHA/provenance, каждый unique authored frame hash, dimensions, root/mouth/hand sockets, partial-alpha edge metrics, clip preload/release group и decoded bytes.
 3. Снять из production browser flame low/mid/high/Inferno в normal playback и 0.25× slow playback, continuous-heat ramp и все upward/downward stage crossings. Автор устраняет любой обнаруженный pop, seam, hard swap, double/ghost flame и particle teleport до Pass 2.
-4. Снять Demoness idle, disapproval и полный `idle→notice→prepare→arms-rise→hands-to-flame→cold-contact→fire-reaction→release→recovery→idle`. Проверить continuity landmarks, stable feet/root/scale, reference features, hand sockets и actual visible flame target.
-5. Выполнить Ash Servant exact fingerprint/temporal regression и frozen gameplay/audio regression. Изменение gameplay или audio запрещает handoff без отдельного согласования.
+4. Снять Servant appearance/idle/inhale/blow/recovery и Demoness idle/disapproval/full `hands→ice travel→contact→steam→fire reaction→recovery`. Проверить уникальность кадров, landmark continuity, no-flicker/no-matte, sockets и actual flame target.
+5. Прогнать quality-controller matrix `30/40/60/120 Hz`, startup spikes, sustained render cost, hidden/resume и forced tiers; auto-quality toast count `0`.
+6. Прогнать overlap/Inferno-entry clip-residency lifecycle и frozen gameplay/audio regression. Изменение gameplay или audio запрещает handoff.
 
 ### Pass 2 — Independent blind Human-Eye QA
 
 Владелец — независимый QA/reviewer, не писавший production animation и не получивший список исправлений до первичных наблюдений.
 
-1. Запустить exact production build и самостоятельно просмотреть несколько полных loops flame каждого уровня при 1× и 0.25×, continuous heat ramp, все stage crossings, Demoness idle ≥20 s, минимум три disapproval и минимум три full casts.
+1. Запустить exact production build и просмотреть при 1×/0.25× минимум три полных Servant attacks, Demoness idle≥20 s, три disapproval/full casts, Inferno entry и ≥15 s sustained host motion.
 2. Первичный blind set имеет случайный порядок/opaque clip IDs; HUD labels, debug overlays, state names и подсказки filename скрыты. Reviewer сначала записывает, что происходит, кто воздействует на какой объект и в каком порядке, затем получает diagnostic overlay для измерений.
-3. Без текста reviewer обязан однозначно распознать: Demoness замечает рост fire, выражает медленное неодобрение, направляет руки/взгляд/cold stream к фактическому flame, effect касается flame, и только затем fire пригибается/тускнеет/теряет sparks. Любая другая цель, «танец», суета, morph или реакция до контакта — FAIL.
+3. Без текста reviewer обязан однозначно распознать: Servant выдыхает изо рта алые снежинки в огонь; Demoness направляет синие конусообразные льдины из рук в огонь; при contact лёд испаряется в пар и только затем реагирует fire.
 4. Reviewer отдельно сравнивает newest reference с idle/cast/recovery frames по face, silhouette, costume, proportions и details; любое изменение identity между соседними states — FAIL.
 5. Первичные observations, ответы без labels, timestamps/frames и severity сохраняются до раскрытия fix summary. Critical/High возвращают build implementer; повторный Pass 2 выполняется на новом exact Build ID.
 
@@ -52,9 +53,9 @@ DONE разрешён только для одного clean exact build пос�
 Владелец — regression QA, отличный от implementation owner и Pass 2 reviewer.
 
 1. Пройти `Тьма→Искра→Пепельный страж→Алый порог→Демонесса→Круг Инферно→Инферно` мышью и touch-emulation; проверить upward/downward transitions, pause/background/resume, reduced motion, restart/reload и optional reward без изменения balance.
-2. Повторить flame low/mid/high/Inferno normal+slow, Ash Servant, Demoness idle/disapproval/cast/contact/recovery на ENV-P2/P3 и минимум одном ENV-R. Проверить UI/flame/characters на clipping и target clearance.
-3. Выполнить mobile-emulated Stage 7 performance/residency, exact audio lifecycle smoke и frozen gameplay/platform suite. Реальные физические devices/Yandex публикация остаются release-platform evidence, а не подменяют Cycle 05 browser gate.
-4. Исполнить `node scripts/validate-visual-polish-evidence.mjs reports/visual-polish/<exact-build-id>`; open Critical=0, High=0, все применимые AC PASS, все evidence hashes/identity совпадают.
+2. Повторить Servant, Demoness ice/contact/steam и Inferno host на ENV-P2/P3 и минимум одном ENV-R; выполнить edge review на black/dark-red/neutral backgrounds, normal/reduced/forced-low tiers.
+3. Выполнить 10-minute Stage 7/overlap performance and instantaneous residency trace, exact audio lifecycle smoke и frozen gameplay/platform suite.
+4. Исполнить `node scripts/validate-corrective-cycle-06-evidence.mjs reports/corrective-cycle-06/<exact-build-id>`; open Critical=0, High=0, все применимые AC PASS, все evidence hashes/identity совпадают.
 
 ## Temporal capture contract
 
@@ -75,19 +76,29 @@ Continuous heat case проходит 0→1000 без reset и содержит 
 
 Каждый из 6 upward и 6 downward crossings начинается ≥250 ms до threshold и заканчивается после settle. Transition длится 0.8–1.5 s, имеет ≥4 промежуточных blend/scale/intensity states, max opacity step≤0.20, hard asset swap/one-frame pop/ghosting=0. Geometry flame остаётся совместимой на соседних states.
 
-### Ash Servant carry-forward
+### Ash Servant Cycle 06
 
-`servantBaselineFingerprint === servantCurrentFingerprint`, visual/temporal contract unchanged, root drift≤2 logical px, edge alpha/wrap/clipping/teleport=0. Если байты менялись только ради frame/clipping fix, required signed diff перечисляет изменённые files/pixels, сохраняет reference and timing fingerprints, а Pass 2/3 повторяют полную appearance/idle/attack/recovery regression; redesign или semantic timing change запрещены.
+- Retained semantic key poses сохраняют identity/palette/scale/placement; exact timing соответствует core phases. Между каждой соседней retained key-pose pair есть ≥1 unique authored in-between; duplicate hash, permutation и reverse playback не засчитываются.
+- Root drift≤2 logical px; flicker, ghost/double contour, luminance pop, clipping/wrap/teleport=0 при 1×/0.25× и pause/resume.
+- Snowflake origin-to-current rendered mouth socket≤8 logical px, endpoint-to-current visible flame≤12 px. Scarlet snowflakes существуют только в blow/recovery tail; emitter bounded и очищается.
 
 ### Demoness
 
 - Reference manifest содержит newest user-reference path/SHA-256/provenance и feature checklist: face, crown/hair, silhouette, costume, palette, proportions, scale dominance. Каждый пункт должен быть PASS у Pass 2 и Pass 3.
 - Character bbox height≥1.25× Ash Servant, не перекрывает critical flame/UI; feet/root drift≤2 logical px, unintended scale drift≤2%, fragment/clipping/teleport/sliding=0.
+- Effective upscale≤1.25× на каждом required viewport/DPR; face/crown/hands не мягче Servant по edge/detail comparison. Unique pixel hashes подтверждают authored in-betweens; duplicate/permutation/reverse не засчитываются.
 - Calm idle capture≥20 s: ≥3 breathing periods, subtle chest/shoulder/torso motion и secondary hair/cloth/detail motion; rapid periodic whole-body sway, bustle, twitch и dance/club-like loop=0.
 - Disapproval capture содержит ≥3 полных `look-at-fire→slow gaze shift→frown→pause→one restrained head shake→return-to-fire` cycles. Gesture медленный, не двигает whole body и не прерывает active cast.
 - Control sequence содержит минимум 19 semantic samples: `idle-breath-1`, `idle-breath-2`, `look-fire`, `disapproval`, `head-start`, `head-mid`, `head-end`, `prepare-1`, `prepare-2`, `arms-halfway`, `hands-to-flame`, `cold-start`, `cold-mid`, `cold-full`, `contact`, `fire-reacts`, `cast-ending`, `recovery`, `idle-return`. Между `idle→cast` и `cast→recovery` — ≥8 distinct intermediate sampled poses; adjacent identity/costume/morph discontinuities=0.
-- Spell origin находится у текущих rendered hand sockets (distance≤12 logical px). Trajectory/gaze/palms/body converge на текущую видимую flame alpha/bbox, а не на fixed hearth coordinate; endpoint-to-visible-flame distance≤12 logical px во всех mobile/desktop samples.
-- `contactMs` — первый frame пересечения leading cold effect с actual visible flame mask. Fire bend/scale/brightness/glow/spark response до contact = 0; первая реакция наступает в `[contactMs, contactMs+100 ms]`, достигает peak после contact и полностью settles during recovery.
+- Conical shard origin находится у текущих rendered hand sockets (distance≤12 logical px), oriented trajectory converges на actual visible flame, endpoint error≤12 px; legacy Bézier ribbon pixels/path=0.
+- `contactMs` — первый frame пересечения shard с actual visible flame mask. Steam before contact=0; evaporation/steam starts in `[contactMs, contactMs+100 ms]`, rises/fades to zero. Fire reaction before contact=0 and settles during recovery.
+
+### Alpha edges, host and quality/residency
+
+- Partial-alpha silhouettes композятся на black, dark-red and neutral backgrounds. Visible white halo, chroma spill, opaque rectangular residue and sticker edge count=0 for Servant, Demoness and host; Human-Eye veto overrides a passing numeric border scan.
+- Accepted 1.5 s Inferno entry duration/composition matches baseline. In every rolling 5 s after entry, ≥2 independently phased authored internal regions visibly move; whole-plate/crop drift, seam and loop pop=0.
+- Auto quality: 30/40/60/120 Hz refresh-only fixtures, warm-up spikes and hidden/resume produce downgrade count=0; sustained over-budget render cost over ≥2 windows produces one bounded downgrade with reason telemetry and user-facing toast count=0.
+- Instant decoded residency target≤56 MiB, hard≤64 MiB in startup/first attacks/overlap/Inferno/pause-resume. Active draw release=0, missing-frame flash=0, decode/upload spike>50 ms after preload=0, leaked handles and monotonic growth=0.
 
 ## Human-Eye Semantic rubric
 
@@ -95,28 +106,31 @@ Reviewer видит opaque IDs и rendered motion без UI/debug/state labels. 
 
 | ID | Вопрос | PASS |
 |---|---|---|
-| HE-01 | Кто и на что воздействует? | «Demoness/женский персонаж пытается охладить или потушить центральное пламя»; иная/неясная цель = FAIL |
-| HE-02 | Каков порядок причины и эффекта? | руки/взгляд→cold effect→контакт с flame→реакция flame; иной порядок = FAIL |
+| HE-01 | Кто и на что воздействует? | Servant выдыхает алые снежинки изо рта в огонь; Demoness бросает синие льдины из рук в центральное пламя |
+| HE-02 | Каков порядок причины и эффекта? | mouth/hands→snow/ice travel→contact→evaporation/steam→fire reaction; иной порядок = FAIL |
 | HE-03 | Как читается idle/disapproval? | спокойная властная угроза и сдержанное неодобрение; dance/fuss/twitch/comedy отсутствуют |
 | HE-04 | Стабилен ли персонаж? | лицо, костюм, силуэт и пропорции распознаются как одна героиня во всех key states; morph/fragment=0 |
-| HE-05 | Плавен ли flame? | pop/seam/hard picture swap/ghost frame не замечены ни на 1×, ни на 0.25× |
+| HE-05 | Плавны и живы ли characters? | flicker/morph/double contour/white matte/static host не замечены ни на 1×, ни на 0.25× |
 
 Pass 2 обязан PASS по всем пяти строкам с first-observation text и timestamp/frame links. Формальные координаты не могут превратить Human-Eye FAIL в PASS.
 
 ## Exact evidence layout
 
 ```text
-reports/visual-polish/index.json
-reports/visual-polish/<exact-build-id>/
+reports/corrective-cycle-06/index.json
+reports/corrective-cycle-06/<exact-build-id>/
   manifest.json
   README.md
   pass-1-implementation/
     automation.log
     assets-manifest.json
-    servant-regression.json
+    servant-continuity.json
     flame-temporal.json
     demoness-continuity.json
-    spell-contact.json
+    ice-contact-steam.json
+    alpha-edge-audit.json
+    quality-controller.json
+    clip-residency.json
     gameplay-audio-fingerprint-regression.json
   pass-2-independent-blind/
     browser/manifest.json
@@ -132,12 +146,12 @@ reports/visual-polish/<exact-build-id>/
     signoff.json
 ```
 
-`browser/manifest.json` содержит scenarios: flame `low/mid/high/inferno × normal/slow`, `continuous-heat`, `transitions-up`, `transitions-down`, `servant-regression`, `demoness-idle`, `demoness-disapproval`, `demoness-full-cast`, `demoness-spell-contact`, `demoness-fire-reaction`. Все actual evidence files, кроме root manifest, перечислены с bytes/SHA-256; unlisted/missing/tampered/stale files запрещены.
+`browser/manifest.json` содержит scenarios: `servant-appearance/idle/blow/recovery × normal/slow`, `demoness-idle/disapproval/cast/ice-contact-steam × normal/slow`, `character-edges × 3 backgrounds`, `inferno-entry/host-sustain`, `quality-refresh/startup/hidden/load`, `residency-overlap/inferno/pause`. Все evidence files перечислены с bytes/SHA-256; unlisted/missing/tampered/stale files запрещены.
 
 Validator hard-fails missing/stale/corrupt evidence, wrong pass count/order/owners, stale build/reference/source fingerprints, non-genuine PNG, incomplete flame matrix, отсутствующие 19 Demoness states, missing blind semantics, pre-contact fire reaction, spell miss, open Critical/High или любой final decision не `PASS`. Fixture tests обязаны покрывать good/missing/stale/corrupt.
 
 ## Frozen regression contract
 
-Cycle 05 не меняет следующие числа: V5 no-reward stages 2–7 `9000/43500/64500/102000/145200/164800 ms`, checkpoint 180000 ms = 786 taps, score 110498±1, heat 946.465417±0.01, hold 15060±10 ms; optional ×2 starts 65000 ms, stages 5/6/7 `75750/83950/102710 ms`, 944 taps, score 180220±1, heat 936.94±0.01, hold 65950±10 ms. Tap matrix stays 2 tps→4, 4→5, 5→6, 7.14→7 without reward. Audio assets/mix stay unchanged; only lifecycle smoke is new.
+Cycle 06 не меняет следующие числа: V5 no-reward stages 2–7 `9000/43500/64500/102000/145200/164800 ms`, checkpoint 180000 ms = 786 taps, score 110498±1, heat 946.465417±0.01, hold 15060±10 ms; optional ×2 starts 65000 ms, stages 5/6/7 `75750/83950/102710 ms`, 944 taps, score 180220±1, heat 936.94±0.01, hold 65950±10 ms. Tap matrix stays 2 tps→4, 4→5, 5→6, 7.14→7 without reward. Audio assets/mix stay unchanged; only lifecycle smoke is repeated.
 
-Все новые Cycle 05 checks имеют `NOT RUN` до exact-build evidence. Current decision: DONE = NO.
+Все новые Cycle 06 checks имеют `NOT RUN` до exact-build evidence. Current decision: DONE = NO.

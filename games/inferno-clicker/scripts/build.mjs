@@ -13,7 +13,7 @@ await rm(join(dist, 'assets/PROVENANCE.md'), { force: true });
 await rm(join(dist, 'app/platforms/dev'), { recursive: true, force: true });
 const platformIndexPath = join(dist, 'app/platforms/index.js');
 const productionPlatformIndex = (await readFile(platformIndexPath, 'utf8'))
-  .replace("export * from './dev/index.js';\n", '');
+  .replace(/export \* from '\.\/dev\/index\.js';\r?\n/, '');
 await writeFile(platformIndexPath, productionPlatformIndex);
 
 const htmlPath = join(dist, 'index.html');

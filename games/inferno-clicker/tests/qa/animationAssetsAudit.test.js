@@ -26,7 +26,7 @@ async function makeFixture() {
         loop: loopNames.includes(name),
         frames: Array.from({ length: frameCount }, (_, index) => ({
           x: (cell + index) * 10, y: 0, w: 10, h: 10,
-          durationMs: 100, sha256: sha(`${id}/${name}/${index}`), provenance: 'fixture-author/export-v1',
+          durationMs: 100, sha256: sha(`${id}/${name}/${index}`), provenance: 'fixture-author/export-v1', edgeAlphaPixels: 0, matteRatio: 0,
         })),
       };
       cell += frameCount;
@@ -38,29 +38,11 @@ async function makeFixture() {
     assets.push({ id, path: `assets/${id}.webp`, metadata: metadataPath, metadataSha256: sha(bytes), kind: 'fixture-atlas', width: cell * 10, height: 10 });
   }
 
-  async function addHost() {
-    const id = 'CH-INFERNO-HOST';
-    const metadata = {
-      schemaVersion: 1,
-      regions: [
-        { id: 'watchers', x: 0, y: 0, w: 30, h: 30 },
-        { id: 'wings', x: 30, y: 0, w: 30, h: 30 },
-        { id: 'host', x: 60, y: 0, w: 30, h: 30 },
-        { id: 'eyes', x: 90, y: 0, w: 30, h: 30 },
-        { id: 'distant', x: 120, y: 0, w: 30, h: 30 },
-      ],
-      runtimeContract: { independentMotion: true, wholePlateOnly: false, allowed: ['crop', 'transform', 'glow'] },
-    };
-    const bytes = Buffer.from(`${JSON.stringify(metadata)}\n`);
-    const metadataPath = `assets/meta/${id}.json`;
-    await writeFile(join(root, metadataPath), bytes);
-    assets.push({ id, path: `assets/${id}.webp`, metadata: metadataPath, metadataSha256: sha(bytes), kind: 'character-group-regions', width: 150, height: 30 });
-  }
-
   for (const family of ['LOW', 'MID', 'HIGH']) for (const layer of ['CORE', 'OUTER']) await add(`FL-${family}-${layer}`, ['loop']);
-  await add('CH-ASH-SERVANT', ['appearance', 'idle', 'inhale', 'blow'], 4);
-  await add('CH-DEMONESS', ['appearance', 'idle', 'cast', 'hold'], 4);
-  await addHost();
+  for (const clip of ['IDLE', 'INHALE', 'BLOW', 'RECOVERY']) await add(`CH-ASH-SERVANT-${clip}-C06`, [clip.toLowerCase()], 8);
+  for (const clip of ['IDLE', 'CAST', 'HOLD', 'RECOVERY']) await add(`CH-DEMONESS-${clip}-C06`, [clip.toLowerCase()], 8);
+  await add('CH-INFERNO-HOST-MAIN-C06', ['ambient'], 5);
+  await add('CH-INFERNO-HOST-SENTINEL-C06', ['ambient'], 5);
   const manifest = { schemaVersion: 1, provenance: 'assets/PROVENANCE.md', assets };
   await writeFile(join(root, 'assets/assets-manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
   return { root, manifest };
@@ -70,7 +52,7 @@ test('animation asset hard gate accepts complete authored metadata', async () =>
   const { root } = await makeFixture();
   const report = await auditAnimationAssets({ root });
   assert.equal(report.status, 'PASS');
-  assert.equal(report.animatedAssets.length, 9);
+  assert.equal(report.animatedAssets.length, 16);
 });
 
 test('animation asset hard gate rejects missing per-frame authorship', async () => {

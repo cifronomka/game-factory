@@ -4,18 +4,64 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PerformanceQualityController } from '../../src/app/performanceQuality.js';
 
-test('downgrades exactly once after a full five-second over-budget p95 window', () => {
-  const controller = new PerformanceQualityController();
+function observeFor(controller, { startMs = 0, durationMs, refreshHz, workMs, state }) {
   let changes = 0;
-  for (let at = 0; at <= 5_100; at += 30) changes += Number(controller.observe(at, 30));
+  const step = 1_000 / refreshHz;
+  for (let at = startMs; at <= startMs + durationMs; at += step) {
+    changes += Number(controller.observe(at, typeof workMs === 'function' ? workMs(at) : workMs, state));
+  }
+  return changes;
+}
+
+test('downgrades exactly once after warm-up and two sustained expensive render windows', () => {
+  const controller = new PerformanceQualityController({ warmupMs: 500, windowMs: 500, thresholdMs: 20, minSamples: 5 });
+  let changes = observeFor(controller, { durationMs: 1_700, refreshHz: 60, workMs: 28 });
   assert.equal(changes, 1);
-  for (let at = 5_130; at <= 12_000; at += 40) changes += Number(controller.observe(at, 40));
+  changes += observeFor(controller, { startMs: 1_800, durationMs: 1_000, refreshHz: 60, workMs: 35 });
   assert.equal(changes, 1);
+  assert.deepEqual(controller.getDiagnostics(), {
+    downgraded: true,
+    reason: 'sustained-render-cost',
+    renderP95Ms: 28,
+    thresholdMs: 20,
+    confirmedWindows: 2,
+  });
 });
 
-test('does not downgrade when p95 remains within budget', () => {
-  const controller = new PerformanceQualityController();
-  let changed = false;
-  for (let at = 0; at <= 6_000; at += 16) changed ||= controller.observe(at, at % 800 === 0 ? 40 : 16);
-  assert.equal(changed, false);
+for (const refreshHz of [30, 40, 60, 120]) {
+  test(`does not mistake ${refreshHz} Hz requestAnimationFrame cadence for render cost`, () => {
+    const controller = new PerformanceQualityController({ warmupMs: 200, windowMs: 400, thresholdMs: 20, minSamples: 5 });
+    const changes = observeFor(controller, { durationMs: 2_000, refreshHz, workMs: 8 });
+    assert.equal(changes, 0);
+    assert.equal(controller.getDiagnostics().reason, null);
+  });
+}
+
+test('transient render spikes do not confirm a downgrade', () => {
+  const controller = new PerformanceQualityController({ warmupMs: 200, windowMs: 500, thresholdMs: 20, minSamples: 5 });
+  const changes = observeFor(controller, {
+    durationMs: 2_500,
+    refreshHz: 60,
+    workMs: (at) => Math.round(at / (1_000 / 60)) % 30 === 0 ? 45 : 8,
+  });
+  assert.equal(changes, 0);
+});
+
+test('startup samples are ignored during warm-up', () => {
+  const controller = new PerformanceQualityController({ warmupMs: 500, windowMs: 400, thresholdMs: 20, minSamples: 5 });
+  let changes = observeFor(controller, { durationMs: 450, refreshHz: 60, workMs: 80 });
+  changes += observeFor(controller, { startMs: 500, durationMs: 1_500, refreshHz: 60, workMs: 8 });
+  assert.equal(changes, 0);
+});
+
+test('hidden and paused periods reset confirmation and resume through warm-up', () => {
+  const controller = new PerformanceQualityController({ warmupMs: 300, windowMs: 400, thresholdMs: 20, minSamples: 5 });
+  let changes = observeFor(controller, { durationMs: 850, refreshHz: 60, workMs: 35 });
+  assert.equal(changes, 0, 'only one expensive window was observed');
+  controller.observe(900, 500, { visible: false });
+  controller.observe(5_000, 500, { paused: true });
+  changes += observeFor(controller, { startMs: 5_100, durationMs: 650, refreshHz: 60, workMs: 35 });
+  assert.equal(changes, 0, 'resume warm-up cannot reuse confirmation from before suspension');
+  changes += observeFor(controller, { startMs: 5_800, durationMs: 1_000, refreshHz: 60, workMs: 8 });
+  assert.equal(changes, 0);
 });

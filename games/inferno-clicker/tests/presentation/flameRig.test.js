@@ -31,6 +31,8 @@ test('family switch crossfades for at least 0.8 seconds and authored flare plays
   assert.equal(rig.getStats().previousFamily, 'low');
   for (let index = 0; index < 6; index += 1) rig.update(0.05);
   assert.equal(rig.getStats().previousFamily, null);
+  assert.equal(rig.families.low.coreBitmap.status, 'idle');
+  assert.equal(rig.families.low.outerBitmap.status, 'idle');
 });
 
 test('pause freezes authored flame and stage flare frames', () => {

@@ -1,8 +1,8 @@
 # Art Direction — «Зажги»
 
-## Corrective Cycle 05
+## Corrective Cycle 06 — active direction
 
-Пользовательский review Cycle 05 установил final visual-polish baseline: существующий образ огня сохраняется, но authored cells должны восприниматься как непрерывно горящие языки без кадровых скачков; Ash Servant остаётся принятым; Demoness полностью пересобирается по newest user reference как спокойная властная Inferno Queen с ясным hand→flame cast и реакцией огня только после контакта.
+Cycle 06 сохраняет принятые identity/composition огня, Ash Servant, Demoness и Inferno entry, но заменяет технически слабое движение. Плавность строится на многочисленных уникальных authored in-betweens: full-body мерцание, morph-crossfade, reverse-as-recovery и перестановка одинаковых кадров не считаются анимацией. У каждого персонажа чистый естественный alpha edge без белого matte.
 
 Concept art из `visual-references/` задаёт mood, palette, fixed hearth/camera и путь darkness → Inferno. Его нельзя использовать как fullscreen screen или копировать пиксели в production. Persistent world, characters, flame layers, particles, runes, glow, smoke, overlays, HUD и transition FX остаются раздельными.
 
@@ -46,31 +46,31 @@ Tap не выбирает кадр и не ускоряет animation loop. Heig
 ### Ash Servant
 
 - `appearance`: 6 frames at 10 fps, once.
-- `idle`: 6 authored frames at restrained 4 fps; дыхание и малые движения головы/плеч без перемещения root.
-- Telegraph: `prepare → inhale-ramp → inhale-hold`; effect: `exhale-start → ramp → peak → fade → end`; recovery ≤450 ms.
-- Отдельный ash stream, lateral ember drift и bend/suppression пламени используют один `exhaleStrength`, поэтому причина и эффект совпадают по кадру.
+- `idle`: restrained breathing/head/shoulder loop с уникальными промежуточными poses и root drift≤2 logical px; принятые ключевые poses сохраняются.
+- Telegraph: `prepare → inhale-ramp → inhale-hold`; effect: `exhale-start → ramp → peak → fade → end`; eight-frame Cycle 06 recovery lasts 800 ms.
+- Recovery имеет собственные forward-authored кадры. Из покадрового mouth socket выходит читаемый поток алых снежинок к текущему пламени; mouth→snowflakes→flame и bend/suppression совпадают по фазе.
 
 ### Demoness
 
 - Reference: `visual-references/stage-references/stage-5-demoness-reference-view.jpg`, SHA-256 закреплён в atlas metadata/provenance. Сохраняются лицо, crown/hair, infernal silhouette и soot/ember palette; костюм закрыт high-neck armor для 12+.
-- V4 atlas: 28 transparent cells `192×288`: appearance 4, calm idle 4, restrained disapproval 4, cast 8, hold 4, recovery 4; root drift≤0.5 source px, edge alpha=0.
+- Production atlas/clip set использует genuine alpha и достаточное source resolution для effective upscale≤1.25× на required DPR/viewports; face/crown/hands должны быть не мягче Ash Servant. Appearance, calm idle, restrained disapproval, cast, hold и recovery содержат уникальные authored in-betweens; root drift≤2 logical px.
 - Idle loop длится примерно 6.67 s: дыхание/плечи и вторичные hair/cloth детали едва движутся, feet/root неподвижны. Каждые 5–9 active секунд: `look at flame → restrained disapproval → one slow head shake → return`; whole-body dance/fidget запрещены.
 - Telegraph: `cast-look → arms-rise → hands-to-flame → cast-gather`; effect: `cold-travel → contact → cold-hold → cold-release`; recovery ≤800 ms.
-- Cold ribbon начинается у текущего authored hand socket, идёт к текущей видимой точке flame и имеет отдельные `spellReach` и `impactStrength`. Bend/height/brightness/glow/sparks огня не реагируют до contact.
+- Несколько синих конусообразных льдин начинаются у текущих authored hand sockets и летят к текущей видимой точке flame. При contact льдина исчезает/раскалывается, а из точки контакта поднимается и затухает пар. Bend/height/brightness/glow/sparks огня не реагируют до contact.
 - Demoness rendered bbox минимум в 1.25 раза выше Ash Servant, но не перекрывает HUD и центральный flame target.
 
 После effect state machine возвращается в `idle` через отдельный authored recovery. Pause замораживает application clock. Персонаж не перекрывает центральный tap target и остаётся отдельным от flame/environment. Servant и Demoness могут действовать одновременно: каждый сохраняет собственный таймер, позу и FX.
 
 ### Inferno host
 
-Host bitmap разделён metadata на пять непересекающихся пространственных регионов: left/right wings, left/right watchers и crown. У регионов разные фазы и периоды 5.5–8.9 s; whole-plate drift запрещён. Первый переход 6→7 длится 1.5 s и сочетает staged host reveal, расширение high flame, ember burst, rune wave и bounded lighting pulse. В каждом 5-секундном окне sustained Inferno видимо меняются минимум две области.
+Принятый первый переход 6→7 длительностью 1.5 s и его композиция сохраняются. После reveal left/right wings, watchers, crown/body и вторичные фигуры имеют authored internal changes (дыхание, голова/плечи/руки/крылья/глаза) с разными фазами. В каждом rolling 5-секундном окне sustained Inferno видимо меняются минимум две области; whole-plate/crop drift не засчитывается.
 
 ## Quality tiers
 
 - High: native authored fps, ≤80 embers, ≤24 smoke, ≤2 pulses.
 - Low: те же authored frames с ограниченными particles; static fallback запрещён.
 - Off/reduced: authored poster/спокойная выборка кадров, impulse/flash и частицы сокращены, но telegraph/effect pose остаются различимы.
-- Auto downgrade меняет presentation cost, но не gameplay timing.
+- Auto downgrade беззвучен и не показывает toast; меняет только optional presentation cost, но не gameplay timing и не semantic attack cues.
 
 ## Visual QA rubric
 
@@ -78,11 +78,11 @@ PASS требует exact-build evidence:
 
 1. За 2 s idle минимум 12 sampled frames и минимум 8 различных authored flame cells; silhouette tongues действительно меняются.
 2. Каждый из шести upward boundaries и применимые downward boundaries показывает ≥3 промежуточных состояния без pop/black frame/root jump.
-3. Servant и Demoness в blind test различимы в appearance/idle/attack; attack cause и влияние на flame читаются без HUD label.
+3. Servant и Demoness в blind test различимы в appearance/idle/attack; без HUD читаются `mouth→scarlet snowflakes→flame` и `hands→conical ice→contact→steam`.
 4. Characters/host/HUD остаются читаемы на `360×640`, `390×844`, `768×1024`, `1366×768` и `800×360`.
 5. Reduced Motion не превращает actors/flame в прежние static cards и не меняет encounter timing.
 6. P05→P100 сохраняет сильный последовательный reveal; Inferno не выжигает HUD и silhouettes.
 
 ## Remaining risk
 
-Автоматические atlas/state/pause/preload tests проверяют механику, но не доказывают субъективную плавность. Cycle 05 v4 использует новые просторные source strips и mechanical alpha/root repack; ранние baked-matte candidates не входят в repo. Первый `390×844` Human-Eye pass уже перенёс effect cards из зоны рук/пламени вниз и усилил 0.8 s hand→flame ribbon после blind finding о слабой читаемости траектории. Открытые риски до exact sign-off: perceptual ghosting при blend далёких hand poses и близость worst decoded residency `62.60 MiB` к hard limit `64 MiB`; production-browser normal/0.25× evidence и независимый regression остаются обязательными.
+Автоматические atlas/state/pause/preload tests не доказывают субъективную плавность. Главные Cycle 06 риски — ghosting между далёкими poses, белый fringe на partial-alpha edges, excessive Demoness upscale, слабая читаемость steam и рост decoded residency из-за дополнительных кадров. Production-browser normal/0.25× review на контрастных фонах, bounded-residency timeline и независимый regression обязательны.

@@ -6,6 +6,8 @@
 
 Release запрещён, пока каждый применимый пункт `ACCEPTANCE_CRITERIA.md` не имеет `PASS` с evidence, открытые Critical/High не равны нулю либо QA report не завершён. Код и assets внутри `dist/` вручную не исправляются: после любого изменения выполняется полная пересборка из source.
 
+Active gate is Corrective Cycle 06. Cycle 05 reports cannot be carried forward for changed character motion/effects/edges/quality/residency. Gameplay and audio may carry forward only when exact frozen fingerprints and full neighboring regression match.
+
 ## Версионирование и идентичность
 
 - Схема: Semantic Versioning `MAJOR.MINOR.PATCH`; первый планируемый production candidate — `0.1.0` до явного решения о стабильном `1.0.0`.
@@ -43,12 +45,14 @@ Build contract:
 1. Freeze scope и назначить SemVer/build ID на clean commit.
 2. Проверить актуальные официальные Yandex Games package, SDK, ads, leaderboard, localization и content requirements; записать дату и sources в `PLATFORM_REQUIREMENTS.md`.
 3. Выполнить clean install, lint, typecheck, automated tests, production build и E2E.
-4. Запустить полный QA plan на точной production build, оформить issues.
-5. Для каждого fix создать новую build, выполнить targeted retest и neighboring regression; старый candidate считается отозванным.
-6. После полного regression обновить все acceptance statuses и evidence. Reviewer подтверждает отсутствие скрытой смены требований.
-7. Только когда QA-критерии имеют PASS и остаются лишь package criteria, выполнить `node scripts/package.mjs`, затем создать checksum и release report.
-8. Распаковать ZIP в новый temp-каталог, запустить через простой static HTTP server и повторить launch/input/audio/fallback smoke.
-9. Загрузить в Yandex test environment, выполнить ENV-Y1/ENV-Y2 smoke; production publish выполняется отдельно после platform acceptance.
+4. Выполнить Cycle 06 asset uniqueness/alpha-edge/upscale audits, quality-controller matrix, clip-residency lifecycle and frozen gameplay/audio fingerprint comparison.
+5. Выполнить три ordered QA passes из `QA_PLAN.md` на одном exact clean Build ID, включая normal/0.25× character review, three-background edge composites и 10-minute Stage-7/overlap trace.
+6. Запустить полный QA plan на точной production build, оформить issues.
+7. Для каждого fix создать новую build, выполнить targeted retest и neighboring regression; старый candidate считается отозванным.
+8. После полного regression обновить все acceptance statuses и evidence. Reviewer подтверждает отсутствие скрытой смены требований.
+9. Только когда QA-критерии имеют PASS и остаются лишь package criteria, выполнить `node scripts/package.mjs`, затем создать checksum и release report.
+10. Распаковать ZIP в новый temp-каталог, запустить через простой static HTTP server и повторить launch/input/audio/fallback smoke.
+11. Загрузить в Yandex test environment, выполнить ENV-Y1/ENV-Y2 smoke; production publish выполняется отдельно после platform acceptance.
 
 ## Очистка production output
 
@@ -106,6 +110,10 @@ archive-root/
 - [ ] Размер ZIP и SHA-256 записаны и перепроверены.
 - [ ] `node scripts/package.mjs` завершился с exit code 0 и создал ZIP только после QA gate.
 - [ ] Reviewer и Release Agent подписали release decision.
+- [ ] Automatic quality downgrade toast count=0; refresh/startup/hidden false downgrade=0.
+- [ ] Servant/Demoness/host visual requirements, ice/steam causality and white-matte veto PASS.
+- [ ] Instant decoded residency≤64 MiB (target≤56 MiB), active-resource release/missing flash/leak=0.
+- [ ] Gameplay and audio fingerprints equal the signed pre-Cycle-06 baseline.
 
 На текущем candidate автоматические build/audit пункты выполнены, но checklist остаётся неотмеченным до exact source commit, browser/device/Yandex regression и формального обновления acceptance evidence.
 
@@ -137,3 +145,4 @@ archive-root/
 - Yandex APIs/policies may change before integration; mitigation — source/date revalidation immediately before adapter work and again before upload.
 - Reward callback race may duplicate a boost or leave audio paused; mitigation — idempotent lifecycle contract and `QA:R-01…R-07` / `AC:Y-09` / `AC:Y-10` / `AC:A-07` / `AC:A-08` tests.
 - Production ZIP/tag/upload разрешаются только после финального gate; build и QA reports создаются до него.
+- Additional authored frames can exceed decoded memory despite a small package; mitigation is independently disposable clip resources and `AC:PERF-08`, not keeping all atlases resident.

@@ -17,6 +17,7 @@ const ids = new Set();
 let artBytes = 0;
 let criticalArtBytes = 0;
 let decodedBytes = 0;
+const decodedResidencyGroups = new Map();
 let audioBytes = 0;
 
 function readBitmapDimensions(bytes, relativePath) {
@@ -58,7 +59,19 @@ for (const entry of manifest.assets) {
   if (!manifest.provenance || !manifest.reviewOwner) throw new Error(`Missing manifest provenance/reviewer: ${relativePath}`);
   artBytes += bytes.length;
   if (entry.critical === true) criticalArtBytes += bytes.length;
-  decodedBytes += width * height * 4;
+  const physicalDecodedBytes = width * height * 4;
+  if (entry.decodedBytes !== undefined && entry.decodedBytes !== physicalDecodedBytes) throw new Error(`Decoded byte mismatch: ${relativePath}`);
+  if (entry.residencyGroup) {
+    if (!manifest.residencyGroups?.[entry.residencyGroup]) throw new Error(`Missing residency group contract: ${entry.residencyGroup}`);
+    const values = decodedResidencyGroups.get(entry.residencyGroup) ?? [];
+    values.push(physicalDecodedBytes);
+    decodedResidencyGroups.set(entry.residencyGroup, values);
+  } else decodedBytes += physicalDecodedBytes;
+}
+for (const [group, values] of decodedResidencyGroups) {
+  const maxResident = Number(manifest.residencyGroups[group].maxResident);
+  if (!Number.isInteger(maxResident) || maxResident < 1 || maxResident > values.length) throw new Error(`Invalid maxResident for ${group}`);
+  decodedBytes += values.sort((a, b) => b - a).slice(0, maxResident).reduce((sum, value) => sum + value, 0);
 }
 const audioAssets = Array.isArray(manifest.audioAssets) ? manifest.audioAssets : [];
 for (const entry of audioAssets) {

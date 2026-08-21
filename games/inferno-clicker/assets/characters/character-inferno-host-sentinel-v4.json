@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "cycle": "06",
+  "atlasWidth": 912,
+  "atlasHeight": 512,
+  "frameWidth": 304,
+  "frameHeight": 256,
+  "pivot": [
+    0.5,
+    0.9765625
+  ],
+  "transparentGutterPixels": 6,
+  "packing": "Cycle 06 clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve",
+  "sourceSheet": "visual-references/cycle-06-sources/inferno-sentinel-6-source.png",
+  "sourceSheetSha256": "67eda9392e249b44575307cf027f77f708660478f8bc0da5ffc2ba62bf9ac92e",
+  "atlasSha256": "95b33b965b1af2f976edecd26e9ecb64cbeb2680b401f0778b60c0332a47f844",
+  "clips": {
+    "ambient": {
+      "fps": 2,
+      "loop": true,
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 304,
+          "h": 256,
+          "durationMs": 500,
+          "sha256": "1c8d5e2c20b78b9ed0712560f554ca837dadfd80122aadad86c03827c2910948",
+          "provenance": "Cycle 06 ImageGen source inferno-sentinel-6-source.png; ambient authored frame 0; alpha defringe, stable-root fit and quality-100 WebP export only",
+          "alphaBBox": [
+            38,
+            6,
+            265,
+            249
+          ],
+          "rootY": 249,
+          "centroidX": 153.27,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.09873
+        },
+        {
+          "x": 304,
+          "y": 0,
+          "w": 304,
+          "h": 256,
+          "durationMs": 500,
+          "sha256": "9bc31c2dc9ed9421fb15a379218afea25fb2d209a003ed9a9cb2c63418414135",
+          "provenance": "Cycle 06 ImageGen source inferno-sentinel-6-source.png; ambient authored frame 1; alpha defringe, stable-root fit and quality-100 WebP export only",
+          "alphaBBox": [
+            43,
+            6,
+            260,
+            249
+          ],
+          "rootY": 249,
+          "centroidX": 150.39,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.09427
+        },
+        {
+          "x": 608,
+          "y": 0,
+          "w": 304,
+          "h": 256,
+          "durationMs": 500,
+          "sha256": "38a6639583e265ef41eff95dc7482291c85151527384e7e65407a7922958ca75",
+          "provenance": "Cycle 06 ImageGen source inferno-sentinel-6-source.png; ambient authored frame 2; alpha defringe, stable-root fit and quality-100 WebP export only",
+          "alphaBBox": [
+            34,
+            6,
+            269,
+            249
+          ],
+          "rootY": 249,
+          "centroidX": 153.65,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99995,
+          "matteRatio": 0.09576
+        },
+        {
+          "x": 0,
+          "y": 256,
+          "w": 304,
+          "h": 256,
+          "durationMs": 500,
+          "sha256": "154e4224cf7d467852f3b513d0c3b81b3fcf416cd9c0bc57c9944f05cbd7cf3e",
+          "provenance": "Cycle 06 ImageGen source inferno-sentinel-6-source.png; ambient authored frame 3; alpha defringe, stable-root fit and quality-100 WebP export only",
+          "alphaBBox": [
+            37,
+            6,
+            267,
+            249
+          ],
+          "rootY": 249,
+          "centroidX": 153.65,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.09316
+        },
+        {
+          "x": 304,
+          "y": 256,
+          "w": 304,
+          "h": 256,
+          "durationMs": 500,
+          "sha256": "270edf65cb95ace0097cd2618b49ac9734ace8c3b68ef0892f58742518ae181e",
+          "provenance": "Cycle 06 ImageGen source inferno-sentinel-6-source.png; ambient authored frame 4; alpha defringe, stable-root fit and quality-100 WebP export only",
+          "alphaBBox": [
+            38,
+            6,
+            265,
+            249
+          ],
+          "rootY": 249,
+          "centroidX": 152.67,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.08579
+        }
+      ]
+    }
+  }
+}

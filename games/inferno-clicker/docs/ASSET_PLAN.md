@@ -1,8 +1,19 @@
 # Asset Plan — «Зажги»
 
-## Corrective Cycle 05 production baseline
+## Corrective Cycle 06 active production contract
 
-Этот документ описывает фактически подключённый Cycle 05 candidate. Flame bitmap design и audio recordings не меняются: runtime добавляет sub-frame temporal blending, continuous heat response и reversible stage envelopes. Принятый Ash Servant остаётся byte-identical. Demoness заменена на reference-driven v4 Inferno Queen с настоящим alpha, стабильным root, спокойным idle и полным направленным cast/recovery.
+Cycle 06 сохраняет flame bitmap design и все audio recordings/mix byte-identical. Character assets version bump: принятые key poses/identity сохраняются, но добавляются genuine in-betweens, clean alpha, higher-resolution Demoness, scarlet snowflake/ice/steam FX и authored Inferno-host internal motion. Конкретные filenames, dimensions, counts and hashes становятся authoritative только после записи в manifest; старые v3/v4 rows ниже считаются superseded inventory, а не target.
+
+### Cycle 06 required registry delta
+
+| ID | Required production artifact | Measurable contract | Load/residency |
+|---|---|---|---|
+| CH-ASH-SERVANT-C06 | Versioned clip atlases + JSON for appearance/idle/inhale/blow/recovery | retained key poses; unique forward-authored in-between between every semantic key pair; per-frame root/mouth sockets; no white matte; root drift≤2 logical px | preload appearance/idle before Stage 3; attack clip ahead of first event; release inactive clips |
+| FX-SERVANT-SNOW-C06 | Scarlet snowflake sprites/JSON or reproducible vector draw contract | readable snowflake silhouette; bounded pool; origin mouth≤8 px, target flame≤12 px | load with servant attack; particle cap included in tier budget |
+| CH-DEMONESS-C06 | High-resolution versioned clip atlases + JSON | effective upscale≤1.25× at DPR2 targets; unique appearance/idle/disapproval/cast/hold/recovery cells; per-frame root/hand sockets; clean alpha | preload idle before Stage 5; cast/recovery ahead of first event; release inactive clips |
+| FX-DEMONESS-ICE-C06 | Blue conical shard sprites/JSON or reproducible draw contract | multiple oriented cones; legacy ribbon geometry absent; contact driven by live flame mask | load with cast clip; bounded projectile pool |
+| FX-DEMONESS-STEAM-C06 | Evaporation/steam sprites/JSON or reproducible particle contract | starts only 0–100 ms after contact; rises/fades to zero; clean pause/teardown | share impact group; bounded pool and lifetime |
+| CH-INFERNO-HOST-{MAIN,SENTINEL}-C06 | Two versioned authored atlases + JSON | accepted 1.5 s entry preserved; main host and sentinel use separate decoded resources and independent phases | preload before Stage 7; release at run teardown |
 
 Все runtime paths указаны относительно корня игры. Точный размер, SHA-256, preload group, codec и длительность являются машиночитаемой частью `assets/assets-manifest.json`; источники и лицензии — `assets/PROVENANCE.md` и `assets/AUDIO_CREDITS.txt`.
 
@@ -18,9 +29,9 @@
 | FL-HIGH-CORE | Высокое ветвящееся ядро/Inferno column | 6–7 | `/assets/flame/atlases/core-high-v2.webp` + JSON, 1536×1280 | Yes | 12 frames, 11 fps loop | Yes | No body synthesis | Yes | READY — preload S5 60% |
 | FL-HIGH-OUTER | Высокие внешние языки | 6–7 | `/assets/flame/atlases/outer-high-v2.webp` + JSON, 1536×1280 | Yes | 12 frames, 11 fps loop, phase +4 | Yes | No body synthesis | Yes | READY — preload S5 60% |
 | FX-STAGE-FLARE | Скрывает texture swap и подчёркивает каждый stage boundary | 1–7 | `/assets/flame/transitions/stage-flare-v2.webp` + JSON, 1024×1024 | Yes | 8 frames at 8 fps; forward upward, reverse + cool tint downward; family crossfade 1.05 s, entry S7 1.5 s | Yes | Runtime tint/light | Yes | READY — preload S1 60% |
-| CH-ASH-SERVANT | Stationary comic devil и читаемый длинный выдох | 3–7 | `/assets/characters/ash-servant/ash-servant-states-v3.webp` + JSON, lossless VP8L 1536×1120, 24 cells 256×280 | Yes, gutter ≥8 | appearance; restrained idle 4 fps; phase-selected prepare/inhale/hold/exhale ramp/peak/fade; 450 ms authored reverse recovery | Existing generated source, lossless repack | Ash stream, ember drift, proportional flame bend | Yes | READY — preload S2 60% |
-| CH-DEMONESS | Высокая спокойная Inferno Queen по newest user reference | 4–7 | `/assets/characters/demoness/demoness-states-v4.webp` + JSON, lossless VP8L 1536×1152, 28 cells 192×288 | Yes, gutter ≥4, edge alpha=0 | appearance 4; idle 4/0.6 fps; disapproval 4; cast 8; hold 4; recovery 4; sub-frame blend | ImageGen Cycle 05; chroma-key removal/stable-root repack only | Dynamic hand→actual flame ribbon; separate travel/contact/impact | Yes | READY — preload S3 60% |
-| CH-INFERNO-HOST | Living watchers/winged silhouettes кульминации | 6–7 | `/assets/characters/character-inferno-host.webp` + `/assets/characters/character-inferno-host-v3.json`, RGBA WebP 1024×683 | Yes | 5 real non-overlapping regions, independent 5.5–8.9 s periods; 1.5 s Stage 6→7 staged reveal | Yes | Region transforms/glow; no whole-plate drift | Spatial crop animation | READY — preload S5 60% |
+| CH-ASH-SERVANT | Cycle 05 historical baseline; superseded by C06 clip set | 3–7 | `/assets/characters/ash-servant/ash-servant-states-v3.webp` + JSON | Yes | Sparse baseline used only for retained-key-pose/fingerprint comparison | Existing generated source | N/A — historical | Yes | SUPERSEDED BY C06 |
+| CH-DEMONESS | Cycle 05 historical baseline; superseded by high-resolution C06 clip set | 4–7 | `/assets/characters/demoness/demoness-states-v4.webp` + JSON | Yes | Sparse/duplicated baseline used only for identity comparison | ImageGen Cycle 05 | N/A — historical ribbon | Yes | SUPERSEDED BY C06 |
+| CH-INFERNO-HOST | Cycle 05 historical baseline; entry reference only | 6–7 | `/assets/characters/character-inferno-host.webp` + JSON | Yes | Accepted entry/composition reference; post-entry crop motion superseded | Yes | N/A — historical | Spatial crop | SUPERSEDED BY C06 |
 
 ### Multilayer flame contract
 
@@ -30,10 +41,10 @@
 
 ### Character state contract
 
-- Servant: `prepare → inhale-ramp → inhale-hold → exhale-start → exhale-ramp → exhale-peak → exhale-fade → exhale-end → recovery`; один normalized strength одновременно управляет ash stream, ember drift и flame reaction.
+- Servant: forward-authored `prepare → inhale-ramp → inhale-hold → exhale-start → exhale-ramp → exhale-peak → exhale-fade → exhale-end → recovery`; один normalized strength управляет scarlet snowflakes и flame reaction. Reverse recovery запрещён.
 - Demoness: Stage 4 silhouette не расходует reveal; Stage 5 запускает authored appearance. Спокойный 6.67 s idle и presentation-only disapproval раз в 5–9 s не двигают root. Attack: `cast-look → arms-rise → cast-gather → cold-travel → contact → cold-hold → cold-release → recovery`.
-- Cold ribbon начинается у authored hand socket и каждый frame направляется к `FlameRig.getTargetAnchor()`, который учитывает текущие heat/impulse/bend/suppression. Flame reaction использует отдельный `impactStrength=0` до фактического contact; energy возле рук не влияет на огонь заранее.
-- Recovery использует authored settle frames: 450 ms Servant и 800 ms Demoness.
+- Conical ice shards начинаются у authored hand sockets и каждый frame направляются к `FlameRig.getTargetAnchor()`. При contact shard исчезает/раскалывается и запускает bounded steam в точке hit; `impactStrength=0` до contact.
+- Recovery использует все authored settle frames: 800 ms Servant и 1000 ms Demoness.
 - `encounters[]` допускает одновременную работу обоих actors. HUD получает отдельные `debuffs[]` rows и общий capped factor, но не влияет на animation/gameplay clocks.
 - Reduced Motion сохраняет authored poses/frames с уменьшенной частотой эффектов; static cutout fallback отсутствует.
 
@@ -57,19 +68,19 @@ Accepted taps объединяются в окно 120 ms, новый fan voice 
 - Stage flare начинает грузиться при 60% Stage 1; mid + Servant — при 60% Stage 2; Demoness — при 60% Stage 3; high + host — при 60% Stage 5.
 - Ошибка critical image даёт bounded retry/safe darkness. Optional late asset остаётся невидимым до успешной загрузки; старые static-card ассеты не являются fallback.
 - Audio создаёт graph и загружает media только после trusted gesture. Failed codec pair деградирует конкретный asset до silence без повторного fetch на каждый tap.
-- Candidate сохраняет загруженные atlases до завершения run/session; worst full residency учитывается целиком, а не маскируется preload-группами.
+- Large character animation partitioned into independently disposable clip resources. Active plus one imminent clip are pinned; inactive optional clips are released immediately after the requested atlas commits. Flame families likewise retain at most the two families needed by a boundary transition. A delayed decode freezes the last valid authored cell instead of interpreting an old atlas with new-clip timing.
 
 ## Measured budgets
 
 | Budget | Result | Hard limit | Status |
 |---|---:|---:|---|
 | Startup critical art | 818,566 B | 1.5 MiB | PASS |
-| Total registered art | 7,182,484 B | 9.8 MiB | PASS |
-| Worst decoded bitmap residency | 65,645,568 B / 62.60 MiB | 64 MiB | PASS, margin is small |
+| Total registered art | 9,703,758 B | 9.8 MiB | PASS |
+| Worst decoded bitmap residency | 64,838,656 B (61.84 MiB); target 56 MiB exceeded, hard cap preserved | 64 MiB | PASS hard gate; target exception recorded for high-resolution Demoness |
 | Both stored audio codec packs | 675,540 B | 2.2 MiB | PASS |
 | Largest texture side | 1600 px | 2048 px | PASS |
 | Working production package | 8,430,646 B / 71 files | 15 MiB | PASS offline; clean release identity still required |
 
 ## Verification status and remaining risk
 
-Automated manifest/hash/magic/dimension/budget checks and atlas state tests pass. Motion quality, loop smoothness, character readability during action and stage transition pop still require exact-build browser video/hashed-frame evidence. Audio files and lifecycle are machine-audited, but classification as «wood fire»/«bellows» and absence of an audible loop seam require two independent real-device listening passes before release.
+Cycle 06 status is `NOT RUN`: manifests must list every clip, unique frame hash, socket, partial-alpha edge metrics, preload/release group and decoded byte count. Motion/causality/edge quality require exact-build browser video/hashed frames. Audio remains frozen and is verified by fingerprint equality plus lifecycle regression; no new listening classification is opened unless a fingerprint changes.

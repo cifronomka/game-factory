@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "cycle": "06",
+  "atlasWidth": 1600,
+  "atlasHeight": 1200,
+  "frameWidth": 400,
+  "frameHeight": 600,
+  "pivot": [
+    0.5,
+    0.99
+  ],
+  "transparentGutterPixels": 6,
+  "packing": "Cycle 06 clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve",
+  "sourceSheet": "visual-references/cycle-06-sources/demoness-idle-8-source.png",
+  "sourceSheetSha256": "e5984b380148ffb7f2a1631ea27c41328f058db07b31e2ab8e62b9bc3335c8f9",
+  "atlasSha256": "43fc96e43a41e881ea500cdedff27a6a3e2f35a5ed2dc04e031b19a614fe20bc",
+  "clips": {
+    "idle": {
+      "fps": 1.2,
+      "loop": true,
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 400,
+          "h": 600,
+          "durationMs": 833.33,
+          "sha256": "194176140513a2b74e07d2b16404a489d913021b6868f7120073e1e4cf805571",
+          "provenance": "Cycle 06 ImageGen source demoness-idle-8-source.png; idle authored frame 0; alpha defringe, stable-root fit and high-quality WebP export only",
+          "sockets": {
+            "castHand": [
+              0.37,
+              0.43
+            ]
+          },
+          "alphaBBox": [
+            12,
+            7,
+            388,
+            593
+          ],
+          "rootY": 593,
+          "centroidX": 194.55,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99974,
+          "matteRatio": 0.00004
+        },
+        {
+          "x": 400,
+          "y": 0,
+          "w": 400,
+          "h": 600,
+          "durationMs": 833.33,
+          "sha256": "e6bc5d1385c593f5fd7f4d4fc598b944df02e42541eee9b1e1717d2774065fa6",
+          "provenance": "Cycle 06 ImageGen source demoness-idle-8-source.png; idle authored frame 1; alpha defringe, stable-root fit and high-quality WebP export only",
+          "sockets": {
+            "castHand": [
+              0.37,
+              0.43
+            ]
+          },
+          "alphaBBox": [
+            11,
+            6,
+            388,
+            593
+          ],
+          "rootY": 593,
+          "centroidX": 192.99,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99994,
+          "matteRatio": 0.00017
+        },
+        {
+          "x": 800,
+          "y": 0,
+          "w": 400,
+          "h": 600,
+          "durationMs": 833.33,
+          "sha256": "115bce7f9d7861ff0fa8361d1bf8558d8c11645b22a5b8e50c3485ad8b2f9be7",
+          "provenance": "Cycle 06 ImageGen source demoness-idle-8-source.png; idle authored frame 2; alpha defringe, stable-root fit and high-quality WebP export only",
+          "sockets": {
+            "castHand": [
+              0.37,
+              0.43
+            ]
+          },
+          "alphaBBox": [
+            12,
+            6,
+            387,
+            593
+          ],
+          "rootY": 593,
+          "centroidX": 192.72,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99991,
+          "matteRatio": 0.00003
+        },
+        {
+          "x": 1200,
+          "y": 0,
+          "w": 400,
+          "h": 600,
+          "durationMs": 833.33,
+          "sha256": "308bde7f964abc51f1cf2c1b310168fb04f8a94eba461a685026650437aee112",
+          "provenance": "Cycle 06 ImageGen source demoness-idle-8-source.png; idle authored frame 3; alpha defringe, stable-root fit and high-quality WebP export only",
+          "sockets": {
+            "castHand": [
+              0.37,
+              0.43
+            ]
+          },
+          "alphaBBox": [
+            12,
+            6,
+            387,
+            593
+          ],
+          "rootY": 593,
+          "centroidX": 190.68,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99994,
+          "matteRatio": 0.00004
+        },
+        {
+          "x": 0,
+          "y": 600,
+          "w": 400,
+          "h": 600,
+          "durationMs": 833.33,
+          "sha256": "37a1659fef23f7698c97d71c4fc563f7bfee3dff97369468130409a79bcc394e",
+          "provenance": "Cycle 06 ImageGen source demoness-idle-8-source.png; idle authored frame 4; alpha defringe, stable-root fit and high-quality WebP export only",
+          "sockets": {
+            "castHand": [
+              0.37,
+              0.43
+            ]
+          },
+          "alphaBBox": [
+            8,
+            6,
+            391,
+            593
+          ],
+          "rootY": 593,
+          "centroidX": 193.52,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99992,
+          "matteRatio": 0
+        },
+        {
+          "x": 400,
+          "y": 600,
+          "w": 400,
+          "h": 600,
+          "durationMs": 833.33,
+          "sha256": "e7eca10120e7a3dbd1cc89baed9c7b38fde808ee6a8bc2ed0f2125e0b498912b",
+          "provenance": "Cycle 06 ImageGen source demoness-idle-8-source.png; idle authored frame 5; alpha defringe, stable-root fit and high-quality WebP export only",
+          "sockets": {
+            "castHand": [
+              0.37,
+              0.43
+            ]
+          },
+          "alphaBBox": [
+            8,
+            9,
+            391,
+            593
+          ],
+          "rootY": 593,
+          "centroidX": 192.31,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99992,
+          "matteRatio": 0.00016
+        },
+        {
+          "x": 800,
+          "y": 600,
+          "w": 400,
+          "h": 600,
+          "durationMs": 833.33,
+          "sha256": "230ab5e3a63614742827a746864049796625e55d460fd81313d246799e4604e9",
+          "provenance": "Cycle 06 ImageGen source demoness-idle-8-source.png; idle authored frame 6; alpha defringe, stable-root fit and high-quality WebP export only",
+          "sockets": {
+            "castHand": [
+              0.37,
+              0.43
+            ]
+          },
+          "alphaBBox": [
+            11,
+            7,
+            388,
+            593
+          ],
+          "rootY": 593,
+          "centroidX": 191.74,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99994,
+          "matteRatio": 0.00003
+        },
+        {
+          "x": 1200,
+          "y": 600,
+          "w": 400,
+          "h": 600,
+          "durationMs": 833.33,
+          "sha256": "52a6723e4bd01ea5a04f7c4ca10f7876c371a8640ef680ebdd81241e0fe2f7a1",
+          "provenance": "Cycle 06 ImageGen source demoness-idle-8-source.png; idle authored frame 7; alpha defringe, stable-root fit and high-quality WebP export only",
+          "sockets": {
+            "castHand": [
+              0.37,
+              0.43
+            ]
+          },
+          "alphaBBox": [
+            10,
+            6,
+            389,
+            593
+          ],
+          "rootY": 593,
+          "centroidX": 192.21,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 0.99994,
+          "matteRatio": 0.00007
+        }
+      ]
+    }
+  }
+}

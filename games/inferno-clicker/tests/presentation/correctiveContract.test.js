@@ -46,10 +46,14 @@ test('flame and characters use authored frame atlases without static-card deform
   assert.match(flame, /stage-flare-v2\.webp/);
   assert.match(flame, /SpriteAnimator/);
   assert.doesNotMatch(flame, /flame-core-organic|flame-outer-organic|inferno-beam-organic|drawSlice|slice deformation/i);
-  assert.match(characters, /ash-servant-states-v3\.webp/);
-  assert.match(characters, /demoness-states-v4\.webp/);
-  assert.match(characters, /appearance.*idle.*inhale.*blow/s);
-  assert.match(characters, /appearance.*idle.*cast.*hold/s);
+  assert.match(characters, /ash-servant-\$\{clip\}-v4\.webp/);
+  assert.match(characters, /demoness-\$\{clip\}-v5\.webp/);
+  assert.match(characters, /appearance.*idle.*inhale.*blow.*recovery/s);
+  assert.match(characters, /appearance.*idle.*cast.*hold.*recovery/s);
+  assert.match(characters, /drawScarletSnowflakes/);
+  assert.match(characters, /drawIceShards/);
+  assert.match(characters, /drawImpactFx/);
+  assert.doesNotMatch(characters, /drawColdRibbon|drawDirectedAsh/);
   assert.doesNotMatch(characters, /drawServant|drawDemoness|fallback character/i);
 });
 

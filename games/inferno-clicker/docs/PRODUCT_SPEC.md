@@ -1,5 +1,11 @@
 # Product Spec — «Зажги»
 
+## Active corrective scope — Cycle 06
+
+Cycle 06 improves perceived quality without changing the game. Automatic presentation-quality adaptation is silent and must not claim that the user's device is weak. The Ash Servant remains the same character but no longer flickers: it has genuinely smooth authored idle/exhale/recovery and visibly exhales scarlet snowflakes from its mouth. The Demoness retains the approved sovereign identity at higher clarity, uses more genuine transition frames and attacks with blue conical ice shards that evaporate into steam at the flame. All character edges are clean, and the accepted Inferno-host entrance leads into clearly living authored motion rather than a static plate.
+
+These are presentation requirements, not new mechanics. Gameplay balance/progression/input/reward/platform behavior, flame/environment design and audio assets/mix are frozen. Accessibility/performance tiers may reduce optional density or filters, but never remove the readable mouth→snowflake→flame or hand→ice→contact→steam causal chain.
+
 ## Назначение
 
 Документ определяет продуктовую цель, аудиторию, ограничения и измеримые признаки успеха browser-first HTML5-игры «Зажги». Детальные игровые правила зафиксированы в `GAME_DESIGN.md`, техническая реализация — в `TECHNICAL_ARCHITECTURE.md`.
@@ -39,6 +45,7 @@
 - Седьмая стадия не является концом контента: после её открытия появляется skill-based задача удержания Инферно и охота за личным/публичным рекордом.
 - Rewarded placement оформлен как необязательное ускорение: его отсутствие, ошибка или закрытие не ограничивают ни одну стадию и не открывают модальное окно автоматически.
 - Визуальный product intent: огонь должен ощущаться живым через sprite/frame animation, а персонажи — через различимые appearance, idle и attack-состояния. Audio intent — спокойный огонь и воздушный шум раздувания/атаки; частота taps не создаёт ритм или обязательный per-tap звук.
+- Качество анимации достигается настоящими authored in-between кадрами, а не мерцанием или наложением далёких поз. Белая кайма, грубый matte, размытие из-за чрезмерного upscale и статичная жизнь персонажей неприемлемы.
 
 ## Продуктовый scope и ограничения
 

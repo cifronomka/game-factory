@@ -15,9 +15,14 @@
     "test": "node scripts/test.mjs",
     "test:e2e": "node scripts/e2e-smoke.mjs",
     "assets:audit": "node scripts/assets-audit.mjs",
+    "assets:build:cycle06": "node scripts/build-cycle06-character-assets.mjs",
     "animation:audit": "node scripts/animation-assets-audit.mjs",
     "evidence:validate": "node scripts/validate-animation-evidence.mjs",
+    "evidence:cycle06": "node scripts/validate-corrective-cycle-06-evidence.mjs",
     "release:audit": "node scripts/release-audit.mjs",
     "package": "node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.3"
   }
 }

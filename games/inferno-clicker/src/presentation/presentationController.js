@@ -7,7 +7,7 @@ import { DomHud } from './ui/domHud.js';
 import { DEFAULT_PRESENTATION_CALLBACKS } from './types.js';
 
 export class PresentationController {
-  /** @param {{host:HTMLElement,callbacks?:Partial<import('./types.js').PresentationCallbacks>,audio?:AudioMixer}} options */
+  /** @param {{host:HTMLElement,callbacks?:Partial<import('./types.js').PresentationCallbacks>,audio?:AudioMixer,onPerformanceSample?:(sample:{atMs:number,workMs:number,paused:boolean})=>void}} options */
   constructor(options) {
     const callbacks = Object.freeze({ ...DEFAULT_PRESENTATION_CALLBACKS, ...options.callbacks });
     this.host = options.host;
@@ -20,7 +20,7 @@ export class PresentationController {
     this.scene = new InfernoScene(this.canvas, (input) => {
       void this.audio.unlock();
       callbacks.onGameplayTap(input);
-    });
+    }, options.onPerformanceSample);
     this.hud = new DomHud(options.host, callbacks);
     this.resizeHandler = () => this.scene.resize();
     globalThis.addEventListener('resize', this.resizeHandler);

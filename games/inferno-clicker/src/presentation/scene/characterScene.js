@@ -3,52 +3,42 @@
 import { OptionalBitmap } from './optionalBitmap.js';
 import { SpriteAnimator, drawSpriteFrame, gridFrames } from './spriteAnimator.js';
 
-export const ASH_SERVANT_ATLAS_URL = new URL('../../../assets/characters/ash-servant/ash-servant-states-v3.webp', import.meta.url).href;
-export const DEMONESS_ATLAS_URL = new URL('../../../assets/characters/demoness/demoness-states-v4.webp', import.meta.url).href;
-export const INFERNO_HOST_URL = new URL('../../../assets/characters/character-inferno-host.webp', import.meta.url).href;
+export const ASH_SERVANT_ATLAS_URLS = Object.freeze(Object.fromEntries(['idle', 'inhale', 'blow', 'recovery'].map((clip) => [clip,
+  new URL(`../../../assets/characters/ash-servant/ash-servant-${clip}-v4.webp`, import.meta.url).href,
+])));
+export const DEMONESS_ATLAS_URLS = Object.freeze(Object.fromEntries(['idle', 'cast', 'hold', 'recovery'].map((clip) => [clip,
+  new URL(`../../../assets/characters/demoness/demoness-${clip}-v5.webp`, import.meta.url).href,
+])));
+export const ASH_SERVANT_ATLAS_URL = ASH_SERVANT_ATLAS_URLS.idle;
+export const DEMONESS_ATLAS_URL = DEMONESS_ATLAS_URLS.idle;
+export const INFERNO_HOST_URLS = Object.freeze({
+  main: new URL('../../../assets/characters/character-inferno-host-main-v4.webp', import.meta.url).href,
+  sentinel: new URL('../../../assets/characters/character-inferno-host-sentinel-v4.webp', import.meta.url).href,
+});
+export const INFERNO_HOST_URL = INFERNO_HOST_URLS.main;
 
 const SERVANT_CELL_WIDTH = 256;
-const SERVANT_CELL_HEIGHT = 280;
-const SERVANT_PIVOT = Object.freeze([0.5, 272 / SERVANT_CELL_HEIGHT]);
-const DEMONESS_CELL_WIDTH = 192;
-const DEMONESS_CELL_HEIGHT = 288;
-const DEMONESS_COLUMNS = 8;
-const DEMONESS_PIVOT = Object.freeze([0.5, 278 / DEMONESS_CELL_HEIGHT]);
-const ROW = Object.freeze({ appearance: 0, idle: 1, actionA: 2, actionB: 3 });
-/** @param {number} row */
-function servantRowFrames(row) { return gridFrames(6, 6, SERVANT_CELL_WIDTH, SERVANT_CELL_HEIGHT).map((frame) => Object.freeze({ ...frame, y: row * SERVANT_CELL_HEIGHT })); }
-/** @param {number} start @param {number} count */
-function demonessFrames(start, count) {
-  return Object.freeze(Array.from({ length: count }, (_, offset) => {
-    const index = start + offset;
-    return Object.freeze({
-      x: index % DEMONESS_COLUMNS * DEMONESS_CELL_WIDTH,
-      y: Math.floor(index / DEMONESS_COLUMNS) * DEMONESS_CELL_HEIGHT,
-      w: DEMONESS_CELL_WIDTH,
-      h: DEMONESS_CELL_HEIGHT,
-    });
-  }));
-}
-/** @param {readonly any[]} frames */
-function reverseFrames(frames) { return Object.freeze([...frames].reverse()); }
-
-const servantInhale = servantRowFrames(ROW.actionA);
-const servantBlow = servantRowFrames(ROW.actionB);
+const SERVANT_CELL_HEIGHT = 320;
+const SERVANT_PIVOT = Object.freeze([0.5, 0.98125]);
+const DEMONESS_CELL_WIDTH = 400;
+const DEMONESS_CELL_HEIGHT = 600;
+const DEMONESS_PIVOT = Object.freeze([0.5, 0.99]);
+const eightFrames = gridFrames(4, 8, SERVANT_CELL_WIDTH, SERVANT_CELL_HEIGHT);
+const demonessEightFrames = gridFrames(4, 8, DEMONESS_CELL_WIDTH, DEMONESS_CELL_HEIGHT);
 const SERVANT_CLIPS = Object.freeze({
-  appearance: Object.freeze({ fps: 8, loop: false, frames: servantRowFrames(ROW.appearance) }),
-  idle: Object.freeze({ fps: 4, loop: true, frames: servantRowFrames(ROW.idle) }),
-  inhale: Object.freeze({ fps: 10, loop: false, frames: servantInhale }),
-  blow: Object.freeze({ fps: 10, loop: true, frames: servantBlow }),
-  'inhale-settle': Object.freeze({ fps: 10, loop: false, frames: reverseFrames(servantInhale) }),
-  'blow-settle': Object.freeze({ fps: 10, loop: false, frames: reverseFrames(servantBlow) }),
+  appearance: Object.freeze({ fps: 10, loop: false, frames: eightFrames }),
+  idle: Object.freeze({ fps: 6, loop: true, frames: eightFrames }),
+  inhale: Object.freeze({ fps: 10, loop: false, frames: eightFrames }),
+  blow: Object.freeze({ fps: 10, loop: true, frames: eightFrames }),
+  recovery: Object.freeze({ fps: 10, loop: false, frames: eightFrames }),
 });
 const DEMONESS_CLIPS = Object.freeze({
-  appearance: Object.freeze({ fps: 6, loop: false, frames: demonessFrames(0, 4) }),
-  idle: Object.freeze({ fps: 0.6, loop: true, frames: demonessFrames(4, 4) }),
-  disapproval: Object.freeze({ fps: 2, loop: false, frames: demonessFrames(8, 4) }),
-  cast: Object.freeze({ fps: 4, loop: false, frames: demonessFrames(12, 8) }),
-  hold: Object.freeze({ fps: 2, loop: true, frames: demonessFrames(20, 4) }),
-  settle: Object.freeze({ fps: 4, loop: false, frames: demonessFrames(24, 4) }),
+  appearance: Object.freeze({ fps: 8, loop: false, frames: demonessEightFrames }),
+  idle: Object.freeze({ fps: 1.2, loop: true, frames: demonessEightFrames }),
+  disapproval: Object.freeze({ fps: 4, loop: false, frames: demonessEightFrames }),
+  cast: Object.freeze({ fps: 8, loop: false, frames: demonessEightFrames }),
+  hold: Object.freeze({ fps: 6, loop: true, frames: demonessEightFrames }),
+  recovery: Object.freeze({ fps: 8, loop: false, frames: demonessEightFrames }),
 });
 
 const SERVANT_MOUTH = Object.freeze([0.65, 0.31]);
@@ -58,18 +48,25 @@ const DEMONESS_CAST_HAND = Object.freeze([
 ]);
 const DEMONESS_HOLD_HAND = Object.freeze([
   Object.freeze([0.24, 0.35]), Object.freeze([0.23, 0.34]), Object.freeze([0.22, 0.33]), Object.freeze([0.21, 0.32]),
+  Object.freeze([0.20, 0.32]), Object.freeze([0.19, 0.33]), Object.freeze([0.20, 0.34]), Object.freeze([0.21, 0.33]),
 ]);
 const DEMONESS_DISAPPROVAL_INTERVALS = Object.freeze([6.4, 8.2, 5.6, 7.3]);
-const DEMONESS_PLACEMENT = Object.freeze({ anchorX: 850, anchorY: 1_235, width: 520, height: 780 });
+const DEMONESS_PLACEMENT = Object.freeze({ anchorX: 850, anchorY: 1_235, width: 460, height: 700 });
 const SERVANT_PLACEMENT = Object.freeze({ anchorX: 300, anchorY: 1_225, width: 540, height: 590 });
 const SERVANT_APPEARANCE_DURATION = SERVANT_CLIPS.appearance.frames.length / SERVANT_CLIPS.appearance.fps;
 
+/** Worst-axis source upscale for the fixed 1080×1920 scene contained in a viewport. */
+export function demonessEffectiveUpscale(viewportWidth, viewportHeight, dpr = 2) {
+  const sceneScale = Math.min(viewportWidth / 1080, viewportHeight / 1920);
+  return Math.max(
+    DEMONESS_PLACEMENT.width * sceneScale * dpr / DEMONESS_CELL_WIDTH,
+    DEMONESS_PLACEMENT.height * sceneScale * dpr / DEMONESS_CELL_HEIGHT,
+  );
+}
+
 export const INFERNO_HOST_REGIONS = Object.freeze([
-  Object.freeze({ id: 'left-wing', x: 0, y: 0, w: 340, h: 360, phase: 0.0, period: 7.7, amplitude: 5, role: 'wing' }),
-  Object.freeze({ id: 'left-watchers', x: 0, y: 360, w: 340, h: 323, phase: 1.2, period: 6.1, amplitude: 3.5, role: 'watchers' }),
-  Object.freeze({ id: 'crown', x: 340, y: 0, w: 344, h: 683, phase: 2.4, period: 8.9, amplitude: 3, role: 'crown' }),
-  Object.freeze({ id: 'right-wing', x: 684, y: 0, w: 340, h: 360, phase: 3.6, period: 7.1, amplitude: 5, role: 'wing' }),
-  Object.freeze({ id: 'right-watchers', x: 684, y: 360, w: 340, h: 323, phase: 4.8, period: 5.5, amplitude: 3.5, role: 'watchers' }),
+  Object.freeze({ id: 'inferno-sentinel', phase: 0, period: 2.5, amplitude: 3, role: 'sentinel' }),
+  Object.freeze({ id: 'crowned-host', phase: 1.1, period: 3.4, amplitude: 2, role: 'main' }),
 ]);
 
 /** @param {typeof INFERNO_HOST_REGIONS[number]} region @param {number} time @param {boolean} reducedMotion */
@@ -80,9 +77,9 @@ export function hostMotionForRegion(region, time, reducedMotion) {
   const breath = Math.sin(motionTime * Math.PI * 2 / (region.period * 1.37) + region.phase * 0.61);
   return Object.freeze({
     hover: wave * region.amplitude * motionScale,
-    scaleX: 1 + breath * (region.role === 'wing' ? 0.009 : 0.004) * motionScale,
-    scaleY: 1 + breath * (region.role === 'crown' ? 0.006 : 0.003) * motionScale,
-    rotation: !reducedMotion && region.role === 'wing' ? wave * (region.id.startsWith('left') ? -0.007 : 0.007) : 0,
+    scaleX: 1 + breath * (region.role === 'sentinel' ? 0.009 : 0.004) * motionScale,
+    scaleY: 1 + breath * (region.role === 'main' ? 0.006 : 0.003) * motionScale,
+    rotation: !reducedMotion && region.role === 'sentinel' ? wave * -0.005 : 0,
   });
 }
 
@@ -111,26 +108,40 @@ function socketWorld(placement, socket, pivot) {
 }
 
 /** @param {CanvasRenderingContext2D} context @param {number} time @param {number} strength @param {{x:number,y:number}} start */
-function drawDirectedAsh(context, time, strength, start) {
-  const target = { x: 540, y: 1_145 };
+function drawScarletSnowflakes(context, time, strength, start, target) {
   context.save();
   context.globalCompositeOperation = 'screen';
   context.lineCap = 'round';
-  context.shadowColor = `rgba(244,155,83,${0.4 * strength})`;
-  context.shadowBlur = 8;
-  for (let index = 0; index < 24; index += 1) {
-    const phase = time * (1.7 + (index % 4) * 0.11) + index * 1.91;
-    const progress = ((phase % 1.8) + 1.8) % 1.8 / 1.8;
+  context.shadowColor = `rgba(255,54,62,${0.75 * strength})`;
+  context.shadowBlur = 16;
+  for (let index = 0; index < 9; index += 1) {
+    const phase = time * 1.9 + index / 9;
+    const progress = ((phase % 1) + 1) % 1;
     const x = start.x + (target.x - start.x) * progress;
-    const y = start.y + (target.y - start.y) * progress + Math.sin(phase * 5.1) * (8 + index * 0.45);
-    context.strokeStyle = index % 3 === 0
-      ? `rgba(245,178,107,${(1 - progress) * 0.48 * strength})`
-      : `rgba(171,137,105,${(1 - progress) * 0.38 * strength})`;
-    context.lineWidth = 2.5 + (index % 5);
+    const y = start.y + (target.y - start.y) * progress + Math.sin(index * 2.7 + time * 4) * 5 * Math.sin(progress * Math.PI);
+    const radius = (11 + index % 3 * 2.5) * (0.78 + Math.sin(progress * Math.PI) * 0.32);
+    context.save();
+    context.translate(x, y);
+    context.rotate(time * 1.4 + index);
+    const particleAlpha = (0.45 + Math.sin(progress * Math.PI) * 0.55) * 0.98 * strength;
+    context.strokeStyle = `rgba(255,${92 + index % 3 * 18},${108 + index % 2 * 22},${particleAlpha})`;
+    context.lineWidth = 3.1 + index % 2 * 0.75;
+    for (let arm = 0; arm < 3; arm += 1) {
+      context.rotate(Math.PI / 3);
+      context.beginPath();
+      context.moveTo(-radius, 0);
+      context.lineTo(radius, 0);
+      context.moveTo(radius * 0.45, 0);
+      context.lineTo(radius * 0.7, -radius * 0.3);
+      context.moveTo(radius * 0.45, 0);
+      context.lineTo(radius * 0.7, radius * 0.3);
+      context.stroke();
+    }
+    context.fillStyle = `rgba(255,215,220,${particleAlpha})`;
     context.beginPath();
-    context.moveTo(x, y);
-    context.quadraticCurveTo(x + 22, y - 9, x + 42, y + Math.sin(phase * 3) * 7);
-    context.stroke();
+    context.arc(0, 0, 3.4, 0, Math.PI * 2);
+    context.fill();
+    context.restore();
   }
   context.restore();
 }
@@ -155,19 +166,8 @@ function drawDisapprovalCue(context, time, placement, gesture) {
 }
 
 /** @param {CanvasRenderingContext2D} context @param {HTMLImageElement} image @param {SpriteAnimator} animator @param {any} placement */
-function drawTemporalCharacter(context, image, animator, placement) {
-  const sample = animator.getBlendSample();
-  const alpha = placement.alpha ?? 1;
-  if (!sample.next || sample.mix <= 0.001) {
-    drawSpriteFrame(context, image, sample.current, placement);
-    return;
-  }
-  if (sample.mix >= 0.999) {
-    drawSpriteFrame(context, image, sample.next, placement);
-    return;
-  }
-  drawSpriteFrame(context, image, sample.current, { ...placement, alpha: alpha * (1 - sample.mix) });
-  drawSpriteFrame(context, image, sample.next, { ...placement, alpha: alpha * sample.mix });
+function drawTemporalCharacter(context, image, frame, placement) {
+  drawSpriteFrame(context, image, frame, placement);
 }
 
 /** @param {CanvasRenderingContext2D} context @param {number} time @param {number} strength @param {{x:number,y:number}} target */
@@ -190,32 +190,18 @@ function drawInhaleAir(context, time, strength, target) {
   context.restore();
 }
 
-/** @param {number} a @param {number} b @param {number} t */
-function lerp(a, b, t) { return a + (b - a) * t; }
-
-/** @param {{x:number,y:number}} start @param {{x:number,y:number}} controlA @param {{x:number,y:number}} controlB @param {{x:number,y:number}} target @param {number} t */
-function cubicPoint(start, controlA, controlB, target, t) {
-  const inverse = 1 - t;
-  return {
-    x: inverse ** 3 * start.x + 3 * inverse ** 2 * t * controlA.x + 3 * inverse * t ** 2 * controlB.x + t ** 3 * target.x,
-    y: inverse ** 3 * start.y + 3 * inverse ** 2 * t * controlA.y + 3 * inverse * t ** 2 * controlB.y + t ** 3 * target.y,
-  };
-}
-
 /** @param {CanvasRenderingContext2D} context @param {number} time @param {number} strength @param {{x:number,y:number}} start @param {{x:number,y:number}} target @param {number} reach */
-function drawColdRibbon(context, time, strength, start, target, reach) {
+function drawIceShards(context, time, strength, start, target, reach) {
   const visibleReach = clamp(reach, 0, 1);
   if (strength <= 0) return start;
   context.save();
   context.globalCompositeOperation = 'screen';
-  context.lineCap = 'round';
-  context.lineJoin = 'round';
-  const chargePulse = 0.78 + Math.sin(time * 4.1) * 0.12;
-  context.fillStyle = `rgba(185,248,248,${0.48 * strength})`;
+  const chargePulse = 0.82 + Math.sin(time * 4.1) * 0.1;
+  context.fillStyle = `rgba(185,248,255,${0.42 * strength})`;
   context.shadowColor = 'rgba(72,222,228,.95)';
-  context.shadowBlur = 20;
+  context.shadowBlur = 14;
   context.beginPath();
-  context.arc(start.x, start.y, (7 + strength * 7) * chargePulse, 0, Math.PI * 2);
+  context.arc(start.x, start.y, (6 + strength * 6) * chargePulse, 0, Math.PI * 2);
   context.fill();
   if (visibleReach <= 0) {
     context.restore();
@@ -224,57 +210,39 @@ function drawColdRibbon(context, time, strength, start, target, reach) {
   const axisX = target.x - start.x;
   const axisY = target.y - start.y;
   const axisLength = Math.max(1, Math.hypot(axisX, axisY));
-  const normalX = -axisY / axisLength;
-  const normalY = axisX / axisLength;
-  let leadingPoint = start;
-  for (let pass = 0; pass < 3; pass += 1) {
-    const phase = time * (2.1 + pass * 0.18) + pass * 2.15;
-    const wobble = Math.sin(phase) * 18;
-    context.globalCompositeOperation = pass === 0 ? 'source-over' : 'screen';
-    context.strokeStyle = pass === 0
-      ? `rgba(7,48,58,${0.46 * strength})`
-      : pass === 1
-        ? `rgba(72,207,219,${0.52 * strength})`
-        : `rgba(211,255,254,${0.78 * strength})`;
-    context.lineWidth = pass === 0 ? 18 : pass === 1 ? 10 : 3.5;
-    const controlA = { x: start.x - 70, y: start.y + 90 + wobble };
-    const controlB = { x: lerp(start.x, target.x, 0.7), y: target.y - 155 - wobble };
+  const ux = axisX / axisLength;
+  const uy = axisY / axisLength;
+  const nx = -uy;
+  const ny = ux;
+  const leadingPoint = { x: start.x + axisX * visibleReach, y: start.y + axisY * visibleReach };
+  const angle = Math.atan2(axisY, axisX);
+  for (const { index, progress } of visibleIceShardProgresses(visibleReach)) {
+    const lateral = Math.sin(index * 2.17 + time * 3.2) * (5 + index % 3 * 2);
+    const x = start.x + axisX * progress + nx * lateral;
+    const y = start.y + axisY * progress + ny * lateral;
+    const length = 30 + index % 3 * 9;
+    const width = 8 + index % 2 * 3;
+    context.save();
+    context.translate(x, y);
+    context.rotate(angle);
+    context.fillStyle = `rgba(${index % 2 ? 116 : 186},${index % 2 ? 225 : 248},255,${0.55 + strength * 0.28})`;
     context.beginPath();
-    context.moveTo(start.x, start.y);
-    const steps = Math.max(2, Math.ceil(24 * visibleReach));
-    for (let index = 1; index <= steps; index += 1) {
-      const progress = visibleReach * index / steps;
-      const basePoint = cubicPoint(start, controlA, controlB, target, progress);
-      const taper = Math.sin(Math.PI * progress) * (1 - pass * 0.18);
-      const lateral = Math.sin(progress * Math.PI * (2.4 + pass * 0.35) + phase) * (11 - pass * 2.5) * taper;
-      const point = {
-        x: basePoint.x + normalX * lateral,
-        y: basePoint.y + normalY * lateral,
-      };
-      context.lineTo(point.x, point.y);
-      if (pass === 0 && index === steps) leadingPoint = basePoint;
-    }
-    context.stroke();
-  }
-  const motes = Math.max(2, Math.round(7 * visibleReach));
-  context.globalCompositeOperation = 'screen';
-  context.fillStyle = `rgba(178,244,244,${0.48 * strength})`;
-  for (let index = 0; index < motes; index += 1) {
-    const progress = visibleReach * (0.18 + index / Math.max(1, motes - 1) * 0.8);
-    const point = cubicPoint(start, { x: start.x - 70, y: start.y + 90 }, { x: lerp(start.x, target.x, 0.7), y: target.y - 155 }, target, progress);
-    const drift = Math.sin(time * 3 + index * 2.4) * 7 * Math.sin(Math.PI * progress);
-    context.beginPath();
-    context.arc(point.x + normalX * drift, point.y + normalY * drift, 1.8 + (index % 3) * 0.6, 0, Math.PI * 2);
+    context.moveTo(length * 0.65, 0);
+    context.lineTo(-length * 0.35, -width);
+    context.lineTo(-length * 0.2, 0);
+    context.lineTo(-length * 0.35, width);
+    context.closePath();
     context.fill();
+    context.restore();
   }
-  context.fillStyle = `rgba(208,255,254,${0.82 * strength})`;
-  context.shadowColor = 'rgba(86,218,222,.9)';
-  context.shadowBlur = 18;
-  context.beginPath();
-  context.arc(leadingPoint.x, leadingPoint.y, 8 + strength * 6, 0, Math.PI * 2);
-  context.fill();
   context.restore();
   return leadingPoint;
+}
+
+/** Individual shards disappear at the flame-contact threshold and are replaced by steam. */
+export function visibleIceShardProgresses(reach) {
+  return Object.freeze(Array.from({ length: 7 }, (_, index) => ({ index, progress: clamp(reach - index * 0.09, 0, 1) }))
+    .filter(({ progress }) => progress > 0 && progress < 0.97));
 }
 
 function requestedServantClip(requested) { return requested === 'inhale' ? 'inhale' : requested === 'blow' ? 'blow' : 'idle'; }
@@ -304,18 +272,20 @@ function demonessExitVisual(progress) {
 
 /** Authoritative Cycle 04 telegraph/effect phase mapper. */
 export function servantTemporalPhase(encounter) {
-  if (!encounter) return Object.freeze({ phase: 'idle', strength: 0, frame: 0 });
+  if (!encounter) return Object.freeze({ phase: 'idle', strength: 0, frame: 0, framePosition: 0 });
   const progress = clamp(Number(encounter.progress) || 0, 0, 1);
   if (encounter.phase === 'telegraph') {
-    if (progress < 0.15) return Object.freeze({ phase: 'prepare', strength: 0, frame: 0 });
-    if (progress < 0.7) return Object.freeze({ phase: 'inhale-ramp', strength: 0, frame: Math.min(4, 1 + Math.floor(ramp(progress, 0.15, 0.7) * 4)) });
-    return Object.freeze({ phase: 'inhale-hold', strength: 0, frame: 5 });
+    const framePosition = progress * 7;
+    if (progress < 0.15) return Object.freeze({ phase: 'prepare', strength: 0, frame: Math.floor(framePosition), framePosition });
+    if (progress < 0.7) return Object.freeze({ phase: 'inhale-ramp', strength: 0, frame: Math.floor(framePosition), framePosition });
+    return Object.freeze({ phase: 'inhale-hold', strength: 0, frame: Math.min(7, Math.floor(framePosition)), framePosition });
   }
-  if (progress < 0.1) return Object.freeze({ phase: 'exhale-start', strength: ramp(progress, 0, 0.1) * 0.3, frame: 0 });
-  if (progress < 0.36) return Object.freeze({ phase: 'exhale-ramp', strength: 0.3 + ramp(progress, 0.1, 0.36) * 0.7, frame: Math.min(4, 1 + Math.floor(ramp(progress, 0.1, 0.36) * 4)) });
-  if (progress < 0.68) return Object.freeze({ phase: 'exhale-peak', strength: 1, frame: 5 });
-  if (progress < 0.9) return Object.freeze({ phase: 'exhale-fade', strength: 1 - ramp(progress, 0.68, 0.9) * 0.8, frame: Math.max(1, 5 - Math.floor(ramp(progress, 0.68, 0.9) * 4)) });
-  return Object.freeze({ phase: 'exhale-end', strength: 0.2 * (1 - ramp(progress, 0.9, 1)), frame: 0 });
+  const framePosition = progress * 7;
+  if (progress < 0.1) return Object.freeze({ phase: 'exhale-start', strength: ramp(progress, 0, 0.1) * 0.3, frame: Math.floor(framePosition), framePosition });
+  if (progress < 0.36) return Object.freeze({ phase: 'exhale-ramp', strength: 0.3 + ramp(progress, 0.1, 0.36) * 0.7, frame: Math.floor(framePosition), framePosition });
+  if (progress < 0.68) return Object.freeze({ phase: 'exhale-peak', strength: 1, frame: Math.floor(framePosition), framePosition });
+  if (progress < 0.9) return Object.freeze({ phase: 'exhale-fade', strength: 1 - ramp(progress, 0.68, 0.9) * 0.8, frame: Math.floor(framePosition), framePosition });
+  return Object.freeze({ phase: 'exhale-end', strength: 0.2 * (1 - ramp(progress, 0.9, 1)), frame: Math.min(7, Math.floor(framePosition)), framePosition });
 }
 
 /** Authoritative Cycle 05 Demoness telegraph/effect phase mapper. */
@@ -330,22 +300,22 @@ export function demonessTemporalPhase(encounter) {
   }
   if (progress < 0.2) {
     const reach = ramp(progress, 0, 0.2);
-    const framePosition = reach * 3;
+    const framePosition = reach * 7;
     return Object.freeze({
       phase: 'cold-ramp',
       strength: 0.45 + reach * 0.55,
-      impactStrength: ramp(reach, 0.92, 1),
+      impactStrength: ramp(reach, 0.97, 1),
       reach,
-      frame: Math.min(3, Math.floor(framePosition)),
+      frame: Math.min(7, Math.floor(framePosition)),
       framePosition,
     });
   }
   if (progress < 0.8) {
-    const framePosition = ramp(progress, 0.2, 0.8) * 3.999;
-    return Object.freeze({ phase: 'cold-hold', strength: 1, impactStrength: 1, reach: 1, frame: Math.min(3, Math.floor(framePosition)), framePosition });
+    const framePosition = ramp(progress, 0.2, 0.8) * 7.999;
+    return Object.freeze({ phase: 'cold-hold', strength: 1, impactStrength: 1, reach: 1, frame: Math.min(7, Math.floor(framePosition)), framePosition });
   }
   const release = ramp(progress, 0.8, 1);
-  const framePosition = 3 * (1 - release);
+  const framePosition = 7 * (1 - release);
   return Object.freeze({ phase: 'cold-release', strength: 1 - release, impactStrength: 1 - release, reach: 1, frame: Math.max(0, Math.floor(framePosition)), framePosition });
 }
 
@@ -353,11 +323,26 @@ export function demonessTemporalPhase(encounter) {
 export class CharacterScene {
   /** @param {{imageFactory?:(()=>HTMLImageElement|null)}=} options */
   constructor(options = {}) {
-    this.servantBitmap = new OptionalBitmap(ASH_SERVANT_ATLAS_URL, { ...options, autoLoad: false });
-    this.demonessBitmap = new OptionalBitmap(DEMONESS_ATLAS_URL, { ...options, autoLoad: false });
-    this.hostBitmap = new OptionalBitmap(INFERNO_HOST_URL, { ...options, autoLoad: false });
+    this.servantBitmaps = Object.fromEntries(Object.entries(ASH_SERVANT_ATLAS_URLS).map(([clip, url]) => [clip, new OptionalBitmap(url, { ...options, autoLoad: false })]));
+    this.demonessBitmaps = Object.fromEntries(Object.entries(DEMONESS_ATLAS_URLS).map(([clip, url]) => [clip, new OptionalBitmap(url, { ...options, autoLoad: false })]));
+    this.servantBitmap = this.servantBitmaps.idle;
+    this.demonessBitmap = this.demonessBitmaps.idle;
+    this.hostBitmaps = Object.fromEntries(Object.entries(INFERNO_HOST_URLS).map(([part, url]) => [part, new OptionalBitmap(url, { ...options, autoLoad: false })]));
+    this.hostBitmap = this.hostBitmaps.main;
     this.servantAnimator = new SpriteAnimator(SERVANT_CLIPS, 'appearance');
     this.demonessAnimator = new SpriteAnimator(DEMONESS_CLIPS, 'appearance');
+    this.hostAnimators = {
+      main: new SpriteAnimator({ ambient: { fps: 2, loop: true, frames: gridFrames(3, 5, 304, 256) } }, 'ambient'),
+      sentinel: new SpriteAnimator({ ambient: { fps: 2, loop: true, frames: gridFrames(3, 5, 304, 256) } }, 'ambient'),
+    };
+    this.hostAnimators.sentinel.elapsed = 0.67;
+    this.hostAnimator = this.hostAnimators.main;
+    this.servantAssetKey = 'idle';
+    this.servantReadyKey = 'idle';
+    this.demonessAssetKey = 'idle';
+    this.demonessReadyKey = 'idle';
+    this.servantPendingFrame = 0;
+    this.demonessPendingFrame = 0;
     this.servantVisible = false;
     this.demonessVisible = false;
     this.demonessRevealed = false;
@@ -388,19 +373,69 @@ export class CharacterScene {
   async prepareCriticalAssets() { return true; }
   async retryCriticalAssets() { return true; }
 
+  /** Decode an upcoming clip without changing the currently rendered atlas. */
+  /** @param {'servant'|'demoness'} kind @param {string} key */
+  warmClipAsset(kind, key) {
+    const bitmaps = kind === 'servant' ? this.servantBitmaps : this.demonessBitmaps;
+    bitmaps[key].startLoad();
+  }
+
+  /** @param {'servant'|'demoness'} kind @param {string} key */
+  requestClipAsset(kind, key) {
+    const bitmaps = kind === 'servant' ? this.servantBitmaps : this.demonessBitmaps;
+    const assetKey = `${kind}AssetKey`;
+    const readyKey = `${kind}ReadyKey`;
+    const bitmap = bitmaps[key];
+    if (this[assetKey] === key && this[readyKey] === key && bitmap.isReady()) return;
+    if (this[assetKey] !== key) {
+      const animator = kind === 'servant' ? this.servantAnimator : this.demonessAnimator;
+      this[`${kind}PendingFrame`] = animator.getFrameIndex();
+      this[assetKey] = key;
+    }
+    const settle = bitmap.startLoad();
+    const commit = () => {
+      if (!bitmap.isReady() || this[assetKey] !== key) return;
+      this[readyKey] = key;
+      for (const [otherKey, other] of Object.entries(bitmaps)) if (otherKey !== key) other.release();
+    };
+    if (bitmap.isReady()) commit();
+    else settle.then(commit);
+  }
+
+  /** @param {'servant'|'demoness'} kind */
+  activeBitmap(kind) {
+    const bitmaps = kind === 'servant' ? this.servantBitmaps : this.demonessBitmaps;
+    return bitmaps[this[`${kind}ReadyKey`]];
+  }
+
+  /** Keep the previous atlas on a stable authored frame while a requested clip decodes. */
+  activeFrame(kind) {
+    const animator = kind === 'servant' ? this.servantAnimator : this.demonessAnimator;
+    if (this[`${kind}ReadyKey`] === this[`${kind}AssetKey`]) return animator.getFrame();
+    const frames = kind === 'servant' ? eightFrames : demonessEightFrames;
+    return frames[this[`${kind}PendingFrame`] % frames.length];
+  }
+
   /** @param {any} state */
   setState(state) {
-    if ((state.stage === 2 && state.stageProgress >= 0.6) || state.stage > 2) this.servantBitmap.startLoad();
-    if ((state.stage === 3 && state.stageProgress >= 0.6) || state.stage > 3) this.demonessBitmap.startLoad();
-    if ((state.stage === 5 && state.stageProgress >= 0.6) || state.stage > 5) this.hostBitmap.startLoad();
+    if (this.servantAssetKey === 'idle' && ((state.stage === 2 && state.stageProgress >= 0.6) || state.stage > 2)) this.requestClipAsset('servant', 'idle');
+    if (this.demonessAssetKey === 'idle' && ((state.stage === 3 && state.stageProgress >= 0.6) || state.stage > 3)) this.requestClipAsset('demoness', 'idle');
+    if ((state.stage === 5 && state.stageProgress >= 0.6) || state.stage > 5) for (const bitmap of Object.values(this.hostBitmaps)) bitmap.startLoad();
     this.paused = Boolean(state.paused);
     if (state.hostLevel === 2 && this.previousHostLevel < 2) this.hostEntryAge = 0;
     this.previousHostLevel = state.hostLevel;
     this.servantAnimator.setPaused(this.paused);
     this.demonessAnimator.setPaused(this.paused);
+    for (const animator of Object.values(this.hostAnimators)) animator.setPaused(this.paused);
     const encounters = Array.isArray(state.encounters) ? state.encounters : [];
     const servantEncounter = encounters.find((item) => item.kind === 'servant') ?? null;
     const demonessEncounter = encounters.find((item) => item.kind === 'demoness') ?? null;
+    if (state.stage >= 3 && !servantEncounter) this.warmClipAsset('servant', 'inhale');
+    if (servantEncounter?.phase === 'telegraph') this.warmClipAsset('servant', 'blow');
+    if (servantEncounter?.phase === 'active' && servantEncounter.progress >= 0.35) this.warmClipAsset('servant', 'recovery');
+    if (state.stage >= 5 && !demonessEncounter) this.warmClipAsset('demoness', 'cast');
+    if (demonessEncounter?.phase === 'telegraph') this.warmClipAsset('demoness', 'hold');
+    if (demonessEncounter?.phase === 'active' && demonessEncounter.progress >= 0.35) this.warmClipAsset('demoness', 'recovery');
     const servantRequested = state.stage < 3 ? 'hidden' : servantEncounter ? servantEncounter.phase === 'telegraph' ? 'inhale' : 'blow' : 'idle';
     const demonessRequested = state.stage < 4
       ? 'hidden'
@@ -423,21 +458,23 @@ export class CharacterScene {
       : 0;
 
     if (servantEnding) {
-      this.servantRecoveryRemaining = 0.45;
+      this.requestClipAsset('servant', 'recovery');
+      this.servantRecoveryRemaining = 0.8;
       this.servantVisible = true;
       this.servantDisplay = 'recovery';
       this.servantStrength = 0;
-      this.servantAnimator.setClip('blow-settle', true);
+      this.servantAnimator.setClip('recovery', true);
     }
     if (demonessEnding) {
-      this.demonessRecoveryRemaining = 0.8;
+      this.requestClipAsset('demoness', 'recovery');
+      this.demonessRecoveryRemaining = 1;
       this.demonessVisible = true;
       this.demonessRevealed = true;
       this.demonessDisplay = 'recovery';
       this.demonessStrength = 0;
       this.demonessImpactStrength = 0;
       this.demonessSpellReach = 0;
-      this.demonessAnimator.setClip('settle', true);
+      this.demonessAnimator.setClip('recovery', true);
     } else if (demonessStageExit) {
       this.demonessExitRemaining = DEMONESS_STAGE_EXIT_DURATION;
       this.demonessVisible = true;
@@ -453,10 +490,11 @@ export class CharacterScene {
     if (this.servantDisplay !== 'appearance' && servantEncounter) {
       const temporal = servantTemporalPhase(servantEncounter);
       const clip = servantEncounter.phase === 'telegraph' ? 'inhale' : 'blow';
+      this.requestClipAsset('servant', clip);
       this.servantDisplay = temporal.phase;
       this.servantStrength = temporal.strength;
       this.servantAnimator.setClip(clip);
-      this.servantAnimator.elapsed = temporal.frame / this.servantAnimator.clip.fps;
+      this.servantAnimator.elapsed = temporal.framePosition / this.servantAnimator.clip.fps;
     } else if (!servantEncounter && this.servantRecoveryRemaining <= 0 && this.servantDisplay !== 'appearance') {
       this.servantStrength = 0;
     }
@@ -464,6 +502,7 @@ export class CharacterScene {
     if (this.demonessDisplay !== 'appearance' && this.demonessDisplay !== 'silhouette' && demonessEncounter) {
       const temporal = demonessTemporalPhase(demonessEncounter);
       const clip = demonessEncounter.phase === 'telegraph' ? 'cast' : 'hold';
+      this.requestClipAsset('demoness', clip);
       this.demonessDisplay = temporal.phase;
       this.demonessStrength = temporal.strength;
       this.demonessImpactStrength = temporal.impactStrength;
@@ -486,6 +525,7 @@ export class CharacterScene {
       return;
     }
     if (!this.servantVisible) {
+      this.requestClipAsset('servant', 'idle');
       this.servantVisible = true;
       this.servantDisplay = 'appearance';
       this.servantAnimator.setClip('appearance', true);
@@ -527,6 +567,7 @@ export class CharacterScene {
     }
     this.demonessVisible = true;
     if (!this.demonessRevealed) {
+      this.requestClipAsset('demoness', 'idle');
       this.demonessRevealed = true;
       this.demonessDisplay = 'appearance';
       this.demonessAnimator.setClip('appearance', true);
@@ -550,6 +591,7 @@ export class CharacterScene {
     const step = clamp(dt, 0, 0.05);
     if (this.servantDisplay !== 'hidden') this.servantAnimator.update(step);
     if (this.demonessDisplay !== 'hidden' && this.demonessDisplay !== 'silhouette' && this.demonessDisplay !== 'stage-exit') this.demonessAnimator.update(step);
+    if (this.previousHostLevel > 0) for (const animator of Object.values(this.hostAnimators)) animator.update(step);
     if (this.servantDisplay === 'appearance' && this.servantAnimator.isComplete()) {
       this.servantDisplay = 'idle';
       this.servantAnimator.setClip(this.servantDisplay, true);
@@ -560,19 +602,33 @@ export class CharacterScene {
     }
     if (this.servantRecoveryRemaining > 0) {
       this.servantRecoveryRemaining = Math.max(0, this.servantRecoveryRemaining - step);
-      this.servantDisplay = this.servantRecoveryRemaining > 0 ? 'recovery' : 'idle';
       this.servantStrength = 0;
-      this.servantAnimator.setClip(this.servantRecoveryRemaining > 0 ? 'blow-settle' : 'idle');
-      if (this.servantRecoveryRemaining === 0) this.setServantState(this.servantRequested);
+      if (this.servantRecoveryRemaining > 0) {
+        this.servantDisplay = 'recovery';
+        this.servantAnimator.setClip('recovery');
+      } else {
+        // Capture the final recovery frame before switching the animator. If
+        // idle is not decoded yet, activeFrame() keeps this exact pose stable.
+        this.requestClipAsset('servant', 'idle');
+        this.servantDisplay = 'idle';
+        this.servantAnimator.setClip('idle');
+        this.setServantState(this.servantRequested);
+      }
     }
     if (this.demonessRecoveryRemaining > 0) {
       this.demonessRecoveryRemaining = Math.max(0, this.demonessRecoveryRemaining - step);
-      this.demonessDisplay = this.demonessRecoveryRemaining > 0 ? 'recovery' : 'idle';
       this.demonessStrength = 0;
       this.demonessImpactStrength = 0;
       this.demonessSpellReach = 0;
-      this.demonessAnimator.setClip(this.demonessRecoveryRemaining > 0 ? 'settle' : 'idle');
-      if (this.demonessRecoveryRemaining === 0) this.setDemonessState(this.demonessRequested);
+      if (this.demonessRecoveryRemaining > 0) {
+        this.demonessDisplay = 'recovery';
+        this.demonessAnimator.setClip('recovery');
+      } else {
+        this.requestClipAsset('demoness', 'idle');
+        this.demonessDisplay = 'idle';
+        this.demonessAnimator.setClip('idle');
+        this.setDemonessState(this.demonessRequested);
+      }
     }
     if (this.demonessExitRemaining > 0) {
       this.demonessExitRemaining = Math.max(0, this.demonessExitRemaining - step);
@@ -583,6 +639,7 @@ export class CharacterScene {
     }
     if (this.demonessDisplay === 'disapproval' && this.demonessAnimator.isComplete()) {
       this.demonessDisplay = 'idle';
+      this.requestClipAsset('demoness', 'idle');
       this.demonessAnimator.setClip('idle', true);
       this.demonessDisapprovalCount += 1;
       this.demonessNextDisapproval = DEMONESS_DISAPPROVAL_INTERVALS[this.demonessDisapprovalCount % DEMONESS_DISAPPROVAL_INTERVALS.length];
@@ -620,35 +677,37 @@ export class CharacterScene {
 
   /** @param {CanvasRenderingContext2D} context @param {any} state @param {number} timeSeconds */
   draw(context, state, timeSeconds) {
-    if (state.hostLevel > 0 && this.hostBitmap.image && this.hostBitmap.isReady()) {
-      const image = this.hostBitmap.image;
-      const scale = 1080 / 1024;
-      const originY = 515;
+    if (state.hostLevel > 0) {
       context.save();
       const entryLinear = state.hostLevel === 2 && this.hostEntryAge < 1.5 ? clamp(this.hostEntryAge / 1.5, 0, 1) : 1;
       const entry = entryLinear * entryLinear * (3 - 2 * entryLinear);
       context.globalAlpha = state.hostLevel === 1 ? 0.58 : 0.24 + entry * 0.76;
       context.filter = state.hostLevel === 1 ? 'brightness(.78) contrast(1.08) saturate(.9) drop-shadow(0 0 16px rgba(175,49,23,.46))' : 'brightness(1.34) contrast(1.16) saturate(1.2) drop-shadow(0 0 28px rgba(255,103,42,.82))';
       if (state.hostLevel === 1) { context.beginPath(); context.rect(0, 720, 1080, 620); context.clip(); }
-      for (const region of INFERNO_HOST_REGIONS) {
-        const motion = hostMotionForRegion(region, timeSeconds, Boolean(state.reducedMotion));
-        const width = region.w * scale;
-        const height = region.h * scale;
-        const side = region.id.startsWith('left') ? -1 : region.id.startsWith('right') ? 1 : 0;
-        const centerX = region.x * scale + width / 2 + side * (1 - entry) * 36;
-        const centerY = originY + region.y * scale + height / 2 + motion.hover + (1 - entry) * (region.role === 'crown' ? -24 : 18);
-        context.save();
-        context.translate(centerX, centerY);
-        context.rotate(motion.rotation);
-        const entryScale = 0.94 + entry * 0.06;
-        context.scale(motion.scaleX * entryScale, motion.scaleY * entryScale);
-        context.drawImage(image, region.x, region.y, region.w, region.h, -width / 2, -height / 2, width, height);
-        context.restore();
+      const hostParts = [
+        { key: 'sentinel', region: INFERNO_HOST_REGIONS[0], anchorX: 540, anchorY: 900, width: 330, height: 360 },
+        { key: 'main', region: INFERNO_HOST_REGIONS[1], anchorX: 655, anchorY: 1_285, width: 720, height: 650 },
+      ];
+      for (const part of hostParts) {
+        const bitmap = this.hostBitmaps[part.key];
+        if (!bitmap.image || !bitmap.isReady()) continue;
+        const motion = hostMotionForRegion(part.region, timeSeconds, Boolean(state.reducedMotion));
+        drawSpriteFrame(context, bitmap.image, this.hostAnimators[part.key].getFrame(), {
+          anchorX: part.anchorX,
+          anchorY: part.anchorY + (1 - entry) * 32 + motion.hover,
+          width: part.width,
+          height: part.height,
+          pivot: [0.5, 1],
+          scaleX: (0.94 + entry * 0.06) * motion.scaleX,
+          scaleY: (0.94 + entry * 0.06) * motion.scaleY,
+          rotation: motion.rotation,
+        });
       }
       context.restore();
     }
 
-    if (this.demonessVisible && this.demonessBitmap.image && this.demonessBitmap.isReady()) {
+    const demonessBitmap = this.activeBitmap('demoness');
+    if (this.demonessVisible && demonessBitmap.image && demonessBitmap.isReady()) {
       const active = this.demonessStrength > 0 || this.demonessDisplay === 'arms-rise' || this.demonessDisplay.startsWith('cast');
       const silhouette = this.demonessDisplay === 'silhouette';
       const placement = DEMONESS_PLACEMENT;
@@ -670,14 +729,14 @@ export class CharacterScene {
         context.fillRect(placement.anchorX - 380, placement.anchorY - placement.height - 90, 660, placement.height + 120);
         context.restore();
       }
-      drawTemporalCharacter(context, this.demonessBitmap.image, this.demonessAnimator, {
+      drawTemporalCharacter(context, demonessBitmap.image, this.activeFrame('demoness'), {
         ...placement, pivot: DEMONESS_PIVOT, alpha: this.getDemonessOpacity(), filter: demonessFilter,
       });
       if (disapproval) drawDisapprovalCue(context, timeSeconds, placement, disapproval);
       if (this.demonessStrength > 0) {
         const snapshot = this.demonessAnimator.snapshot();
         const origin = socketWorld(placement, demonessHandSocket(snapshot.clip, snapshot.frame), DEMONESS_PIVOT);
-        const leading = drawColdRibbon(
+        const leading = drawIceShards(
           context,
           timeSeconds,
           this.demonessStrength * (state.reducedMotion ? 0.6 : 1),
@@ -685,13 +744,21 @@ export class CharacterScene {
           this.flameTarget,
           this.demonessSpellReach,
         );
-        this.spellGeometry = Object.freeze({ origin: Object.freeze(origin), target: this.flameTarget, leading: Object.freeze(leading), contact: this.demonessSpellReach >= 0.92 });
+        const contact = this.demonessSpellReach >= 0.97;
+        this.spellGeometry = Object.freeze({
+          origin: Object.freeze(origin),
+          target: this.flameTarget,
+          leading: Object.freeze(leading),
+          contact,
+          contactPoint: contact ? Object.freeze(leading) : null,
+        });
       } else {
         this.spellGeometry = Object.freeze({ origin: null, target: this.flameTarget, leading: null, contact: false });
       }
     }
 
-    if (this.servantVisible && this.servantBitmap.image && this.servantBitmap.isReady()) {
+    const servantBitmap = this.activeBitmap('servant');
+    if (this.servantVisible && servantBitmap.image && servantBitmap.isReady()) {
       const active = this.servantStrength > 0;
       const placement = SERVANT_PLACEMENT;
       context.save();
@@ -705,13 +772,37 @@ export class CharacterScene {
       const appearanceOpacity = this.servantDisplay === 'appearance'
         ? smoothstep(this.servantAnimator.elapsed / SERVANT_APPEARANCE_DURATION)
         : 1;
-      drawTemporalCharacter(context, this.servantBitmap.image, this.servantAnimator, {
+      drawTemporalCharacter(context, servantBitmap.image, this.activeFrame('servant'), {
         ...placement, pivot: SERVANT_PIVOT, alpha: 0.98 * appearanceOpacity,
         filter: active ? 'brightness(1.28) contrast(1.08) saturate(1.12) drop-shadow(12px 0 24px rgba(255,132,52,.72))' : 'brightness(1.24) contrast(1.08) saturate(1.08) drop-shadow(0 0 22px rgba(255,126,45,.62))',
       });
       if (this.servantInhaleStrength > 0) drawInhaleAir(context, timeSeconds, this.servantInhaleStrength * (state.reducedMotion ? 0.55 : 1), socketWorld(placement, SERVANT_MOUTH, SERVANT_PIVOT));
-      if (active) drawDirectedAsh(context, timeSeconds, this.servantStrength * (state.reducedMotion ? 0.55 : 1), socketWorld(placement, SERVANT_MOUTH, SERVANT_PIVOT));
+      if (active) drawScarletSnowflakes(context, timeSeconds, this.servantStrength * (state.reducedMotion ? 0.55 : 1), socketWorld(placement, SERVANT_MOUTH, SERVANT_PIVOT), this.flameTarget);
     }
+  }
+
+  /** Steam starts only after the travelling ice reaches the live flame anchor. */
+  /** @param {CanvasRenderingContext2D} context @param {number} timeSeconds @param {boolean=} reducedMotion */
+  drawImpactFx(context, timeSeconds, reducedMotion = false) {
+    if (this.demonessImpactStrength <= 0 || !this.spellGeometry.contact) return;
+    const impactPoint = this.spellGeometry.contactPoint ?? this.flameTarget;
+    const count = reducedMotion ? 5 : 10;
+    context.save();
+    context.globalCompositeOperation = 'source-over';
+    for (let index = 0; index < count; index += 1) {
+      const age = ((timeSeconds * (0.38 + index * 0.009) + index * 0.137) % 1 + 1) % 1;
+      const spread = Math.sin(index * 4.17) * (10 + age * 24);
+      const x = impactPoint.x + spread;
+      const y = impactPoint.y - age * (125 + index % 3 * 24);
+      const radius = 11 + age * 25;
+      context.fillStyle = `rgba(${178 + index % 3 * 12},${211 + index % 2 * 16},224,${Math.pow(1 - age, 0.55) * 0.7 * this.demonessImpactStrength})`;
+      context.shadowColor = 'rgba(210,241,244,.58)';
+      context.shadowBlur = 18;
+      context.beginPath();
+      context.ellipse(x, y, radius * 1.25, radius, Math.sin(index) * 0.3, 0, Math.PI * 2);
+      context.fill();
+    }
+    context.restore();
   }
 
   getDiagnostics() {
@@ -728,7 +819,9 @@ export class CharacterScene {
         anchor: [SERVANT_PLACEMENT.anchorX, SERVANT_PLACEMENT.anchorY],
         size: [SERVANT_PLACEMENT.width, SERVANT_PLACEMENT.height],
         ...this.servantAnimator.snapshot(),
-        asset: this.servantBitmap.status,
+        asset: this.activeBitmap('servant').status,
+        assetClip: this.servantReadyKey,
+        residentClips: Object.entries(this.servantBitmaps).filter(([, bitmap]) => bitmap.isReady()).map(([clip]) => clip),
       }),
       demoness: Object.freeze({
         visible: this.demonessVisible,
@@ -752,9 +845,20 @@ export class CharacterScene {
         size: [DEMONESS_PLACEMENT.width, DEMONESS_PLACEMENT.height],
         spell: this.spellGeometry,
         ...this.demonessAnimator.snapshot(),
-        asset: this.demonessBitmap.status,
+        asset: this.activeBitmap('demoness').status,
+        assetClip: this.demonessReadyKey,
+        residentClips: Object.entries(this.demonessBitmaps).filter(([, bitmap]) => bitmap.isReady()).map(([clip]) => clip),
       }),
-      host: Object.freeze({ asset: this.hostBitmap.status, regions: INFERNO_HOST_REGIONS.length, wholePlateOnly: false, entryProgress: this.hostEntryAge < 1.5 ? this.hostEntryAge / 1.5 : 1, entryDurationMs: 1_500 }),
+      host: Object.freeze({
+        asset: Object.values(this.hostBitmaps).every((bitmap) => bitmap.isReady()) ? 'ready' : Object.values(this.hostBitmaps).some((bitmap) => bitmap.status === 'loading') ? 'loading' : 'idle',
+        regions: INFERNO_HOST_REGIONS.length,
+        authoredFrames: 5,
+        frames: Object.freeze(Object.fromEntries(Object.entries(this.hostAnimators).map(([key, animator]) => [key, animator.getFrameIndex()]))),
+        parts: Object.freeze(Object.fromEntries(Object.entries(this.hostBitmaps).map(([key, bitmap]) => [key, bitmap.status]))),
+        wholePlateOnly: false,
+        entryProgress: this.hostEntryAge < 1.5 ? this.hostEntryAge / 1.5 : 1,
+        entryDurationMs: 1_500,
+      }),
       reaction: this.getFlameReaction(),
     });
   }
