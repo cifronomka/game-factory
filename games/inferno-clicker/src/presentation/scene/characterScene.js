@@ -283,6 +283,10 @@ function requestedDemonessClip(requested) { return requested === 'cast' ? 'cast'
 function clamp(value, low, high) { return Math.max(low, Math.min(high, value)); }
 /** @param {number} value @param {number} from @param {number} to */
 function ramp(value, from, to) { return clamp((value - from) / (to - from), 0, 1); }
+/** @param {number} value */
+function smoothstep(value) { const progress = clamp(value, 0, 1); return progress * progress * (3 - 2 * progress); }
+
+const DEMONESS_STAGE_EXIT_DURATION = 0.9;
 
 /** Authoritative Cycle 04 telegraph/effect phase mapper. */
 export function servantTemporalPhase(encounter) {
@@ -357,6 +361,7 @@ export class CharacterScene {
     this.spellGeometry = Object.freeze({ origin: null, target: this.flameTarget, leading: null, contact: false });
     this.servantRecoveryRemaining = 0;
     this.demonessRecoveryRemaining = 0;
+    this.demonessExitRemaining = 0;
     this.servantWasActive = false;
     this.demonessWasActive = false;
     this.demonessIdleTime = 0;
@@ -392,8 +397,13 @@ export class CharacterScene {
     this.demonessRequested = demonessRequested;
     const servantEnding = this.servantWasActive && !servantEncounter;
     const demonessEnding = this.demonessWasActive && !demonessEncounter;
+    const demonessExitActive = this.demonessExitRemaining > 0;
+    const demonessStageExit = !demonessEnding
+      && !demonessExitActive
+      && demonessRequested === 'silhouette'
+      && this.demonessRevealed;
     if (!servantEnding && this.servantRecoveryRemaining <= 0) this.setServantState(servantRequested);
-    if (!demonessEnding && this.demonessRecoveryRemaining <= 0) this.setDemonessState(demonessRequested);
+    if (!demonessEnding && !demonessExitActive && !demonessStageExit && this.demonessRecoveryRemaining <= 0) this.setDemonessState(demonessRequested);
     this.servantInhaleStrength = servantEncounter?.phase === 'telegraph'
       ? servantEncounter.progress < 0.15 ? 0 : servantEncounter.progress < 0.7 ? ramp(servantEncounter.progress, 0.15, 0.7) : 0.35
       : 0;
@@ -410,6 +420,15 @@ export class CharacterScene {
       this.demonessVisible = true;
       this.demonessRevealed = true;
       this.demonessDisplay = 'recovery';
+      this.demonessStrength = 0;
+      this.demonessImpactStrength = 0;
+      this.demonessSpellReach = 0;
+      this.demonessAnimator.setClip('settle', true);
+    } else if (demonessStageExit) {
+      this.demonessExitRemaining = DEMONESS_STAGE_EXIT_DURATION;
+      this.demonessVisible = true;
+      this.demonessRevealed = true;
+      this.demonessDisplay = 'stage-exit';
       this.demonessStrength = 0;
       this.demonessImpactStrength = 0;
       this.demonessSpellReach = 0;
@@ -541,6 +560,15 @@ export class CharacterScene {
       this.demonessAnimator.setClip(this.demonessRecoveryRemaining > 0 ? 'settle' : 'idle');
       if (this.demonessRecoveryRemaining === 0) this.setDemonessState(this.demonessRequested);
     }
+    if (this.demonessExitRemaining > 0) {
+      this.demonessExitRemaining = Math.max(0, this.demonessExitRemaining - step);
+      this.demonessDisplay = this.demonessExitRemaining > 0 ? 'stage-exit' : 'silhouette';
+      this.demonessStrength = 0;
+      this.demonessImpactStrength = 0;
+      this.demonessSpellReach = 0;
+      this.demonessAnimator.setClip(this.demonessExitRemaining > 0 ? 'settle' : 'appearance');
+      if (this.demonessExitRemaining === 0) this.setDemonessState(this.demonessRequested);
+    }
     if (this.demonessDisplay === 'disapproval' && this.demonessAnimator.isComplete()) {
       this.demonessDisplay = 'idle';
       this.demonessAnimator.setClip('idle', true);
@@ -613,7 +641,13 @@ export class CharacterScene {
       const silhouette = this.demonessDisplay === 'silhouette';
       const placement = DEMONESS_PLACEMENT;
       const disapproval = this.demonessDisplay === 'disapproval' ? demonessDisapprovalGesture(this.demonessAnimator.elapsed) : null;
-      const demonessFilter = silhouette ? 'brightness(.12) saturate(.45)' : active ? 'brightness(1.16) contrast(1.05) saturate(.96) drop-shadow(0 0 28px rgba(91,218,218,.72))' : 'brightness(1.16) contrast(1.03) saturate(1.05) drop-shadow(0 0 22px rgba(192,55,28,.5))';
+      const exitProgress = this.getDemonessExitProgress();
+      const exitShade = smoothstep(exitProgress);
+      const demonessFilter = silhouette
+        ? 'brightness(.12) saturate(.45)'
+        : this.demonessDisplay === 'stage-exit'
+          ? `brightness(${(1.16 - exitShade * 1.04).toFixed(3)}) contrast(${(1.03 - exitShade * 0.03).toFixed(3)}) saturate(${(1.05 - exitShade * 0.6).toFixed(3)}) drop-shadow(0 0 ${Math.round(22 - exitShade * 10)}px rgba(192,55,28,${(0.5 * (1 - exitShade)).toFixed(3)}))`
+          : active ? 'brightness(1.16) contrast(1.05) saturate(.96) drop-shadow(0 0 28px rgba(91,218,218,.72))' : 'brightness(1.16) contrast(1.03) saturate(1.05) drop-shadow(0 0 22px rgba(192,55,28,.5))';
       if (active) {
         context.save();
         context.globalCompositeOperation = 'screen';
@@ -626,7 +660,7 @@ export class CharacterScene {
         context.restore();
       }
       drawTemporalCharacter(context, this.demonessBitmap.image, this.demonessAnimator, {
-        ...placement, pivot: DEMONESS_PIVOT, alpha: silhouette ? 0.5 : 0.97, filter: demonessFilter,
+        ...placement, pivot: DEMONESS_PIVOT, alpha: this.getDemonessOpacity(), filter: demonessFilter,
       });
       if (disapproval) drawDisapprovalCue(context, timeSeconds, placement, disapproval);
       if (this.demonessStrength > 0) {
@@ -678,6 +712,8 @@ export class CharacterScene {
         impactStrength: this.demonessImpactStrength,
         spellReach: this.demonessSpellReach,
         recoveryMs: Math.round(this.demonessRecoveryRemaining * 1_000),
+        exitMs: Math.round(this.demonessExitRemaining * 1_000),
+        opacity: this.getDemonessOpacity(),
         idleTime: this.demonessIdleTime,
         disapprovalCount: this.demonessDisapprovalCount,
         nextDisapprovalMs: Math.max(0, Math.round(this.demonessNextDisapproval * 1_000)),
@@ -693,5 +729,18 @@ export class CharacterScene {
       host: Object.freeze({ asset: this.hostBitmap.status, regions: INFERNO_HOST_REGIONS.length, wholePlateOnly: false, entryProgress: this.hostEntryAge < 1.5 ? this.hostEntryAge / 1.5 : 1, entryDurationMs: 1_500 }),
       reaction: this.getFlameReaction(),
     });
+  }
+
+  getDemonessExitProgress() {
+    return this.demonessExitRemaining > 0
+      ? clamp(1 - this.demonessExitRemaining / DEMONESS_STAGE_EXIT_DURATION, 0, 1)
+      : this.demonessDisplay === 'silhouette' ? 1 : 0;
+  }
+
+  getDemonessOpacity() {
+    if (!this.demonessVisible) return 0;
+    if (this.demonessDisplay === 'silhouette') return 0.5;
+    if (this.demonessDisplay === 'stage-exit') return 0.97 - smoothstep(this.getDemonessExitProgress()) * 0.47;
+    return 0.97;
   }
 }

@@ -170,6 +170,39 @@ test('stage-down waits for authored recovery before hiding or returning to silho
   assert.equal(silhouetteScene.getDiagnostics().demoness.revealed, false);
 });
 
+test('Stage 5 to 4 keeps a visible preframe and fades through intermediate opacity states', () => {
+  const scene = new CharacterScene();
+  scene.setState(state({ stage: 5 }));
+  advance(scene, 0.75);
+  const preframe = scene.getDiagnostics().demoness;
+  assert.equal(preframe.visible, true);
+  assert.equal(preframe.opacity, 0.97);
+
+  scene.setState(state({ stage: 4 }));
+  const transitionStart = scene.getDiagnostics().demoness;
+  assert.equal(transitionStart.visible, true);
+  assert.equal(transitionStart.revealed, true);
+  assert.equal(transitionStart.state, 'stage-exit');
+  assert.equal(transitionStart.opacity, preframe.opacity, 'first transition frame does not pop');
+
+  const opacitySamples = [];
+  for (let index = 0; index < 18; index += 1) {
+    scene.setState(state({ stage: 4 }));
+    scene.update(0.05);
+    opacitySamples.push(scene.getDiagnostics().demoness.opacity);
+  }
+  const intermediate = opacitySamples.filter((opacity) => opacity > 0.5 && opacity < 0.97);
+  assert.ok(new Set(intermediate.map((opacity) => opacity.toFixed(4))).size >= 3);
+  for (let index = 1; index < opacitySamples.length; index += 1) {
+    assert.ok(opacitySamples[index] <= opacitySamples[index - 1], 'opacity never jumps brighter during exit');
+  }
+  const silhouette = scene.getDiagnostics().demoness;
+  assert.equal(silhouette.visible, true);
+  assert.equal(silhouette.state, 'silhouette');
+  assert.equal(silhouette.revealed, false);
+  assert.equal(silhouette.opacity, 0.5);
+});
+
 test('active Demoness effect remains revealed when heat falls back to Stage 4', () => {
   const scene = new CharacterScene();
   scene.setState(state({ stage: 5 }));
