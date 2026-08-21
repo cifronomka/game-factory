@@ -3,8 +3,9 @@ import { spawnSync } from 'node:child_process';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-export const gameRoot = new URL('..', import.meta.url).pathname.replace(/\/$/, '');
+export const gameRoot = fileURLToPath(new URL('..', import.meta.url)).replace(/[\\/]+$/, '');
 
 export async function walk(root, predicate = () => true) {
   const entries = [];
