@@ -6,6 +6,14 @@ import { SaveCoordinator } from '../../src/app/saveCoordinator.js';
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function waitUntil(predicate, timeoutMs = 250) {
+  const deadline = Date.now() + timeoutMs;
+  while (!predicate()) {
+    if (Date.now() >= deadline) throw new Error('Timed out waiting for asynchronous work');
+    await wait(2);
+  }
+}
+
 test('coalesces a burst and serializes changes arriving during a save', async () => {
   let value = 1;
   let active = 0;
@@ -45,7 +53,7 @@ test('retries a retryable failure with bounded backoff', async () => {
     save: async () => ({ ok: ++attempts >= 3 }),
   });
   coordinator.request();
-  await wait(35);
+  await waitUntil(() => attempts === 3);
   assert.equal(attempts, 3);
   coordinator.dispose();
 });
@@ -62,7 +70,7 @@ test('surfaces a final failure once after bounded retries', async () => {
     onFailure: () => { failures += 1; },
   });
   coordinator.request();
-  await wait(15);
+  await waitUntil(() => failures === 1);
   assert.equal(attempts, 2);
   assert.equal(failures, 1);
   coordinator.dispose();
