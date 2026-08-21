@@ -13,9 +13,9 @@ export function isGameplayPoint(x, y) {
 
 export function sceneTransform(width, height) {
   if (width > height) {
-    const visibleLogicalHeight = height < 420 ? 700 : 1_300;
+    const visibleLogicalHeight = height < 420 ? 820 : 1_300;
     const scale = Math.min(width / LOGICAL_WIDTH, height / visibleLogicalHeight);
-    const focusY = height < 420 ? 1_110 : 1_225;
+    const focusY = height < 420 ? 1_055 : 1_225;
     return { scale, left: (width - LOGICAL_WIDTH * scale) / 2, top: height * 0.72 - focusY * scale };
   }
   const scale = Math.min(width / LOGICAL_WIDTH, height / LOGICAL_HEIGHT);

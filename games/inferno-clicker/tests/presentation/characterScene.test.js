@@ -49,6 +49,34 @@ test('servant holds one world anchor and recovers after effect', () => {
   assert.equal(scene.getDiagnostics().servant.state, 'idle');
 });
 
+test('servant appearance fades in and temporally blends authored poses without a full-opacity pop', () => {
+  const scene = new CharacterScene();
+  scene.setState(state({ stage: 2 }));
+  assert.equal(scene.getDiagnostics().servant.visible, false);
+
+  scene.setState(state({ stage: 3 }));
+  const start = scene.getDiagnostics().servant;
+  assert.equal(start.state, 'appearance');
+  assert.equal(start.opacity, 0);
+  assert.equal(start.temporal.mix, 0);
+
+  scene.update(0.05);
+  const first = scene.getDiagnostics().servant;
+  scene.update(0.05);
+  const second = scene.getDiagnostics().servant;
+  assert.ok(first.opacity > 0 && first.opacity < second.opacity);
+  assert.ok(second.opacity < 0.1, 'the character remains a soft reveal during the first 100ms');
+
+  scene.update(0.05);
+  const blended = scene.getDiagnostics().servant;
+  assert.ok(blended.temporal.mix > 0 && blended.temporal.mix < 1, 'adjacent authored poses crossfade at render cadence');
+
+  advance(scene, 0.65);
+  const settled = scene.getDiagnostics().servant;
+  assert.equal(settled.state, 'idle');
+  assert.equal(settled.opacity, 0.98);
+});
+
 test('Demoness Stage 4 silhouette does not consume reveal and cast is restrained phase-driven', () => {
   const scene = new CharacterScene();
   scene.setState(state({ stage: 4 }));

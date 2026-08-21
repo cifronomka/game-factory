@@ -35,7 +35,7 @@ function reverseFrames(frames) { return Object.freeze([...frames].reverse()); }
 const servantInhale = servantRowFrames(ROW.actionA);
 const servantBlow = servantRowFrames(ROW.actionB);
 const SERVANT_CLIPS = Object.freeze({
-  appearance: Object.freeze({ fps: 10, loop: false, frames: servantRowFrames(ROW.appearance) }),
+  appearance: Object.freeze({ fps: 8, loop: false, frames: servantRowFrames(ROW.appearance) }),
   idle: Object.freeze({ fps: 4, loop: true, frames: servantRowFrames(ROW.idle) }),
   inhale: Object.freeze({ fps: 10, loop: false, frames: servantInhale }),
   blow: Object.freeze({ fps: 10, loop: true, frames: servantBlow }),
@@ -62,6 +62,7 @@ const DEMONESS_HOLD_HAND = Object.freeze([
 const DEMONESS_DISAPPROVAL_INTERVALS = Object.freeze([6.4, 8.2, 5.6, 7.3]);
 const DEMONESS_PLACEMENT = Object.freeze({ anchorX: 850, anchorY: 1_235, width: 520, height: 780 });
 const SERVANT_PLACEMENT = Object.freeze({ anchorX: 300, anchorY: 1_225, width: 540, height: 590 });
+const SERVANT_APPEARANCE_DURATION = SERVANT_CLIPS.appearance.frames.length / SERVANT_CLIPS.appearance.fps;
 
 export const INFERNO_HOST_REGIONS = Object.freeze([
   Object.freeze({ id: 'left-wing', x: 0, y: 0, w: 340, h: 360, phase: 0.0, period: 7.7, amplitude: 5, role: 'wing' }),
@@ -701,8 +702,11 @@ export class CharacterScene {
       context.fillStyle = rim;
       context.fillRect(20, 610, 540, 650);
       context.restore();
-      drawSpriteFrame(context, this.servantBitmap.image, this.servantAnimator.getFrame(), {
-        ...placement, pivot: SERVANT_PIVOT, alpha: 0.98,
+      const appearanceOpacity = this.servantDisplay === 'appearance'
+        ? smoothstep(this.servantAnimator.elapsed / SERVANT_APPEARANCE_DURATION)
+        : 1;
+      drawTemporalCharacter(context, this.servantBitmap.image, this.servantAnimator, {
+        ...placement, pivot: SERVANT_PIVOT, alpha: 0.98 * appearanceOpacity,
         filter: active ? 'brightness(1.28) contrast(1.08) saturate(1.12) drop-shadow(12px 0 24px rgba(255,132,52,.72))' : 'brightness(1.24) contrast(1.08) saturate(1.08) drop-shadow(0 0 22px rgba(255,126,45,.62))',
       });
       if (this.servantInhaleStrength > 0) drawInhaleAir(context, timeSeconds, this.servantInhaleStrength * (state.reducedMotion ? 0.55 : 1), socketWorld(placement, SERVANT_MOUTH, SERVANT_PIVOT));
@@ -713,7 +717,19 @@ export class CharacterScene {
   getDiagnostics() {
     const disapproval = this.demonessDisplay === 'disapproval' ? demonessDisapprovalGesture(this.demonessAnimator.elapsed) : null;
     return Object.freeze({
-      servant: Object.freeze({ visible: this.servantVisible, state: this.servantDisplay, strength: this.servantStrength, inhaleStrength: this.servantInhaleStrength, recoveryMs: Math.round(this.servantRecoveryRemaining * 1_000), anchor: [SERVANT_PLACEMENT.anchorX, SERVANT_PLACEMENT.anchorY], size: [SERVANT_PLACEMENT.width, SERVANT_PLACEMENT.height], ...this.servantAnimator.snapshot(), asset: this.servantBitmap.status }),
+      servant: Object.freeze({
+        visible: this.servantVisible,
+        state: this.servantDisplay,
+        opacity: this.servantDisplay === 'appearance' ? 0.98 * smoothstep(this.servantAnimator.elapsed / SERVANT_APPEARANCE_DURATION) : this.servantVisible ? 0.98 : 0,
+        temporal: this.servantAnimator.getBlendSample(),
+        strength: this.servantStrength,
+        inhaleStrength: this.servantInhaleStrength,
+        recoveryMs: Math.round(this.servantRecoveryRemaining * 1_000),
+        anchor: [SERVANT_PLACEMENT.anchorX, SERVANT_PLACEMENT.anchorY],
+        size: [SERVANT_PLACEMENT.width, SERVANT_PLACEMENT.height],
+        ...this.servantAnimator.snapshot(),
+        asset: this.servantBitmap.status,
+      }),
       demoness: Object.freeze({
         visible: this.demonessVisible,
         revealed: this.demonessRevealed,

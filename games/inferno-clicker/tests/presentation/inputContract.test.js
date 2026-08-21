@@ -28,11 +28,13 @@ test('gameplay hit target is central, large and excludes character lanes', () =>
 
 test('short landscape keeps the Demoness hand-to-flame action inside the viewport', () => {
   const transform = sceneTransform(800, 360);
-  const demonessHeadY = 634;
+  const demonessCrownTopY = 482;
   const demonessCastHandY = 646;
+  const demonessFeetY = 1_262;
   const flameBaseY = 1_145;
 
-  assert.ok(transform.top + demonessHeadY * transform.scale >= 0);
+  assert.ok(transform.top + demonessCrownTopY * transform.scale >= 0);
   assert.ok(transform.top + demonessCastHandY * transform.scale >= 0);
+  assert.ok(transform.top + demonessFeetY * transform.scale <= 360);
   assert.ok(transform.top + flameBaseY * transform.scale <= 360);
 });
