@@ -288,6 +288,19 @@ function smoothstep(value) { const progress = clamp(value, 0, 1); return progres
 
 const DEMONESS_STAGE_EXIT_DURATION = 0.9;
 
+/** Stage-exit begins at the exact normal rendered profile and converges to the silhouette profile. */
+function demonessExitVisual(progress) {
+  const shade = smoothstep(progress);
+  return Object.freeze({
+    opacity: 0.97 - shade * 0.47,
+    brightness: 1.16 - shade * 1.04,
+    contrast: 1.03 - shade * 0.03,
+    saturation: 1.05 - shade * 0.6,
+    shadowBlur: Math.round(22 - shade * 10),
+    shadowAlpha: 0.5 * (1 - shade),
+  });
+}
+
 /** Authoritative Cycle 04 telegraph/effect phase mapper. */
 export function servantTemporalPhase(encounter) {
   if (!encounter) return Object.freeze({ phase: 'idle', strength: 0, frame: 0 });
@@ -432,7 +445,6 @@ export class CharacterScene {
       this.demonessStrength = 0;
       this.demonessImpactStrength = 0;
       this.demonessSpellReach = 0;
-      this.demonessAnimator.setClip('settle', true);
     }
     this.servantWasActive = Boolean(servantEncounter?.phase === 'active');
     this.demonessWasActive = Boolean(demonessEncounter?.phase === 'active');
@@ -505,10 +517,11 @@ export class CharacterScene {
       return;
     }
     if (requested === 'silhouette') {
+      const preserveExitPose = this.demonessDisplay === 'stage-exit';
       this.demonessVisible = true;
       this.demonessRevealed = false;
       this.demonessDisplay = 'silhouette';
-      this.demonessAnimator.setClip('appearance', true);
+      if (!preserveExitPose) this.demonessAnimator.setClip('appearance', true);
       return;
     }
     this.demonessVisible = true;
@@ -535,7 +548,7 @@ export class CharacterScene {
     if (this.paused) return;
     const step = clamp(dt, 0, 0.05);
     if (this.servantDisplay !== 'hidden') this.servantAnimator.update(step);
-    if (this.demonessDisplay !== 'hidden' && this.demonessDisplay !== 'silhouette') this.demonessAnimator.update(step);
+    if (this.demonessDisplay !== 'hidden' && this.demonessDisplay !== 'silhouette' && this.demonessDisplay !== 'stage-exit') this.demonessAnimator.update(step);
     if (this.servantDisplay === 'appearance' && this.servantAnimator.isComplete()) {
       this.servantDisplay = 'idle';
       this.servantAnimator.setClip(this.servantDisplay, true);
@@ -562,11 +575,9 @@ export class CharacterScene {
     }
     if (this.demonessExitRemaining > 0) {
       this.demonessExitRemaining = Math.max(0, this.demonessExitRemaining - step);
-      this.demonessDisplay = this.demonessExitRemaining > 0 ? 'stage-exit' : 'silhouette';
       this.demonessStrength = 0;
       this.demonessImpactStrength = 0;
       this.demonessSpellReach = 0;
-      this.demonessAnimator.setClip(this.demonessExitRemaining > 0 ? 'settle' : 'appearance');
       if (this.demonessExitRemaining === 0) this.setDemonessState(this.demonessRequested);
     }
     if (this.demonessDisplay === 'disapproval' && this.demonessAnimator.isComplete()) {
@@ -641,12 +652,11 @@ export class CharacterScene {
       const silhouette = this.demonessDisplay === 'silhouette';
       const placement = DEMONESS_PLACEMENT;
       const disapproval = this.demonessDisplay === 'disapproval' ? demonessDisapprovalGesture(this.demonessAnimator.elapsed) : null;
-      const exitProgress = this.getDemonessExitProgress();
-      const exitShade = smoothstep(exitProgress);
+      const exitVisual = demonessExitVisual(this.getDemonessExitProgress());
       const demonessFilter = silhouette
         ? 'brightness(.12) saturate(.45)'
         : this.demonessDisplay === 'stage-exit'
-          ? `brightness(${(1.16 - exitShade * 1.04).toFixed(3)}) contrast(${(1.03 - exitShade * 0.03).toFixed(3)}) saturate(${(1.05 - exitShade * 0.6).toFixed(3)}) drop-shadow(0 0 ${Math.round(22 - exitShade * 10)}px rgba(192,55,28,${(0.5 * (1 - exitShade)).toFixed(3)}))`
+          ? `brightness(${exitVisual.brightness.toFixed(3)}) contrast(${exitVisual.contrast.toFixed(3)}) saturate(${exitVisual.saturation.toFixed(3)}) drop-shadow(0 0 ${exitVisual.shadowBlur}px rgba(192,55,28,${exitVisual.shadowAlpha.toFixed(3)}))`
           : active ? 'brightness(1.16) contrast(1.05) saturate(.96) drop-shadow(0 0 28px rgba(91,218,218,.72))' : 'brightness(1.16) contrast(1.03) saturate(1.05) drop-shadow(0 0 22px rgba(192,55,28,.5))';
       if (active) {
         context.save();
@@ -714,6 +724,8 @@ export class CharacterScene {
         recoveryMs: Math.round(this.demonessRecoveryRemaining * 1_000),
         exitMs: Math.round(this.demonessExitRemaining * 1_000),
         opacity: this.getDemonessOpacity(),
+        exitVisual: demonessExitVisual(this.getDemonessExitProgress()),
+        temporal: this.demonessAnimator.getBlendSample(),
         idleTime: this.demonessIdleTime,
         disapprovalCount: this.demonessDisapprovalCount,
         nextDisapprovalMs: Math.max(0, Math.round(this.demonessNextDisapproval * 1_000)),
@@ -740,7 +752,7 @@ export class CharacterScene {
   getDemonessOpacity() {
     if (!this.demonessVisible) return 0;
     if (this.demonessDisplay === 'silhouette') return 0.5;
-    if (this.demonessDisplay === 'stage-exit') return 0.97 - smoothstep(this.getDemonessExitProgress()) * 0.47;
+    if (this.demonessDisplay === 'stage-exit') return demonessExitVisual(this.getDemonessExitProgress()).opacity;
     return 0.97;
   }
 }

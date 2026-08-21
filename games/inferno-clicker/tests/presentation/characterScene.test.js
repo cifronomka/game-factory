@@ -184,12 +184,28 @@ test('Stage 5 to 4 keeps a visible preframe and fades through intermediate opaci
   assert.equal(transitionStart.revealed, true);
   assert.equal(transitionStart.state, 'stage-exit');
   assert.equal(transitionStart.opacity, preframe.opacity, 'first transition frame does not pop');
+  assert.equal(transitionStart.clip, preframe.clip, 'exit starts on the currently rendered clip');
+  assert.equal(transitionStart.frame, preframe.frame, 'exit starts on the currently rendered frame');
+  assert.equal(transitionStart.elapsed, preframe.elapsed, 'exit preserves the authored application clock');
+  assert.deepEqual(transitionStart.temporal, preframe.temporal, 'exit preserves the exact sub-frame blend snapshot');
+  assert.deepEqual(transitionStart.exitVisual, {
+    opacity: 0.97,
+    brightness: 1.16,
+    contrast: 1.03,
+    saturation: 1.05,
+    shadowBlur: 22,
+    shadowAlpha: 0.5,
+  }, 'exit filter at t0 exactly matches the normal idle render profile');
 
   const opacitySamples = [];
   for (let index = 0; index < 18; index += 1) {
     scene.setState(state({ stage: 4 }));
     scene.update(0.05);
-    opacitySamples.push(scene.getDiagnostics().demoness.opacity);
+    const sample = scene.getDiagnostics().demoness;
+    opacitySamples.push(sample.opacity);
+    assert.equal(sample.clip, preframe.clip, 'exit keeps the authored clip pose');
+    assert.equal(sample.frame, preframe.frame, 'exit keeps the authored frame pose');
+    assert.deepEqual(sample.temporal, preframe.temporal, 'exit keeps the authored sub-frame blend pose');
   }
   const intermediate = opacitySamples.filter((opacity) => opacity > 0.5 && opacity < 0.97);
   assert.ok(new Set(intermediate.map((opacity) => opacity.toFixed(4))).size >= 3);
