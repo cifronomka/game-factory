@@ -351,6 +351,7 @@ test('Demoness renders two bounded streams at the current palm sockets and clean
   scene.setFlameTarget({ x: 517, y: 982 });
   scene.setState(state({ stage: 5, encounters: [{ kind: 'demoness', phase: 'active', progress: 0.5 }] }));
   scene.draw(/** @type {any} */ (drawingContext()), state({ stage: 5 }), 2.25);
+  scene.drawSteamFx(/** @type {any} */ (drawingContext()));
   const active = scene.getDiagnostics().demoness;
   const sockets = demonessHandSockets('hold', 3);
   assert.deepEqual(active.spell.origins, {

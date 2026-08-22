@@ -3,7 +3,7 @@
 import { OptionalBitmap } from './optionalBitmap.js';
 import { SpriteAnimator, drawSpriteFrame, gridFrames } from './spriteAnimator.js';
 import { sceneTransform } from './infernoScene.js';
-import { drawSteamStream } from './steamEmitter.js';
+import { drawSteamStream, steamStreamGeometry } from './steamEmitter.js';
 
 export const ASH_SERVANT_ATLAS_URLS = Object.freeze(Object.fromEntries(['idle', 'inhale', 'blow', 'recovery'].map((clip) => [clip,
   new URL(`../../../assets/characters/ash-servant/ash-servant-${clip}-v5.webp`, import.meta.url).href,
@@ -278,6 +278,8 @@ export class CharacterScene {
     this.demonessSpellReach = 0;
     this.flameTarget = Object.freeze({ x: 540, y: 1_050 });
     this.spellGeometry = Object.freeze({ origins: null, target: this.flameTarget, leading: null, contact: false });
+    this.servantSteamOptions = null;
+    this.demonessSteamOptions = null;
     this.servantRecoveryRemaining = 0;
     this.demonessRecoveryRemaining = 0;
     this.demonessExitRemaining = 0;
@@ -608,6 +610,8 @@ export class CharacterScene {
 
   /** @param {CanvasRenderingContext2D} context @param {any} state @param {number} timeSeconds */
   draw(context, state, timeSeconds) {
+    this.servantSteamOptions = null;
+    this.demonessSteamOptions = null;
     if (state.hostLevel > 0) {
       context.save();
       const entryLinear = state.hostLevel === 2 && this.hostEntryAge < 1.5 ? clamp(this.hostEntryAge / 1.5, 0, 1) : 1;
@@ -672,14 +676,17 @@ export class CharacterScene {
           rightHand: Object.freeze(socketWorld(placement, sockets.rightHand, DEMONESS_PIVOT)),
         });
         const effectStrength = this.demonessStrength * (state.reducedMotion ? 0.6 : 1);
-        const leftStream = drawSteamStream(context, {
+        const leftOptions = Object.freeze({
           time: timeSeconds, strength: effectStrength, source: origins.leftHand, target: this.flameTarget,
           reach: this.demonessSpellReach, reducedMotion: Boolean(state.reducedMotion), seed: 3,
         });
-        const rightStream = drawSteamStream(context, {
+        const rightOptions = Object.freeze({
           time: timeSeconds, strength: effectStrength, source: origins.rightHand, target: this.flameTarget,
           reach: this.demonessSpellReach, reducedMotion: Boolean(state.reducedMotion), seed: 7,
         });
+        this.demonessSteamOptions = Object.freeze({ left: leftOptions, right: rightOptions });
+        const leftStream = steamStreamGeometry(leftOptions.source, leftOptions.target, leftOptions.reach);
+        const rightStream = steamStreamGeometry(rightOptions.source, rightOptions.target, rightOptions.reach);
         const contact = leftStream.contact && rightStream.contact;
         this.spellGeometry = Object.freeze({
           origins,
@@ -715,7 +722,7 @@ export class CharacterScene {
       const snapshot = this.servantAnimator.snapshot();
       const mouth = socketWorld(placement, servantMouthSocket(snapshot.clip, snapshot.frame), SERVANT_PIVOT);
       if (this.servantInhaleStrength > 0) drawInhaleAir(context, timeSeconds, this.servantInhaleStrength * (state.reducedMotion ? 0.55 : 1), mouth);
-      if (active) drawSteamStream(context, {
+      if (active) this.servantSteamOptions = Object.freeze({
         time: timeSeconds,
         strength: this.servantStrength * (state.reducedMotion ? 0.55 : 1),
         source: mouth,
@@ -727,21 +734,30 @@ export class CharacterScene {
     }
   }
 
+  /** Draw vapor above the authored flame so anatomical sources remain Human-Eye readable. */
+  drawSteamFx(context) {
+    if (this.servantSteamOptions) drawSteamStream(context, this.servantSteamOptions);
+    if (this.demonessSteamOptions) {
+      drawSteamStream(context, this.demonessSteamOptions.left);
+      drawSteamStream(context, this.demonessSteamOptions.right);
+    }
+  }
+
   /** Contact vapor starts only after both hand streams reach the live flame anchor. */
   /** @param {CanvasRenderingContext2D} context @param {number} timeSeconds @param {boolean=} reducedMotion */
   drawImpactFx(context, timeSeconds, reducedMotion = false) {
     if (this.demonessImpactStrength <= 0 || !this.spellGeometry.contact) return;
     const impactPoint = this.spellGeometry.contactPoint ?? this.flameTarget;
-    const count = reducedMotion ? 5 : 12;
+    const count = reducedMotion ? 3 : 5;
     context.save();
     context.globalCompositeOperation = 'screen';
     for (let index = 0; index < count; index += 1) {
       const age = ((timeSeconds * (0.38 + index * 0.009) + index * 0.137) % 1 + 1) % 1;
-      const spread = Math.sin(index * 4.17) * (8 + age * 18);
+      const spread = Math.sin(index * 4.17) * (5 + age * 10);
       const x = impactPoint.x + spread;
-      const y = impactPoint.y - age * (108 + index % 3 * 18);
-      const radius = 6 + age * 13;
-      context.fillStyle = `rgba(${218 + index % 3 * 5},${215 + index % 2 * 6},${208 + index % 2 * 7},${Math.pow(1 - age, 0.8) * 0.18 * this.demonessImpactStrength})`;
+      const y = impactPoint.y - age * (56 + index % 3 * 10);
+      const radius = 4 + age * 7;
+      context.fillStyle = `rgba(${218 + index % 3 * 5},${215 + index % 2 * 6},${208 + index % 2 * 7},${Math.pow(1 - age, 0.9) * 0.11 * this.demonessImpactStrength})`;
       context.shadowColor = 'rgba(232,226,218,.12)';
       context.shadowBlur = 7;
       context.beginPath();

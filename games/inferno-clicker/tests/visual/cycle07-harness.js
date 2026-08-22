@@ -56,3 +56,4 @@ requestAnimationFrame(update);
 
 Object.defineProperty(globalThis, '__c07Diagnostics', { value: () => scene.getDiagnostics(), configurable: false });
 document.documentElement.dataset.c07Ready = 'true';
+setInterval(() => { document.documentElement.dataset.c07Diagnostics = JSON.stringify(scene.getDiagnostics()); }, 100);

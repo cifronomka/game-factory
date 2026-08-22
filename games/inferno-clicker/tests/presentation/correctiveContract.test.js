@@ -57,6 +57,7 @@ test('flame and characters use authored frame atlases without static-card deform
   assert.match(steam, /steamParticles/);
   assert.doesNotMatch(`${characters}\n${steam}`, /snowflake|iceShard|drawColdRibbon|drawDirectedAsh/i);
   assert.doesNotMatch(steam, /quadraticCurveTo|bezierCurveTo/i);
+  assert.doesNotMatch(flame, /hue-rotate\([^)]*150/);
   assert.doesNotMatch(characters, /91,218,218|drop-shadow\(0 0 28px rgba\(91/);
   assert.match(characters, /drawImpactFx/);
   assert.doesNotMatch(characters, /drawServant|drawDemoness|fallback character/i);

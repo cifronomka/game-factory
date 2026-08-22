@@ -13,7 +13,7 @@
   "packing": "Cycle 07 clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve",
   "sourceSheet": "visual-references/cycle-07-sources/ash-servant-blow-8-source.png",
   "sourceSheetSha256": "4efb9cae0aea1bc6001b917f07d5fe8835496b3d0de9f323c4b189ebd9135b25",
-  "atlasSha256": "364038763b4f00ba3954f2b1aff3e0a106c6a69bf0f2b31484bccf48a2478270",
+  "atlasSha256": "5ee00f85cc19d4feca6085d608154817c4f90b1a1a4feae76affbcdb3d5c80ad",
   "clips": {
     "blow": {
       "fps": 10,
@@ -25,7 +25,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 100,
-          "sha256": "eaedbb196b7eb5e2a5657c034e53cb5b069aeedd27065625bccc6d953e3d184a",
+          "sha256": "dc67d8dfa0d83c70dd29b3be40318ceebeb209108f57f1723f0813f2fa22547a",
           "provenance": "Cycle 07 ImageGen Cycle 07 source ash-servant-blow-8-source.png; blow authored frame 0; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -41,10 +41,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 121.74,
+          "centroidX": 121.76,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.09907
+          "matteRatio": 0
         },
         {
           "x": 256,
@@ -52,7 +52,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 100,
-          "sha256": "10873ace03f450f9c51c5989500337cad5d30d3cedef4aee1f6924f27044e95a",
+          "sha256": "f991499d128f5bbea661311356180f9d13c0082b9a5902b404bb8544596d648b",
           "provenance": "Cycle 07 ImageGen Cycle 07 source ash-servant-blow-8-source.png; blow authored frame 1; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -68,10 +68,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 119.3,
+          "centroidX": 119.32,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.08324
+          "matteRatio": 0
         },
         {
           "x": 512,
@@ -79,7 +79,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 100,
-          "sha256": "bd83dc17ca68d6ab35e832640aa41a4bac8f8430d46f6d86b3a1f555a5a3fc1f",
+          "sha256": "254006d4c940adb4c0866bc9376f4ae57e4ecc6b5f65bb87d592ab090cee066c",
           "provenance": "Cycle 07 ImageGen Cycle 07 source ash-servant-blow-8-source.png; blow authored frame 2; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -95,10 +95,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 121.54,
+          "centroidX": 121.53,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.10919
+          "matteRatio": 0
         },
         {
           "x": 768,
@@ -106,7 +106,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 100,
-          "sha256": "45cea8d20540a70c7cfbc9a475351b3127cb3f5ac31e421e33289236b6eb6965",
+          "sha256": "fac896f4d7fc60ee0d1d9e37de8ef824094b4c3f136df728043bddb3b231c074",
           "provenance": "Cycle 07 ImageGen Cycle 07 source ash-servant-blow-8-source.png; blow authored frame 3; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -122,10 +122,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 113.76,
+          "centroidX": 113.79,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.09883
+          "matteRatio": 0
         },
         {
           "x": 0,
@@ -133,7 +133,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 100,
-          "sha256": "54174709348bafacdd840448521920caf35f95593f3f6a679716af8fcdf75ad5",
+          "sha256": "d01b007badf52a82a4d322105141e1e311e421d24a4552c8c67972de237b9740",
           "provenance": "Cycle 07 ImageGen Cycle 07 source ash-servant-blow-8-source.png; blow authored frame 4; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -152,7 +152,7 @@
           "centroidX": 124.35,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.09941
+          "matteRatio": 0
         },
         {
           "x": 256,
@@ -160,7 +160,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 100,
-          "sha256": "db5fa42d848a06af3942db0afcba53bec35a4a1ffde0c73df95ce8e8d3125148",
+          "sha256": "ebefd37b325c28737594d4700f7b3fd0fe1e913e57197bd4da55410108ef71ee",
           "provenance": "Cycle 07 ImageGen Cycle 07 source ash-servant-blow-8-source.png; blow authored frame 5; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -176,10 +176,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 118,
+          "centroidX": 118.03,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.09905
+          "matteRatio": 0
         },
         {
           "x": 512,
@@ -187,7 +187,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 100,
-          "sha256": "1a34f24404f24b88c1733eeb340f7b2b5f1a1d20751f7c2694c0ee6f1e1d39d0",
+          "sha256": "4934c4136ee1fa8654c073e250897a22eb8273c14ea3a7565a608c04b73f37dd",
           "provenance": "Cycle 07 ImageGen Cycle 07 source ash-servant-blow-8-source.png; blow authored frame 6; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -203,10 +203,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 115.45,
+          "centroidX": 115.47,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.08309
+          "matteRatio": 0
         },
         {
           "x": 768,
@@ -214,7 +214,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 100,
-          "sha256": "ab3568aa07da349866302c75860821b0bbb029d5a9901eefc2283bf759bc56cb",
+          "sha256": "e0b94099266dd5724563b3f1d307e4f2ee1dbc9f6f89310695c10b1f47a78e8a",
           "provenance": "Cycle 07 ImageGen Cycle 07 source ash-servant-blow-8-source.png; blow authored frame 7; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -230,10 +230,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 111.12,
+          "centroidX": 111.15,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.08506
+          "matteRatio": 0
         }
       ]
     }

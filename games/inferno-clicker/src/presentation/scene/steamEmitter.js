@@ -37,7 +37,7 @@ export function steamParticles(options) {
   const geometry = steamStreamGeometry(options.source, options.target, options.reach ?? FULL_REACH);
   const strength = clamp(Number(options.strength) || 0, 0, 1);
   if (strength <= 0 || geometry.reach <= 0) return Object.freeze([]);
-  const count = options.reducedMotion ? 8 : 18;
+  const count = options.reducedMotion ? 32 : 64;
   const seed = Number(options.seed) || 0;
   const axisX = geometry.target.x - geometry.source.x;
   const axisY = geometry.target.y - geometry.source.y;
@@ -45,17 +45,17 @@ export function steamParticles(options) {
   const normalX = -axisY / axisLength;
   const normalY = axisX / axisLength;
   return Object.freeze(Array.from({ length: count }, (_, index) => {
-    const cycle = ((options.time * (0.21 + index * 0.0017) + index / count + seed * 0.071) % 1 + 1) % 1;
+    const cycle = ((options.time * (0.08 + index * 0.0007) + (index + 0.35) / count + seed * 0.031) % 1 + 1) % 1;
     const progress = cycle * geometry.reach;
     const envelope = Math.sin(Math.PI * progress);
-    const lateral = Math.sin(index * 4.137 + options.time * 1.91 + seed) * (3 + progress * 13) * envelope;
-    const curl = Math.cos(index * 2.73 + options.time * 1.23) * 4 * envelope;
+    const lateral = Math.sin(index * 4.137 + options.time * 1.31 + seed) * (5 + progress * 17) * envelope;
+    const curl = Math.cos(index * 2.73 + options.time * 0.83) * 6 * envelope;
     return Object.freeze({
       x: geometry.source.x + axisX * progress + normalX * lateral,
       y: geometry.source.y + axisY * progress + normalY * lateral - curl,
       progress,
-      radius: 3.5 + progress * 8 + index % 3,
-      alpha: (0.045 + envelope * 0.13) * strength,
+      radius: 7 + progress * 8 + index % 3 * 1.5,
+      alpha: (0.065 + envelope * 0.085) * strength,
     });
   }));
 }
@@ -73,26 +73,26 @@ export function drawSteamStream(context, options) {
   const particles = steamParticles(options);
 
   context.save();
-  context.globalCompositeOperation = 'screen';
-  context.shadowColor = warm ? 'rgba(236,226,216,.16)' : 'rgba(232,226,218,.14)';
-  context.shadowBlur = 6;
+  context.globalCompositeOperation = 'source-over';
+  context.shadowColor = 'rgba(16,18,20,.28)';
+  context.shadowBlur = 4;
   context.fillStyle = warm
-    ? `rgba(236,230,222,${0.12 * strength})`
-    : `rgba(230,226,220,${0.09 * strength})`;
+    ? `rgba(215,213,208,${0.36 * strength})`
+    : `rgba(205,207,204,${0.38 * strength})`;
   context.beginPath();
-  context.ellipse(geometry.source.x, geometry.source.y, 4 + strength * 2, 2.5 + strength, 0, 0, Math.PI * 2);
+  context.ellipse(geometry.source.x, geometry.source.y, 5 + strength * 2, 3 + strength, 0, 0, Math.PI * 2);
   context.fill();
   for (const [index, particle] of particles.entries()) {
     context.fillStyle = warm
-      ? `rgba(230,225,218,${particle.alpha * 1.08})`
-      : `rgba(222,219,214,${particle.alpha * 0.8})`;
+      ? `rgba(207,207,203,${particle.alpha})`
+      : `rgba(198,201,199,${particle.alpha})`;
     context.beginPath();
     context.ellipse(
       particle.x,
       particle.y,
-      particle.radius * (1.35 + index % 3 * 0.12),
-      particle.radius * (0.42 + index % 2 * 0.08),
-      Math.sin(options.time * 0.7 + index * 1.9) * 0.24,
+      particle.radius * (1.18 + index % 3 * 0.16),
+      particle.radius * (0.72 + index % 2 * 0.14),
+      Math.sin(options.time * 0.7 + index * 1.9) * 0.42,
       0,
       Math.PI * 2,
     );

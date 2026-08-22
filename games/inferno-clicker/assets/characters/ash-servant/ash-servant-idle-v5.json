@@ -13,7 +13,7 @@
   "packing": "Cycle 07 clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve",
   "sourceSheet": "visual-references/cycle-07-sources/ash-servant-idle-inhale-carryforward.png",
   "sourceSheetSha256": "6bf012c486754121e44a380b7a0ef8f29d1ff22b2609e8a179348aa10a8367f9",
-  "atlasSha256": "e048ec7fc099a8ae8afe9cb1522c6b7e11e04748a04ec7d9f525422ffd897a23",
+  "atlasSha256": "9ac2921f64c1abad1f0caf35e179bf37db9d5517f6c9a7aa05ce56893f162388",
   "clips": {
     "idle": {
       "fps": 6,
@@ -25,7 +25,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 166.67,
-          "sha256": "72bdd3de4cfc5721126988cd8f424b64b88f1de40432a7bdf60da11a4bfac4b7",
+          "sha256": "249c874f0ca9860a263472ce3d9983cb91ca9cf562868b1e2b8f48cc50633cc5",
           "provenance": "Cycle 07 ImageGen Cycle 06 carry-forward source ash-servant-idle-inhale-carryforward.png; idle authored frame 0; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -41,10 +41,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 129.1,
+          "centroidX": 130.3,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.06516
+          "matteRatio": 0
         },
         {
           "x": 256,
@@ -52,7 +52,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 166.67,
-          "sha256": "d86841111f0aec6e83e6327e4792cbdd11dee1e480a4ed566d8e529af966b668",
+          "sha256": "618943d280fc2daa23cbac37044ec3ed11555711857503755d30a2db88a67437",
           "provenance": "Cycle 07 ImageGen Cycle 06 carry-forward source ash-servant-idle-inhale-carryforward.png; idle authored frame 1; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -68,10 +68,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 129.64,
+          "centroidX": 130.76,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.0646
+          "matteRatio": 0
         },
         {
           "x": 512,
@@ -79,7 +79,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 166.67,
-          "sha256": "b88411147d260fdd73b067c249b372c19d5640839bf149a8f596a794990a7b06",
+          "sha256": "6c7a0de3c4d95a0ccaaf03ba01b302741f2a9d16fc170e9961a53f473a174bd6",
           "provenance": "Cycle 07 ImageGen Cycle 06 carry-forward source ash-servant-idle-inhale-carryforward.png; idle authored frame 2; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -95,10 +95,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 130.81,
+          "centroidX": 131.94,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.06174
+          "matteRatio": 0
         },
         {
           "x": 768,
@@ -106,7 +106,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 166.67,
-          "sha256": "9da1116999c59203012eef5383b3767c1c2c30cfa325bb7d71de9c6b77478ad9",
+          "sha256": "289134741a585fa27b6b67701d2347a46991ba1692c5264505a20d0745de73d7",
           "provenance": "Cycle 07 ImageGen Cycle 06 carry-forward source ash-servant-idle-inhale-carryforward.png; idle authored frame 3; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -122,10 +122,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 128.4,
+          "centroidX": 129.44,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.05713
+          "matteRatio": 0
         },
         {
           "x": 0,
@@ -133,7 +133,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 166.67,
-          "sha256": "95d78a704f81805cecba39cf9a8acc5085e78a3df3a655d44771e7d6600e4381",
+          "sha256": "32337a6e36374a0f1fca82de29c9662bc1c18e034900252e42177846301d5fe4",
           "provenance": "Cycle 07 ImageGen Cycle 06 carry-forward source ash-servant-idle-inhale-carryforward.png; idle authored frame 4; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -149,10 +149,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 130.04,
+          "centroidX": 131.2,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.05863
+          "matteRatio": 0
         },
         {
           "x": 256,
@@ -160,7 +160,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 166.67,
-          "sha256": "7ac308c0dfcb74e0c7332c749f0ccdccd5d3d7e1a35e7aa1be1a3fa00a890bf5",
+          "sha256": "78b15710c2a8134df4f6b136c163586013d30b864c807ac42d2d14c8a4f6e5b6",
           "provenance": "Cycle 07 ImageGen Cycle 06 carry-forward source ash-servant-idle-inhale-carryforward.png; idle authored frame 5; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -176,10 +176,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 130.85,
+          "centroidX": 132.01,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04927
+          "matteRatio": 0
         },
         {
           "x": 512,
@@ -187,7 +187,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 166.67,
-          "sha256": "28a6b48f62d298c9b68d3dbf8870c56794b8a3d1e5d4454268dadc3378f49c5d",
+          "sha256": "9cd46ca733fdf6883f469f3130c9c1f6f4dff47b200d1d4b5cb1e33a59208dc8",
           "provenance": "Cycle 07 ImageGen Cycle 06 carry-forward source ash-servant-idle-inhale-carryforward.png; idle authored frame 6; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -203,10 +203,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 128.18,
+          "centroidX": 129.29,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.06008
+          "matteRatio": 0
         },
         {
           "x": 768,
@@ -214,7 +214,7 @@
           "w": 256,
           "h": 320,
           "durationMs": 166.67,
-          "sha256": "2df0676efa9ea84c8ab0ae1f8a86b3c18b81f120e7db24472c4d817721f63720",
+          "sha256": "a01b2f48289f9c43536d7d53a2b2c6901dbcab31392bf38244006a1c2558ac64",
           "provenance": "Cycle 07 ImageGen Cycle 06 carry-forward source ash-servant-idle-inhale-carryforward.png; idle authored frame 7; alpha defringe, stable-root fit and high-quality WebP export only",
           "sockets": {
             "mouth": [
@@ -230,10 +230,10 @@
             313
           ],
           "rootY": 313,
-          "centroidX": 126.91,
+          "centroidX": 128.02,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.06365
+          "matteRatio": 0
         }
       ]
     }

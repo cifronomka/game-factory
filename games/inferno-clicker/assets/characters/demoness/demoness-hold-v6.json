@@ -13,7 +13,7 @@
   "packing": "Cycle 07 clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve",
   "sourceSheet": "visual-references/cycle-07-sources/demoness-hold-8-source.png",
   "sourceSheetSha256": "a989eb87dc6b1b2dc16946378d03d6a758bc9e991c0233cb1bc8632192ca4caa",
-  "atlasSha256": "ff829c08f8ab304d9ffce4221125271348f40d1ccab01e3b653d7fc17b4f83e0",
+  "atlasSha256": "0100dba579f98e792067b709c569b88ab4845013341551f19c250017438682c9",
   "clips": {
     "hold": {
       "fps": 6,
@@ -25,7 +25,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 166.67,
-          "sha256": "39a8b29d4633b9591e0c9c3a27daa7b398a3260174864770ca5ddb53a4c7402d",
+          "sha256": "a9c60c70221a6826cc0ecc5376555e56e1bbcd9d5a64673479276a460e5181a5",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-hold-8-source.png; hold authored frame 0; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -45,10 +45,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 203.47,
+          "centroidX": 203.62,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04505
+          "matteRatio": 0
         },
         {
           "x": 412,
@@ -56,7 +56,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 166.67,
-          "sha256": "a74d2cafd1e5912f67a90d6040277db07f656071398367702c9d4977d6cdb7f1",
+          "sha256": "6e4162258bf4132f10c8cf17bc9de3587f2f18db2d5acb2c174414d3c5707f90",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-hold-8-source.png; hold authored frame 1; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -76,10 +76,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 204.79,
+          "centroidX": 204.94,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 0.9999,
-          "matteRatio": 0.04531
+          "matteRatio": 0
         },
         {
           "x": 824,
@@ -87,7 +87,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 166.67,
-          "sha256": "379a8211f7da4210449b8c2bc552d05354323c66c168dc4b689e884a82d975d5",
+          "sha256": "476ce979711ab9057f2ecfcd4f01f5b73cfddfe930deaaa6b77a7945d43c8dce",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-hold-8-source.png; hold authored frame 2; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -107,10 +107,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 207.99,
+          "centroidX": 208.17,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04312
+          "matteRatio": 0
         },
         {
           "x": 1236,
@@ -118,7 +118,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 166.67,
-          "sha256": "20dc1b2bf6ec83e5f110680edb613d08cd231e811558562beeda1c55b007da3e",
+          "sha256": "b9f4ac71da0cb95bc17a8265d0c0a470da1a637afb80ad34bf0b69a621effaa4",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-hold-8-source.png; hold authored frame 3; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -138,10 +138,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 205.43,
+          "centroidX": 205.79,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04297
+          "matteRatio": 0
         },
         {
           "x": 0,
@@ -149,7 +149,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 166.67,
-          "sha256": "cf7cc37a1f23ef75f50d9faeadf78ca033c87e55ea61988a99b43b87e6ab38bf",
+          "sha256": "32ba6d835190e4c2c251577b23e6317f1b60aae86e94e8c5ec1eda66f376698e",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-hold-8-source.png; hold authored frame 4; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -169,10 +169,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 202.95,
+          "centroidX": 203.23,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 0.99998,
-          "matteRatio": 0.0413
+          "matteRatio": 0
         },
         {
           "x": 412,
@@ -180,7 +180,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 166.67,
-          "sha256": "1a7b5524138f4515d9926880ca2131260f027fcbb2c26a2051c424d52bb33833",
+          "sha256": "0a7e757788775d11fcd5eae1930467d0f33e8403d30cc682f587867205f5d227",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-hold-8-source.png; hold authored frame 5; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -200,10 +200,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 206.73,
+          "centroidX": 206.85,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04369
+          "matteRatio": 0
         },
         {
           "x": 824,
@@ -211,7 +211,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 166.67,
-          "sha256": "5a0482ac24a9853e3d291229cbbd704db1114efdad6e7ba8fd427051fe6b1e36",
+          "sha256": "56b681bf903fe571a333024afee9fec07da7942740afc5e8320efb1f2552732b",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-hold-8-source.png; hold authored frame 6; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -231,10 +231,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 209.58,
+          "centroidX": 209.74,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.0419
+          "matteRatio": 0
         },
         {
           "x": 1236,
@@ -242,7 +242,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 166.67,
-          "sha256": "ba3c0e69f70860488650901214e73db815d2387ebfb14114e01618903d1e8160",
+          "sha256": "60884339e27dee5b78d1533ca5bde4aa983151a0b9815fa9f299b10197da789f",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-hold-8-source.png; hold authored frame 7; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -262,10 +262,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 203.54,
+          "centroidX": 203.78,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04544
+          "matteRatio": 0
         }
       ]
     }

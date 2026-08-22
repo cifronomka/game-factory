@@ -73,6 +73,36 @@ function deriveBorderNeutralAlpha(data, info) {
   return output;
 }
 
+/** Remove large enclosed near-white generation islands without erasing small authored highlights. */
+function removeEnclosedNeutralMatte(data, info) {
+  const output = Buffer.from(data);
+  const candidate = new Uint8Array(info.width * info.height);
+  for (let pixel = 0; pixel < candidate.length; pixel += 1) {
+    const index = pixel * info.channels;
+    const r = output[index]; const g = output[index + 1]; const b = output[index + 2];
+    const high = Math.max(r, g, b); const low = Math.min(r, g, b);
+    const luminance = r * 0.2126 + g * 0.7152 + b * 0.0722;
+    candidate[pixel] = output[index + 3] > 12 && high - low < 28 && luminance >= 218 ? 1 : 0;
+  }
+  const queue = new Int32Array(candidate.length);
+  for (let start = 0; start < candidate.length; start += 1) {
+    if (!candidate[start]) continue;
+    let head = 0; let tail = 0; queue[tail++] = start; candidate[start] = 0;
+    const pixels = [];
+    while (head < tail) {
+      const pixel = queue[head++]; pixels.push(pixel);
+      const x = pixel % info.width;
+      for (const next of [pixel - 1, pixel + 1, pixel - info.width, pixel + info.width]) {
+        if (next < 0 || next >= candidate.length || !candidate[next] || Math.abs(next % info.width - x) > 1) continue;
+        candidate[next] = 0; queue[tail++] = next;
+      }
+    }
+    if (pixels.length < 24) continue;
+    for (const pixel of pixels) output[pixel * info.channels + 3] = 0;
+  }
+  return output;
+}
+
 function retainComponents(data, width, height, mode) {
   const output = Buffer.from(data);
   const mask = new Uint8Array(width * height);
@@ -149,6 +179,55 @@ function defringe(data, width, height) {
   return output;
 }
 
+/**
+ * Replace residual near-white RGB in translucent edge pixels with nearby
+ * authored material colour. Canvas compositing otherwise exposes those source
+ * backdrop colours as a pale halo on the game's dark red backgrounds.
+ */
+function scrubPartialNeutralMatte(data, width, height) {
+  const source = Buffer.from(data);
+  const output = Buffer.from(data);
+  const at = (x, y) => (y * width + x) * 4;
+  const isNeutralBright = (index, threshold = 160) => {
+    const r = source[index]; const g = source[index + 1]; const b = source[index + 2];
+    return Math.max(r, g, b) - Math.min(r, g, b) < 24 && (r + g + b) / 3 > threshold;
+  };
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const index = at(x, y);
+      const alpha = source[index + 3];
+      if (alpha <= 0 || alpha >= 245 || !isNeutralBright(index)) continue;
+      let replacement = null;
+      for (let radius = 1; radius <= 8 && replacement === null; radius += 1) {
+        for (let oy = -radius; oy <= radius && replacement === null; oy += 1) {
+          for (let ox = -radius; ox <= radius; ox += 1) {
+            if (Math.max(Math.abs(ox), Math.abs(oy)) !== radius) continue;
+            const nx = x + ox; const ny = y + oy;
+            if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+            const candidate = at(nx, ny);
+            if (source[candidate + 3] >= 245 && !isNeutralBright(candidate)) {
+              replacement = candidate;
+              break;
+            }
+          }
+        }
+      }
+      if (replacement !== null) {
+        output[index] = source[replacement];
+        output[index + 1] = source[replacement + 1];
+        output[index + 2] = source[replacement + 2];
+      } else {
+        const luminance = (source[index] + source[index + 1] + source[index + 2]) / 3;
+        const scale = Math.min(1, 155 / Math.max(1, luminance));
+        output[index] = Math.round(source[index] * scale);
+        output[index + 1] = Math.round(source[index + 1] * scale);
+        output[index + 2] = Math.round(source[index + 2] * scale);
+      }
+    }
+  }
+  return output;
+}
+
 function alphaBounds(data, width, height, threshold = 12) {
   let left = width; let top = height; let right = -1; let bottom = -1;
   for (let y = 0; y < height; y += 1) {
@@ -213,9 +292,13 @@ async function normalizedSource(path, checker, backgroundRemoval) {
   const { data, info } = await image.raw().toBuffer({ resolveWithObject: true });
   const rgba = info.channels === 4 ? data : Buffer.from(data);
   const alphaReady = backgroundRemoval === 'border-neutral'
-    ? deriveBorderNeutralAlpha(rgba, info)
+    ? removeEnclosedNeutralMatte(deriveBorderNeutralAlpha(rgba, info), info)
     : checker ? deriveCheckerAlpha(rgba, info) : rgba;
-  return { data: defringe(alphaReady, info.width, info.height), width: info.width, height: info.height };
+  const defringed = defringe(alphaReady, info.width, info.height);
+  const cleaned = backgroundRemoval === 'border-neutral'
+    ? scrubPartialNeutralMatte(defringed, info.width, info.height)
+    : defringed;
+  return { data: cleaned, width: info.width, height: info.height };
 }
 
 async function extractCell(source, columns, rows, index, targetWidth, targetHeight, componentMode, preserveCellFraming = false, framingScale = 1) {
@@ -262,7 +345,12 @@ export async function buildAtlas(spec) {
   const sourcePath = join(activeSourceRoot, spec.source);
   const source = await normalizedSource(sourcePath, spec.checker, spec.backgroundRemoval);
   const frames = [];
-  for (const sourceIndex of spec.indices) frames.push(await extractCell(source, spec.sourceColumns, spec.sourceRows, sourceIndex, spec.frameWidth, spec.frameHeight, spec.componentMode, spec.preserveCellFraming, spec.framingScale));
+  for (const sourceIndex of spec.indices) {
+    const frame = await extractCell(source, spec.sourceColumns, spec.sourceRows, sourceIndex, spec.frameWidth, spec.frameHeight, spec.componentMode, spec.preserveCellFraming, spec.framingScale);
+    frames.push(spec.backgroundRemoval === 'border-neutral'
+      ? scrubPartialNeutralMatte(frame, spec.frameWidth, spec.frameHeight)
+      : frame);
+  }
   const atlasWidth = spec.columns * spec.frameWidth;
   const atlasHeight = spec.rows * spec.frameHeight;
   const composites = frames.map((input, index) => ({ input, raw: { width: spec.frameWidth, height: spec.frameHeight, channels: 4 }, left: index % spec.columns * spec.frameWidth, top: Math.floor(index / spec.columns) * spec.frameHeight }));

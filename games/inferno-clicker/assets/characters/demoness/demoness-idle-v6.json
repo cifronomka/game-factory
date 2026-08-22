@@ -13,7 +13,7 @@
   "packing": "Cycle 07 clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve",
   "sourceSheet": "visual-references/cycle-07-sources/demoness-idle-8-source.png",
   "sourceSheetSha256": "3c573979e0c8109aebb223f5f9590ce6745e69bc30476967dfe2c482be03e950",
-  "atlasSha256": "6c761f41c4144cb345df36686ff0c7445c6e7a57548dec137acf7209d238eeee",
+  "atlasSha256": "983772250b6c93d47ffe9cd28843883ebca08f9a6ea2711e7ea0e73d48af754f",
   "clips": {
     "idle": {
       "fps": 1.2,
@@ -25,7 +25,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 833.33,
-          "sha256": "1bd4a7c7569dc3023f2bae68d2fd15ac0aafc11f5efdbfb218941936c7eea4ed",
+          "sha256": "f6b7e8746bd71006baa3368bb24222585089ac986c12e0df062525bcedbd40b4",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 0; alpha defringe, stable-root fit and quality-90 WebP export only",
           "anatomicalScale": 1,
           "alphaBBox": [
@@ -35,10 +35,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 200.32,
+          "centroidX": 200.28,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04016
+          "matteRatio": 0
         },
         {
           "x": 412,
@@ -46,7 +46,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 833.33,
-          "sha256": "1df431986490d93768eb7f383dc4957b535ac049ae8e7e6d5978f3fec8071309",
+          "sha256": "67923b8f779bb35dc811fd8f880890a2f84f316eb9810fe5a6dd0aa00bedbd18",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 1; alpha defringe, stable-root fit and quality-90 WebP export only",
           "anatomicalScale": 1,
           "alphaBBox": [
@@ -56,10 +56,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 198.62,
+          "centroidX": 198.6,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04296
+          "matteRatio": 0
         },
         {
           "x": 824,
@@ -67,7 +67,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 833.33,
-          "sha256": "83900533321f6ce4b323eeecf0e79e20a19c4805e777349a6e4051d76bbd975c",
+          "sha256": "839727d244d6e1989ca34ab5ea336249654c7dc67828034feb1f84179617deba",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 2; alpha defringe, stable-root fit and quality-90 WebP export only",
           "anatomicalScale": 1,
           "alphaBBox": [
@@ -77,10 +77,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 198.83,
+          "centroidX": 198.74,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04572
+          "matteRatio": 0
         },
         {
           "x": 1236,
@@ -88,7 +88,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 833.33,
-          "sha256": "cff96fbc328faa73faafbcd0132e52df3992828eed3222aee4c823c992f652f5",
+          "sha256": "416412dfe1fa7f4be1130aa339e709b7d81f70cc85ed0f821ce9e1f414eda4a2",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 3; alpha defringe, stable-root fit and quality-90 WebP export only",
           "anatomicalScale": 1,
           "alphaBBox": [
@@ -98,10 +98,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 197.07,
+          "centroidX": 197.28,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04769
+          "matteRatio": 0
         },
         {
           "x": 0,
@@ -109,7 +109,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 833.33,
-          "sha256": "4a499e5f849f64b6b0bfb6627ae47b77427b04018f648c98a3a903f71fe9edd7",
+          "sha256": "92ee066239afc76828e37dfbe420c4f05fbf24bf70f315b63b6fdaf4a05d7a8d",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 4; alpha defringe, stable-root fit and quality-90 WebP export only",
           "anatomicalScale": 1,
           "alphaBBox": [
@@ -119,10 +119,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 199.03,
+          "centroidX": 199.02,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04715
+          "matteRatio": 0
         },
         {
           "x": 412,
@@ -130,7 +130,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 833.33,
-          "sha256": "446dede65fa71a80ace8ef74501ed939a133574b259f48f597e5b809603d27f3",
+          "sha256": "5824eb4f460b6993fb4f57def7993591c929ce46d881c079f8684812c2f7018b",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 5; alpha defringe, stable-root fit and quality-90 WebP export only",
           "anatomicalScale": 1,
           "alphaBBox": [
@@ -140,10 +140,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 196.64,
+          "centroidX": 196.61,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04785
+          "matteRatio": 0
         },
         {
           "x": 824,
@@ -151,7 +151,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 833.33,
-          "sha256": "2ade86e6e82ee8aa22a5660ac3dfa502e33babac013f3f8cb3551bba3a7fb979",
+          "sha256": "fa56e1efbaa4e13f261a967baec1440250ad2063b4dfae1ea4f44cd637c52ee9",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 6; alpha defringe, stable-root fit and quality-90 WebP export only",
           "anatomicalScale": 1,
           "alphaBBox": [
@@ -161,10 +161,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 196.71,
+          "centroidX": 196.74,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.0488
+          "matteRatio": 0
         },
         {
           "x": 1236,
@@ -172,7 +172,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 833.33,
-          "sha256": "a65a14a71801a00d07a7eb745f86f9700dc3c9028abb237ed0fe8677d49718f8",
+          "sha256": "84cb5e418b44ca497ebd7a13a676821bdd76d225116da42a1d9d726f7a82b3d7",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 7; alpha defringe, stable-root fit and quality-90 WebP export only",
           "anatomicalScale": 1,
           "alphaBBox": [
@@ -182,10 +182,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 197.71,
+          "centroidX": 197.77,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04628
+          "matteRatio": 0
         }
       ]
     }

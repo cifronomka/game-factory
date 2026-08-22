@@ -165,6 +165,7 @@ export class InfernoScene {
       else if (layer === 'flame-rig') this.flame.drawFlame(context, this.elapsed);
       else if (layer === 'lighting-fx') {
         this.flame.drawFx(context, this.elapsed);
+        this.characters.drawSteamFx(context);
         this.characters.drawImpactFx(context, this.elapsed, Boolean(state.reducedMotion));
       }
       else if (layer === 'foreground') this.environment.drawForeground(context, state, this.elapsed);

@@ -13,7 +13,7 @@
   "packing": "Cycle 07 clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve",
   "sourceSheet": "visual-references/cycle-07-sources/demoness-cast-8-source.png",
   "sourceSheetSha256": "dcfd0d80c4bf88d99cd3136f26e6ced7646ab763cd55f1eb24f72ffc86286a6b",
-  "atlasSha256": "778ea2505b8a640daa15e1684f47e074fb3aec76e72d1632e1df656d1d48c760",
+  "atlasSha256": "3c5d235ccee1d743d9961dd8578bfeb1d2f98955fef3d7f4c43d69861f519a4b",
   "clips": {
     "cast": {
       "fps": 8,
@@ -25,7 +25,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 125,
-          "sha256": "0f0a9c349f631a37489ba6aa125271528e4bed9719ab8d5593be97b6d954cf9e",
+          "sha256": "8130e4cc3055a85625f900996651efb5acf5435973dbdc9320071356c4ea603d",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-cast-8-source.png; cast authored frame 0; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -48,7 +48,7 @@
           "centroidX": 202.8,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.03762
+          "matteRatio": 0
         },
         {
           "x": 412,
@@ -56,7 +56,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 125,
-          "sha256": "92cf22e059175ff69f142ee08be4508ae865f8233f9393030237f0efc343d6f4",
+          "sha256": "d9b989022aee22a0283d5a14f232d63f3038308c3f193bc0f31b281e484c8f57",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-cast-8-source.png; cast authored frame 1; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -79,7 +79,7 @@
           "centroidX": 200.57,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.04178
+          "matteRatio": 0
         },
         {
           "x": 824,
@@ -87,7 +87,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 125,
-          "sha256": "c17242d66fa65d0f8805626dd40ae2723624a0a12872233bbeda45a8d5c312cd",
+          "sha256": "c67c0e9674f3fa9ccd8c826f7bc26c8ec8661418a823f75700166bbaed4e4ffa",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-cast-8-source.png; cast authored frame 2; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -107,10 +107,10 @@
             657
           ],
           "rootY": 657,
-          "centroidX": 213.85,
+          "centroidX": 213.96,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.03541
+          "matteRatio": 0
         },
         {
           "x": 1236,
@@ -118,7 +118,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 125,
-          "sha256": "5d4423472aa5572330e6b130c2ba0a39a7ce850820337d15148e36016b787c82",
+          "sha256": "6b71dc3c42f72c8f479b2bfcc3c8e2b3be38f38a354b2ea6107e8e35e02ca402",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-cast-8-source.png; cast authored frame 3; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -141,7 +141,7 @@
           "centroidX": 211.18,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.03627
+          "matteRatio": 0
         },
         {
           "x": 0,
@@ -149,7 +149,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 125,
-          "sha256": "d23380db141eaef4e8870ae147dc24bcd6a9a35e14222f8213d0f2c41befbbf8",
+          "sha256": "ae954ade2555d877615b2811062fa8347d510fb8880dcfa98c17f9b2778c4ee6",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-cast-8-source.png; cast authored frame 4; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -172,7 +172,7 @@
           "centroidX": 199.09,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.03383
+          "matteRatio": 0
         },
         {
           "x": 412,
@@ -180,7 +180,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 125,
-          "sha256": "330bf94b77c11c920bf6d7d9296ed5147ce7398adedd0279c576a6a7c05f4cbd",
+          "sha256": "2f45766212f3ee7837ba4e2777daf013bccbf939ed6fb38b7082820879f71e8d",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-cast-8-source.png; cast authored frame 5; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -203,7 +203,7 @@
           "centroidX": 203.21,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.03124
+          "matteRatio": 0
         },
         {
           "x": 824,
@@ -211,7 +211,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 125,
-          "sha256": "e0a668aa117c29a5734d9f0dd51593ef86d868cbf5b7bed1bd892996792871d3",
+          "sha256": "86e72bead031e284f0d70a7e0b716d176b2697d4c3385d6e9e97703cf7c3c778",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-cast-8-source.png; cast authored frame 6; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -234,7 +234,7 @@
           "centroidX": 202.65,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.03843
+          "matteRatio": 0
         },
         {
           "x": 1236,
@@ -242,7 +242,7 @@
           "w": 412,
           "h": 664,
           "durationMs": 125,
-          "sha256": "4761cade5a0da6dd0f4b32f028d096dfbcb45aa4a6822089887bc301b62be4d8",
+          "sha256": "64c65e3396977f18825fd3689678eeb9976b16e186c871abf25e01948aea9ceb",
           "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-cast-8-source.png; cast authored frame 7; alpha defringe, stable-root fit and quality-90 WebP export only",
           "sockets": {
             "leftHand": [
@@ -265,7 +265,7 @@
           "centroidX": 196.88,
           "edgeAlphaPixels": 0,
           "largestComponentRatio": 1,
-          "matteRatio": 0.03585
+          "matteRatio": 0
         }
       ]
     }

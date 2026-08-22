@@ -345,7 +345,7 @@ export class FlameRig {
     const anchorShift = reaction.bend * box.width * 0.14;
     const rotation = reaction.bend * 0.13;
     const profile = heatVisualProfile(this.state.flameHeight);
-    const coldFilter = reaction.cold > 0.02 ? `hue-rotate(${Math.round(150 * reaction.cold)}deg) saturate(${(1 - reaction.cold * 0.28).toFixed(2)}) brightness(${((1 - reaction.cold * 0.16) * profile.brightness).toFixed(3)})` : null;
+    const coldFilter = reaction.cold > 0.02 ? `saturate(${(1 - reaction.cold * 0.18).toFixed(2)}) brightness(${((1 - reaction.cold * 0.16) * profile.brightness).toFixed(3)})` : null;
     if (outerImage && family.outerBitmap.isReady()) drawTemporalSprite(context, outerImage, family.outerAnimator, {
       anchorX: HEARTH_X + anchorShift, anchorY: HEARTH_Y, width: box.width * 1.18, height: box.height * 1.03 * reactionHeight, pivot: [0.5, 0.965], alpha: alpha * (profile.outerAlpha - reaction.cold * 0.12), rotation, skewX: reaction.bend * 0.1,
       filter: this.state.boostActive ? `hue-rotate(245deg) saturate(1.28) brightness(${(profile.brightness * 1.05).toFixed(3)})` : coldFilter ?? `saturate(1.08) brightness(${profile.brightness.toFixed(3)})`,

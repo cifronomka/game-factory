@@ -21,9 +21,9 @@ test('steam sampling is deterministic, bounded, and reduced-motion aware', () =>
   const first = steamParticles(options);
   const second = steamParticles(options);
   assert.deepEqual(first, second);
-  assert.equal(first.length, 18);
+  assert.equal(first.length, 64);
   assert.ok(first.every(({ progress }) => progress >= 0 && progress <= 0.62));
-  assert.equal(steamParticles({ ...options, reducedMotion: true }).length, 8);
+  assert.equal(steamParticles({ ...options, reducedMotion: true }).length, 32);
   assert.deepEqual(steamParticles({ ...options, strength: 0 }), []);
 });
 
@@ -56,5 +56,5 @@ test('renderer begins exactly at the supplied anatomical socket', () => {
     seed: 3,
   });
   assert.deepEqual(ellipses[0].slice(0, 2), [source.x, source.y]);
-  assert.equal(ellipses.length, 19, 'steam is rendered as a bounded source puff plus vapor particles');
+  assert.equal(ellipses.length, 65, 'steam is rendered as a bounded source puff plus overlapping irregular vapor clouds');
 });
