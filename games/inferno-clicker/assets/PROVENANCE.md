@@ -13,8 +13,8 @@ not shipped as screens, crops or flattened backplates.
 | FL-MID-CORE / OUTER | flame/atlases/{core,outer}-mid-v2.webp | Two independent transparent 10-frame flame layers | preload at stage 2 progress 0.6; 10 fps |
 | FL-HIGH-CORE / OUTER | flame/atlases/{core,outer}-high-v2.webp | Two independent transparent 12-frame Inferno layers | preload at stage 5 progress 0.6; 11 fps |
 | FX-STAGE-FLARE | flame/transitions/stage-flare-v2.webp | Transparent 8-frame boundary flare | preload at stage 1 progress 0.6; 8 fps once; reverse downward |
-| CH-ASH-SERVANT-*-C07 | characters/ash-servant/ash-servant-{idle,inhale,blow,recovery}-v5.webp | Four disposable 8-cell 256×320 atlases with family-scale framing, stable roots and per-frame mouth sockets | idle plus one imminent clip retained; deterministic release after commit |
-| CH-DEMONESS-*-C07 | characters/demoness/demoness-{idle,cast,hold,recovery}-v6.webp | Sharp 8-cell Inferno Queen clips with 412×664 source cells and per-frame two-palm sockets on cast/hold | idle plus one imminent clip retained; deterministic release after commit |
+| CH-ASH-SERVANT-*-C08 | characters/ash-servant/ash-servant-{idle,inhale,blow,recovery}-v6.webp | Four cleaned 8-cell `256×320` atlases retaining the accepted C07 identity/motion, with genuine exterior/internal alpha, stable roots and per-frame mouth sockets | one active clip plus one imminent clip at most; deterministic release after commit |
+| CH-DEMONESS-*-C08 | characters/demoness/demoness-{idle,cast,hold,recovery}-v7.webp | Native-redrawn 8-cell Inferno Queen clips with `512×832` cells, crisp face/crown/hands/armor, clean negative spaces and per-frame two-palm sockets; runtime draw box `504×840` | one active atlas; a bounded single-frame transition cache hides decode handoff without retaining a second full atlas |
 | CH-INFERNO-HOST-{MAIN,SENTINEL}-C06 | characters/character-inferno-host-{main,sentinel}-v4.webp | Two separately decoded five-frame actors with independent animation phases | preload at stage 5 progress 0.6; 2 fps after the accepted 1.5 s entry |
 
 The matching JSON files are the production clip metadata and preserve frame
@@ -55,6 +55,9 @@ exports can be traced back without shipping the large PNG masters:
 | Cycle 07 Demoness cast, corrected padded generation | `exec-231f2682-743d-45f5-af7c-6c9ca19365b6.png` |
 | Cycle 07 Demoness hold | `exec-4a74f3d8-9a93-4092-b3dc-9db5c9b44f8c.png` |
 | Cycle 07 Demoness recovery | `exec-84967551-3757-4c78-86c0-75996a467036.png` |
+| Cycle 08 Demoness identity master | `visual-references/cycle-08-sources/demoness-identity-master.png` |
+| Cycle 08 Demoness individual native redraws | `visual-references/cycle-08-sources/demoness-frames/{idle,cast,hold,recovery}/frame-{0..7}.png` |
+| Cycle 08 assembled character sources and hashes | `visual-references/cycle-08-sources/source-manifest.json` |
 
 Deterministic post-processing used Sharp only for grid crop/resize, removal of
 the generated white/checker preview background into real alpha, WebP encoding,
@@ -95,6 +98,39 @@ stable bottom-root placement, measured sockets and high-quality WebP encoding;
 it does not repaint anatomy. The 412×664 Demoness cells keep the exact runtime
 `sceneTransform × DPR` upscale within the C07 1.25× limit.
 
+Cycle 08 replaces those runtime character atlases. The Ash Servant preserves the
+accepted C07 silhouette, scale, key poses and timing, but its four retained
+source sheets are rebuilt as v6 with fresh alpha/edge/internal-gap metrics and
+metadata. Historical v3/v4/v5 runtime copies are not shipped; their accepted C07
+SHA-256 lineage is retained in
+`visual-references/cycle-08-sources/source-manifest.json` and in Git history.
+
+The Demoness is a new native-resolution redraw, not an upscale of the C07 v6
+raster. The built-in OpenAI ImageGen mode used one high-resolution identity
+master plus the corresponding pose reference for each of 32 individual
+full-body frames. The positive prompt required the same face, crown/hair,
+closed high-neck black armor, ember-copper palette, crisp native detail and
+clear negative spaces around arms and inside limb bends. The negative prompt
+forbade exposed chest, white matte/halo, neutral residue inside gaps, blur,
+extra limbs/fingers, cropping, text and watermark. Raw outputs are approximately
+`983–1025×1535–1600`, while the target cell is only `512×832`; therefore every
+production frame is downscaled and `sourceToAtlasUpscale≤1.0`. Exact dimensions
+and SHA-256 values for the identity master, every raw frame and every assembled
+sheet are machine-readable in the source manifest.
+
+ImageGen returned a painted neutral checker preview rather than real alpha.
+`scripts/assemble-cycle08-character-sources.mjs` deterministically removes those
+neutral preview tones, trims the real silhouette, downscales it to a stable
+720-pixel visible height inside a `512×832` cell, preserves both hands without
+cropping, and bottom-roots it with a six-pixel transparent gutter.
+`scripts/build-cycle08-character-assets.mjs` then performs component cleanup,
+edge defringe, strict exterior/internal-residue measurement, WebP encoding at
+RGB quality 66 / lossless alpha quality 100, per-frame bbox/root/socket measurement and
+manifest hashing. It does not paint anatomy or synthesize missing details.
+Black, dark-red and neutral-gray composites are rendered by
+`scripts/render-cycle08-art-review.mjs`; appearance/disapproval reuse authored
+idle-atlas cells rather than unregistered duplicate files.
+
 Cycle 04 losslessly repacked each complete source-space character cluster into
 `1536×1120` VP8L atlases with 24 `256×280` cells, an 8-pixel transparent gutter,
 bottom root at y=272 and centered body. Visible RGBA pixels and alpha are retained;
@@ -116,10 +152,12 @@ and aligns the skirt root. It neither paints new anatomy nor borrows reference
 pixels. The final v4 atlas contains 28 cells with zero edge-alpha pixels and at
 most 0.5 source-pixel root drift.
 
-Cycle 07 character clips are mutually disposable residency groups. The manifest
-records both physical decoded bytes and the runtime group bound; the audit uses
-the two largest members of each group because the currently rendered and one
-imminent decoded clip may overlap. Superseded resources are released on commit.
+Cycle 08 character clips are mutually disposable residency groups. The manifest
+records physical decoded bytes and the runtime group bound. The Servant may
+retain the currently rendered and one imminent clip. The larger Demoness keeps
+one full atlas plus one bounded `512×832` frame cache during handoff; the old
+atlas is released before the next atlas starts decoding. Superseded resources
+are released deterministically.
 Startup-critical bitmaps remain 818,566 compressed bytes and 12,581,888 decoded
 bytes.
 

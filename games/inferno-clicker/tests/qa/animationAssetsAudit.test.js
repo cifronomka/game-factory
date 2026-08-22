@@ -26,7 +26,9 @@ async function makeFixture() {
         loop: loopNames.includes(name),
         frames: Array.from({ length: frameCount }, (_, index) => ({
           x: (cell + index) * 10, y: 0, w: 10, h: 10,
-          durationMs: 100, sha256: sha(`${id}/${name}/${index}`), provenance: 'fixture-author/export-v1', edgeAlphaPixels: 0, matteRatio: 0,
+          durationMs: 100, sha256: sha(`${id}/${name}/${index}`), provenance: 'fixture-author/export-v1', edgeAlphaPixels: 0, matteRatio: 0, internalNeutralResidueRatio: 0,
+          alphaSha256: sha(`${id}/${name}/${index}/alpha`), encodedAlphaSha256: sha(`${id}/${name}/${index}/alpha`), encodedAlphaExact: true, detachedPartialAlphaPixelCount: 0,
+          sourceFrameWidth: 10, sourceFrameHeight: 10, sourceToAtlasUpscale: 1,
           rootY: 9, anatomicalScale: 1,
           sockets: id.startsWith('CH-ASH-SERVANT') ? { mouth: [0.5, 0.3] }
             : id.startsWith('CH-DEMONESS') ? { leftHand: [0.3, 0.4], rightHand: [0.7, 0.4] } : undefined,
@@ -42,8 +44,8 @@ async function makeFixture() {
   }
 
   for (const family of ['LOW', 'MID', 'HIGH']) for (const layer of ['CORE', 'OUTER']) await add(`FL-${family}-${layer}`, ['loop']);
-  for (const clip of ['IDLE', 'INHALE', 'BLOW', 'RECOVERY']) await add(`CH-ASH-SERVANT-${clip}-C07`, [clip.toLowerCase()], 8);
-  for (const clip of ['IDLE', 'CAST', 'HOLD', 'RECOVERY']) await add(`CH-DEMONESS-${clip}-C07`, [clip.toLowerCase()], 8);
+  for (const clip of ['IDLE', 'INHALE', 'BLOW', 'RECOVERY']) await add(`CH-ASH-SERVANT-${clip}-C08`, [clip.toLowerCase()], 8);
+  for (const clip of ['IDLE', 'CAST', 'HOLD', 'RECOVERY']) await add(`CH-DEMONESS-${clip}-C08`, [clip.toLowerCase()], 8);
   await add('CH-INFERNO-HOST-MAIN-C06', ['ambient'], 5);
   await add('CH-INFERNO-HOST-SENTINEL-C06', ['ambient'], 5);
   const manifest = { schemaVersion: 1, provenance: 'assets/PROVENANCE.md', assets };
@@ -75,4 +77,62 @@ test('animation asset hard gate rejects corrupt metadata hashes', async () => {
   manifest.assets[0].metadataSha256 = '0'.repeat(64);
   await writeFile(join(root, 'assets/assets-manifest.json'), JSON.stringify(manifest));
   await assert.rejects(() => auditAnimationAssets({ root }), /metadata hash mismatch/);
+});
+
+test('Cycle 08 animation gate requires an explicit internal neutral-residue measurement', async () => {
+  const { root, manifest } = await makeFixture();
+  const entry = manifest.assets.find((asset) => asset.id === 'CH-ASH-SERVANT-IDLE-C08');
+  const path = join(root, entry.metadata);
+  const metadata = JSON.parse(await readFile(path, 'utf8'));
+  delete metadata.clips.idle.frames[0].internalNeutralResidueRatio;
+  const bytes = Buffer.from(JSON.stringify(metadata));
+  await writeFile(path, bytes);
+  entry.metadataSha256 = sha(bytes);
+  await writeFile(join(root, 'assets/assets-manifest.json'), JSON.stringify(manifest));
+  await assert.rejects(() => auditAnimationAssets({ root }), /internal neutral residue ratio|internalNeutralResidueRatio/i);
+});
+
+test('Cycle 08 animation gate requires exact encoded-alpha proof', async () => {
+  const { root, manifest } = await makeFixture();
+  const entry = manifest.assets.find((asset) => asset.id === 'CH-DEMONESS-IDLE-C08');
+  const path = join(root, entry.metadata);
+  const metadata = JSON.parse(await readFile(path, 'utf8'));
+  metadata.clips.idle.frames[0].encodedAlphaExact = false;
+  const bytes = Buffer.from(JSON.stringify(metadata));
+  await writeFile(path, bytes);
+  entry.metadataSha256 = sha(bytes);
+  await writeFile(join(root, 'assets/assets-manifest.json'), JSON.stringify(manifest));
+  await assert.rejects(() => auditAnimationAssets({ root }), /encoded-alpha proof|decoded WebP alpha/i);
+});
+
+test('Cycle 08 Servant gate rejects detached block contour pixels', async () => {
+  const { root, manifest } = await makeFixture();
+  const entry = manifest.assets.find((asset) => asset.id === 'CH-ASH-SERVANT-IDLE-C08');
+  const path = join(root, entry.metadata);
+  const metadata = JSON.parse(await readFile(path, 'utf8'));
+  metadata.clips.idle.frames[0].detachedPartialAlphaPixelCount = 1;
+  const bytes = Buffer.from(JSON.stringify(metadata));
+  await writeFile(path, bytes);
+  entry.metadataSha256 = sha(bytes);
+  await writeFile(join(root, 'assets/assets-manifest.json'), JSON.stringify(manifest));
+  await assert.rejects(() => auditAnimationAssets({ root }), /block\/tile contour/i);
+});
+
+test('Cycle 08 animation gate rejects excessive contour matte, internal residue, and source upscale', async () => {
+  for (const [field, value, message] of [
+    ['matteRatio', 0.0101, /neutral bright matte ratio/i],
+    ['internalNeutralResidueRatio', 0.0051, /internal neutral residue ratio|internalNeutralResidueRatio/i],
+    ['sourceToAtlasUpscale', 1.0001, /source-to-atlas upscale/i],
+  ]) {
+    const { root, manifest } = await makeFixture();
+    const entry = manifest.assets.find((asset) => asset.id === 'CH-DEMONESS-IDLE-C08');
+    const path = join(root, entry.metadata);
+    const metadata = JSON.parse(await readFile(path, 'utf8'));
+    metadata.clips.idle.frames[0][field] = value;
+    const bytes = Buffer.from(JSON.stringify(metadata));
+    await writeFile(path, bytes);
+    entry.metadataSha256 = sha(bytes);
+    await writeFile(join(root, 'assets/assets-manifest.json'), JSON.stringify(manifest));
+    await assert.rejects(() => auditAnimationAssets({ root }), message);
+  }
 });

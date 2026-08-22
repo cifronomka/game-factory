@@ -4,7 +4,7 @@ Browser-first HTML5 clicker для Yandex Games о разгоне маленьк
 
 ## Текущий статус
 
-**Candidate 0.1.0 реализован и находится в regression QA.** Headless core, layered Canvas 2D presentation, attributed authored fire ambience through Web Audio, Web/Yandex adapters, persistence, leaderboard и rewarded flow собраны в `dist/`. Автоматические проверки проходят; ZIP и публикация закрыты до browser/device matrix и проверки в Yandex test console.
+**Candidate 0.1.1 — активный Corrective Cycle 08.** Headless core, layered Canvas 2D presentation, authored audio, Web/Yandex adapters, persistence, leaderboard и rewarded flow сохранены; Ash Servant/Demoness пересобраны с чистым alpha, а Demoness — в native `512×832` cells и runtime `504×840`. Исторический `0.1.0` остаётся rollback baseline; новый ZIP и публикация закрыты до полного C08 browser/device/regression gate.
 
 ## Source of truth
 

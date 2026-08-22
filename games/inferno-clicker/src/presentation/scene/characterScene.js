@@ -6,10 +6,10 @@ import { sceneTransform } from './infernoScene.js';
 import { drawSteamStream, steamStreamGeometry } from './steamEmitter.js';
 
 export const ASH_SERVANT_ATLAS_URLS = Object.freeze(Object.fromEntries(['idle', 'inhale', 'blow', 'recovery'].map((clip) => [clip,
-  new URL(`../../../assets/characters/ash-servant/ash-servant-${clip}-v5.webp`, import.meta.url).href,
+  new URL(`../../../assets/characters/ash-servant/ash-servant-${clip}-v6.webp`, import.meta.url).href,
 ])));
 export const DEMONESS_ATLAS_URLS = Object.freeze(Object.fromEntries(['idle', 'cast', 'hold', 'recovery'].map((clip) => [clip,
-  new URL(`../../../assets/characters/demoness/demoness-${clip}-v6.webp`, import.meta.url).href,
+  new URL(`../../../assets/characters/demoness/demoness-${clip}-v7.webp`, import.meta.url).href,
 ])));
 export const ASH_SERVANT_ATLAS_URL = ASH_SERVANT_ATLAS_URLS.idle;
 export const DEMONESS_ATLAS_URL = DEMONESS_ATLAS_URLS.idle;
@@ -22,9 +22,20 @@ export const INFERNO_HOST_URL = INFERNO_HOST_URLS.main;
 const SERVANT_CELL_WIDTH = 256;
 const SERVANT_CELL_HEIGHT = 320;
 const SERVANT_PIVOT = Object.freeze([0.5, 0.98125]);
-const DEMONESS_CELL_WIDTH = 412;
-const DEMONESS_CELL_HEIGHT = 664;
+const DEMONESS_CELL_WIDTH = 512;
+const DEMONESS_CELL_HEIGHT = 832;
 const DEMONESS_PIVOT = Object.freeze([0.5, 0.99]);
+const DEMONESS_CACHED_FRAME = Object.freeze({ x: 0, y: 0, w: DEMONESS_CELL_WIDTH, h: DEMONESS_CELL_HEIGHT });
+export const DEMONESS_RESIDENCY_CONTRACT = Object.freeze({
+  maxResidentClips: 1,
+  maxCachedFrames: 1,
+  cachedFrameSize: Object.freeze([DEMONESS_CELL_WIDTH, DEMONESS_CELL_HEIGHT]),
+  cachedFrameDecodedBytes: DEMONESS_CELL_WIDTH * DEMONESS_CELL_HEIGHT * 4,
+  warmup: 'hint-only-no-decode',
+  browserSwap: 'capture-frame-release-atlas-load-commit',
+  browserCanvasFailure: 'release-current-atlas-before-load',
+  noCanvasFallback: 'node-only-retain-current-atlas-until-commit',
+});
 const eightFrames = gridFrames(4, 8, SERVANT_CELL_WIDTH, SERVANT_CELL_HEIGHT);
 const demonessEightFrames = gridFrames(4, 8, DEMONESS_CELL_WIDTH, DEMONESS_CELL_HEIGHT);
 const SERVANT_CLIPS = Object.freeze({
@@ -50,15 +61,15 @@ const SERVANT_MOUTH_SOCKETS = Object.freeze({
   recovery: Object.freeze([[0.71, 0.45], [0.71, 0.43], [0.71, 0.41], [0.71, 0.39], [0.71, 0.37], [0.71, 0.36], [0.72, 0.35], [0.72, 0.34]].map(Object.freeze)),
 });
 const DEMONESS_CAST_HANDS = Object.freeze([
-  [[0.2886, 0.5665], [0.6600, 0.5665]], [[0.1686, 0.5525], [0.6829, 0.5665]], [[0.0714, 0.3710], [0.7571, 0.4548]], [[0.0943, 0.3897], [0.5114, 0.4455]],
-  [[0.1229, 0.3849], [0.3514, 0.4594]], [[0.1800, 0.3849], [0.3400, 0.4082]], [[0.1686, 0.3803], [0.3171, 0.4361]], [[0.1686, 0.3618], [0.3171, 0.3803]],
+  [[0.3091, 0.5490], [0.6461, 0.5454]], [[0.2275, 0.4762], [0.6860, 0.4961]], [[0.0775, 0.3408], [0.7816, 0.4635]], [[0.1304, 0.3612], [0.5416, 0.4365]],
+  [[0.1462, 0.3348], [0.4096, 0.4111]], [[0.1596, 0.3129], [0.4307, 0.3855]], [[0.1735, 0.3366], [0.3515, 0.4006]], [[0.1902, 0.3013], [0.3552, 0.3360]],
 ].map((pair) => Object.freeze(pair.map(Object.freeze))));
 const DEMONESS_HOLD_HANDS = Object.freeze([
-  [[0.0948, 0.3978], [0.3556, 0.4656]], [[0.1114, 0.3706], [0.2946, 0.4159]], [[0.0892, 0.3661], [0.3113, 0.4475]], [[0.1059, 0.3164], [0.3168, 0.4023]],
-  [[0.1447, 0.3480], [0.3168, 0.4159]], [[0.1781, 0.3661], [0.3556, 0.4385]], [[0.1891, 0.4114], [0.3223, 0.4701]], [[0.0836, 0.3751], [0.3556, 0.4746]],
+  [[0.1763, 0.3674], [0.4381, 0.4338]], [[0.1590, 0.3476], [0.3659, 0.3927]], [[0.1454, 0.3333], [0.3531, 0.4092]], [[0.1518, 0.3005], [0.3738, 0.3492]],
+  [[0.2022, 0.3239], [0.3749, 0.3801]], [[0.2147, 0.3423], [0.4277, 0.4091]], [[0.2115, 0.3781], [0.3934, 0.4359]], [[0.1545, 0.3446], [0.4415, 0.4434]],
 ].map((pair) => Object.freeze(pair.map(Object.freeze))));
 const DEMONESS_DISAPPROVAL_INTERVALS = Object.freeze([6.4, 8.2, 5.6, 7.3]);
-const DEMONESS_PLACEMENT = Object.freeze({ anchorX: 850, anchorY: 1_235, width: 420, height: 700 });
+const DEMONESS_PLACEMENT = Object.freeze({ anchorX: 820, anchorY: 1_235, width: 504, height: 840 });
 const SERVANT_PLACEMENT = Object.freeze({ anchorX: 300, anchorY: 1_225, width: 540, height: 590 });
 const SERVANT_APPEARANCE_DURATION = SERVANT_CLIPS.appearance.frames.length / SERVANT_CLIPS.appearance.fps;
 
@@ -175,6 +186,23 @@ function ramp(value, from, to) { return clamp((value - from) / (to - from), 0, 1
 /** @param {number} value */
 function smoothstep(value) { const progress = clamp(value, 0, 1); return progress * progress * (3 - 2 * progress); }
 
+/** @returns {HTMLCanvasElement|OffscreenCanvas|null} */
+function browserDemonessFrameCacheFactory() {
+  try {
+    if (typeof globalThis.document?.createElement === 'function') return globalThis.document.createElement('canvas');
+    if (typeof globalThis.OffscreenCanvas === 'function') return new globalThis.OffscreenCanvas(DEMONESS_CELL_WIDTH, DEMONESS_CELL_HEIGHT);
+  } catch {
+    // A browser may expose a canvas constructor while policy or memory pressure
+    // prevents allocation. The explicitly diagnosed no-canvas fallback below
+    // keeps the previous atlas until the replacement commits.
+  }
+  return null;
+}
+
+function browserCanvasApiAvailable() {
+  return typeof globalThis.document?.createElement === 'function' || typeof globalThis.OffscreenCanvas === 'function';
+}
+
 const DEMONESS_STAGE_EXIT_DURATION = 0.9;
 
 /** Stage-exit begins at the exact normal rendered profile and converges to the silhouette profile. */
@@ -241,7 +269,7 @@ export function demonessTemporalPhase(encounter) {
 
 /** Authored character state atlases with stable root anchors and spatially independent Inferno host regions. */
 export class CharacterScene {
-  /** @param {{imageFactory?:(()=>HTMLImageElement|null)}=} options */
+  /** @param {{imageFactory?:(()=>HTMLImageElement|null),demonessFrameCacheFactory?:((width:number,height:number)=>(HTMLCanvasElement|OffscreenCanvas|null))}=} options */
   constructor(options = {}) {
     this.servantBitmaps = Object.fromEntries(Object.entries(ASH_SERVANT_ATLAS_URLS).map(([clip, url]) => [clip, new OptionalBitmap(url, { ...options, autoLoad: false })]));
     this.demonessBitmaps = Object.fromEntries(Object.entries(DEMONESS_ATLAS_URLS).map(([clip, url]) => [clip, new OptionalBitmap(url, { ...options, autoLoad: false })]));
@@ -261,6 +289,13 @@ export class CharacterScene {
     this.servantReadyKey = 'idle';
     this.demonessAssetKey = 'idle';
     this.demonessReadyKey = 'idle';
+    this.demonessWarmKey = null;
+    this.demonessFrameCacheFactory = options.demonessFrameCacheFactory ?? browserDemonessFrameCacheFactory;
+    this.demonessAllowRetainedAtlasFallback = !browserCanvasApiAvailable();
+    /** @type {{surface:HTMLCanvasElement|OffscreenCanvas,sourceClip:string,sourceAnimationClip:string,sourceFrame:number}|null} */
+    this.demonessFrameCache = null;
+    this.demonessFallbackRetainedClip = null;
+    this.demonessCacheUnavailableReleaseFirst = false;
     this.servantPendingFrame = 0;
     this.demonessPendingFrame = 0;
     this.servantVisible = false;
@@ -298,12 +333,23 @@ export class CharacterScene {
   /** Decode an upcoming clip without changing the currently rendered atlas. */
   /** @param {'servant'|'demoness'} kind @param {string} key */
   warmClipAsset(kind, key) {
+    if (kind === 'demoness') {
+      // A 2048x1664 warm decode would violate the one-atlas residency bound.
+      // Keep only the intent; requestClipAsset performs the bounded swap when
+      // the state machine actually needs this clip.
+      this.demonessWarmKey = key;
+      return;
+    }
     const bitmaps = kind === 'servant' ? this.servantBitmaps : this.demonessBitmaps;
     bitmaps[key].startLoad();
   }
 
   /** @param {'servant'|'demoness'} kind @param {string} key */
   requestClipAsset(kind, key) {
+    if (kind === 'demoness') {
+      this.requestDemonessClipAsset(key);
+      return;
+    }
     const bitmaps = kind === 'servant' ? this.servantBitmaps : this.demonessBitmaps;
     const assetKey = `${kind}AssetKey`;
     const readyKey = `${kind}ReadyKey`;
@@ -319,6 +365,105 @@ export class CharacterScene {
       if (!bitmap.isReady() || this[assetKey] !== key) return;
       this[readyKey] = key;
       for (const [otherKey, other] of Object.entries(bitmaps)) if (otherKey !== key) other.release();
+    };
+    if (bitmap.isReady()) commit();
+    else settle.then(commit);
+  }
+
+  /** Capture exactly one currently displayed Demoness cell before its atlas is released. */
+  captureDemonessFrame() {
+    const bitmap = this.activeBitmap('demoness');
+    if (!bitmap.image || !bitmap.isReady()) return false;
+    let surface = null;
+    try {
+      surface = this.demonessFrameCacheFactory(DEMONESS_CELL_WIDTH, DEMONESS_CELL_HEIGHT);
+      if (!surface) return false;
+      surface.width = DEMONESS_CELL_WIDTH;
+      surface.height = DEMONESS_CELL_HEIGHT;
+      const context = surface.getContext('2d');
+      if (!context) return false;
+      const frame = this.activeFrame('demoness');
+      context.clearRect(0, 0, DEMONESS_CELL_WIDTH, DEMONESS_CELL_HEIGHT);
+      context.drawImage(bitmap.image, frame.x, frame.y, frame.w, frame.h, 0, 0, DEMONESS_CELL_WIDTH, DEMONESS_CELL_HEIGHT);
+      this.clearDemonessFrameCache();
+      this.demonessFrameCache = {
+        surface,
+        sourceClip: this.demonessReadyKey,
+        sourceAnimationClip: this.demonessAnimator.clipName,
+        sourceFrame: this.demonessAnimator.getFrameIndex(),
+      };
+      return true;
+    } catch {
+      if (surface) {
+        surface.width = 0;
+        surface.height = 0;
+      }
+      return false;
+    }
+  }
+
+  clearDemonessFrameCache() {
+    if (this.demonessFrameCache) {
+      this.demonessFrameCache.surface.width = 0;
+      this.demonessFrameCache.surface.height = 0;
+    }
+    this.demonessFrameCache = null;
+  }
+
+  /** One-atlas Demoness transition; browser canvas cache prevents a visual gap. */
+  /** @param {string} key */
+  requestDemonessClipAsset(key) {
+    const bitmaps = this.demonessBitmaps;
+    const bitmap = bitmaps[key];
+    if (!bitmap) return;
+
+    if (this.demonessReadyKey === key && bitmap.isReady()) {
+      this.demonessAssetKey = key;
+      if (this.demonessWarmKey === key) this.demonessWarmKey = null;
+      this.demonessFallbackRetainedClip = null;
+      this.demonessCacheUnavailableReleaseFirst = false;
+      this.clearDemonessFrameCache();
+      for (const [otherKey, other] of Object.entries(bitmaps)) if (otherKey !== key) other.release();
+      return;
+    }
+    if (this.demonessAssetKey === key && (bitmap.status === 'loading' || bitmap.isReady())) return;
+
+    const currentKey = this.demonessReadyKey;
+    const current = bitmaps[currentKey];
+    const currentReady = currentKey !== key && current?.isReady();
+    this.demonessPendingFrame = this.demonessAnimator.getFrameIndex();
+
+    if (currentReady && !this.demonessFrameCache) {
+      const captured = this.captureDemonessFrame();
+      this.demonessFallbackRetainedClip = !captured && this.demonessAllowRetainedAtlasFallback ? currentKey : null;
+      this.demonessCacheUnavailableReleaseFirst = !captured && !this.demonessAllowRetainedAtlasFallback;
+    }
+    this.demonessAssetKey = key;
+    if (this.demonessWarmKey === key) this.demonessWarmKey = null;
+
+    if (this.demonessFrameCache) {
+      // Production browser path: the 512x832 cache is complete before every
+      // 2048x1664 atlas (including an obsolete pending request) is released.
+      this.demonessFallbackRetainedClip = null;
+      this.demonessCacheUnavailableReleaseFirst = false;
+      for (const other of Object.values(bitmaps)) other.release();
+    } else {
+      // Node/non-canvas fallback may retain exactly the current atlas so tests
+      // and non-browser consumers do not flash. Production browsers expose the
+      // explicit canvas path above and therefore never decode two atlases.
+      for (const [otherKey, other] of Object.entries(bitmaps)) {
+        if (otherKey !== key && otherKey !== this.demonessFallbackRetainedClip) other.release();
+      }
+    }
+
+    const settle = bitmap.startLoad();
+    const commit = () => {
+      if (!bitmap.isReady() || this.demonessAssetKey !== key) return;
+      this.demonessReadyKey = key;
+      for (const [otherKey, other] of Object.entries(bitmaps)) if (otherKey !== key) other.release();
+      this.demonessFallbackRetainedClip = null;
+      this.demonessCacheUnavailableReleaseFirst = false;
+      this.clearDemonessFrameCache();
     };
     if (bitmap.isReady()) commit();
     else settle.then(commit);
@@ -642,7 +787,10 @@ export class CharacterScene {
     }
 
     const demonessBitmap = this.activeBitmap('demoness');
-    if (this.demonessVisible && demonessBitmap.image && demonessBitmap.isReady()) {
+    const demonessBitmapReady = Boolean(demonessBitmap.image && demonessBitmap.isReady());
+    const demonessRenderImage = demonessBitmapReady ? demonessBitmap.image : this.demonessFrameCache?.surface ?? null;
+    const demonessRenderFrame = demonessBitmapReady ? this.activeFrame('demoness') : DEMONESS_CACHED_FRAME;
+    if (this.demonessVisible && demonessRenderImage) {
       const active = this.demonessStrength > 0 || this.demonessDisplay === 'arms-rise' || this.demonessDisplay.startsWith('cast');
       const silhouette = this.demonessDisplay === 'silhouette';
       const placement = DEMONESS_PLACEMENT;
@@ -664,7 +812,7 @@ export class CharacterScene {
         context.fillRect(placement.anchorX - 380, placement.anchorY - placement.height - 90, 660, placement.height + 120);
         context.restore();
       }
-      drawTemporalCharacter(context, demonessBitmap.image, this.activeFrame('demoness'), {
+      drawTemporalCharacter(context, demonessRenderImage, demonessRenderFrame, {
         ...placement, pivot: DEMONESS_PIVOT, alpha: this.getDemonessOpacity(), filter: demonessFilter,
       });
       if (disapproval) drawDisapprovalCue(context, timeSeconds, placement, disapproval);
@@ -771,6 +919,8 @@ export class CharacterScene {
 
   getDiagnostics() {
     const disapproval = this.demonessDisplay === 'disapproval' ? demonessDisapprovalGesture(this.demonessAnimator.elapsed) : null;
+    const demonessResidentClips = Object.freeze(Object.entries(this.demonessBitmaps).filter(([, bitmap]) => bitmap.isReady()).map(([clip]) => clip));
+    const frameCache = this.demonessFrameCache;
     return Object.freeze({
       servant: Object.freeze({
         visible: this.servantVisible,
@@ -814,7 +964,24 @@ export class CharacterScene {
         ...this.demonessAnimator.snapshot(),
         asset: this.activeBitmap('demoness').status,
         assetClip: this.demonessReadyKey,
-        residentClips: Object.entries(this.demonessBitmaps).filter(([, bitmap]) => bitmap.isReady()).map(([clip]) => clip),
+        warmClip: this.demonessWarmKey,
+        residentClips: demonessResidentClips,
+        residentClipCount: demonessResidentClips.length,
+        withinResidencyLimit: demonessResidentClips.length <= DEMONESS_RESIDENCY_CONTRACT.maxResidentClips,
+        residencyContract: DEMONESS_RESIDENCY_CONTRACT,
+        frameCache: Object.freeze({
+          mode: frameCache
+            ? 'canvas-frame'
+            : this.demonessFallbackRetainedClip
+              ? 'retained-atlas-fallback'
+              : this.demonessCacheUnavailableReleaseFirst ? 'release-first-no-cache' : 'none',
+          frameCount: frameCache ? 1 : 0,
+          maxFrames: DEMONESS_RESIDENCY_CONTRACT.maxCachedFrames,
+          size: frameCache ? DEMONESS_RESIDENCY_CONTRACT.cachedFrameSize : null,
+          sourceClip: frameCache?.sourceClip ?? this.demonessFallbackRetainedClip,
+          sourceAnimationClip: frameCache?.sourceAnimationClip ?? null,
+          sourceFrame: frameCache?.sourceFrame ?? null,
+        }),
       }),
       host: Object.freeze({
         asset: Object.values(this.hostBitmaps).every((bitmap) => bitmap.isReady()) ? 'ready' : Object.values(this.hostBitmaps).some((bitmap) => bitmap.status === 'loading') ? 'loading' : 'idle',

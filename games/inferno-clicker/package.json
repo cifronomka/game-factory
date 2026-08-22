@@ -1,6 +1,6 @@
 {
   "name": "inferno-clicker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -17,10 +17,19 @@
     "assets:audit": "node scripts/assets-audit.mjs",
     "assets:build:cycle06": "node scripts/build-cycle06-character-assets.mjs",
     "assets:build:cycle07": "node scripts/build-cycle07-character-assets.mjs",
+    "assets:assemble:cycle08": "node scripts/assemble-cycle08-character-sources.mjs",
+    "assets:build:cycle08": "node scripts/build-cycle08-character-assets.mjs",
+    "assets:manifest:cycle08": "node scripts/sync-cycle08-character-manifest.mjs",
+    "art:review:cycle08": "node scripts/render-cycle08-art-review.mjs",
+    "fingerprint:audit:cycle08": "node scripts/cycle08-fingerprint-audit.mjs",
     "animation:audit": "node scripts/animation-assets-audit.mjs",
     "evidence:validate": "node scripts/validate-animation-evidence.mjs",
     "evidence:cycle06": "node scripts/validate-corrective-cycle-06-evidence.mjs",
     "evidence:cycle07": "node scripts/validate-corrective-cycle-07-evidence.mjs",
+    "evidence:cycle08": "node scripts/validate-corrective-cycle-08-evidence.mjs",
+    "evidence:cycle08:render": "node scripts/generate-cycle08-evidence.mjs --render-only",
+    "evidence:cycle08:generate": "node scripts/generate-cycle08-evidence.mjs",
+    "release:gates:cycle08": "node scripts/run-cycle08-release-gates.mjs",
     "release:audit": "node scripts/release-audit.mjs",
     "package": "node scripts/package.mjs"
   },

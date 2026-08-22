@@ -1,10 +1,10 @@
 # Product Spec — «Зажги»
 
-## Active corrective scope — Cycle 06
+## Active corrective scope — Cycle 08
 
-Cycle 06 improves perceived quality without changing the game. Automatic presentation-quality adaptation is silent and must not claim that the user's device is weak. The Ash Servant remains the same character but no longer flickers: it has genuinely smooth authored idle/exhale/recovery and visibly exhales scarlet snowflakes from its mouth. The Demoness retains the approved sovereign identity at higher clarity, uses more genuine transition frames and attacks with blue conical ice shards that evaporate into steam at the flame. All character edges are clean, and the accepted Inferno-host entrance leads into clearly living authored motion rather than a static plate.
+Cycle 08 improves perceived character quality without changing the game. The Ash Servant preserves the accepted C07 identity, scale, poses and timing while its exterior and enclosed-gap alpha are cleaned. The Demoness is redrawn from the approved identity at native-or-higher resolution, keeps the accepted sovereign silhouette and two-palm steam semantics, receives equally clean alpha, and uses one common `504×840` runtime draw box: exactly `+20%` on both axes versus C07 `420×700` and visibly taller than the Servant. White cutout matte, internal residue, blur, morphing, snowflakes and ice shards are forbidden.
 
-These are presentation requirements, not new mechanics. Gameplay balance/progression/input/reward/platform behavior, flame/environment design and audio assets/mix are frozen. Accessibility/performance tiers may reduce optional density or filters, but never remove the readable mouth→snowflake→flame or hand→ice→contact→steam causal chain.
+These are presentation requirements, not new mechanics. Gameplay balance/progression/input/reward/platform behavior, flame/environment design, audio assets/mix and the accepted mouth→steam→flame / two-palms→steam→flame causal chains are frozen. Accessibility/performance tiers may reduce optional density or filters, but never replace the authored characters with static cards or remove those readable sources and targets.
 
 ## Назначение
 

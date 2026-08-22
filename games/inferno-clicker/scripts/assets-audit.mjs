@@ -72,6 +72,11 @@ for (const [group, values] of decodedResidencyGroups) {
   const maxResident = Number(manifest.residencyGroups[group].maxResident);
   if (!Number.isInteger(maxResident) || maxResident < 1 || maxResident > values.length) throw new Error(`Invalid maxResident for ${group}`);
   decodedBytes += values.sort((a, b) => b - a).slice(0, maxResident).reduce((sum, value) => sum + value, 0);
+  const maxCachedFrames = Number(manifest.residencyGroups[group].maxCachedFrames ?? 0);
+  const cachedFrameDecodedBytes = Number(manifest.residencyGroups[group].cachedFrameDecodedBytes ?? 0);
+  if (!Number.isInteger(maxCachedFrames) || maxCachedFrames < 0 || !Number.isInteger(cachedFrameDecodedBytes) || cachedFrameDecodedBytes < 0) throw new Error(`Invalid frame-cache residency contract for ${group}`);
+  if ((maxCachedFrames === 0) !== (cachedFrameDecodedBytes === 0)) throw new Error(`Incomplete frame-cache residency contract for ${group}`);
+  decodedBytes += maxCachedFrames * cachedFrameDecodedBytes;
 }
 const audioAssets = Array.isArray(manifest.audioAssets) ? manifest.audioAssets : [];
 for (const entry of audioAssets) {

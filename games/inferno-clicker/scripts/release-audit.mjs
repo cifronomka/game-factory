@@ -5,7 +5,11 @@ import { gameRoot, walk } from './lib.mjs';
 
 const dist = join(gameRoot, 'dist');
 const manifest = JSON.parse(await readFile(join(dist, 'build-manifest.json'), 'utf8'));
-if (!/^0\.1\.0\+(?:[a-f0-9]{12}|working\.[a-f0-9]{12})$/.test(manifest.buildId) || !/^[a-f0-9]{40}$/.test(manifest.commitSha) || !/^[a-f0-9]{64}$/.test(manifest.sourceFingerprint) || !Array.isArray(manifest.files)) throw new Error('Invalid build manifest');
+const packageJson = JSON.parse(await readFile(join(gameRoot, 'package.json'), 'utf8'));
+const version = String(packageJson.version);
+const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const buildIdPattern = new RegExp(`^${escapedVersion}\\+(?:[a-f0-9]{12}|working\\.[a-f0-9]{12})$`);
+if (manifest.version !== version || !buildIdPattern.test(manifest.buildId) || !/^[a-f0-9]{40}$/.test(manifest.commitSha) || !/^[a-f0-9]{64}$/.test(manifest.sourceFingerprint) || !Array.isArray(manifest.files)) throw new Error('Invalid build manifest');
 const htmlSource = await readFile(join(dist, 'index.html'), 'utf8');
 if (!htmlSource.includes(`<meta name="build-id" content="${manifest.buildId}">`)) throw new Error('Build identity is missing from index.html');
 

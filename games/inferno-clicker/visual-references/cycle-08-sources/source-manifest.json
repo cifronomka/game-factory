@@ -1,0 +1,436 @@
+{
+  "schemaVersion": 1,
+  "cycle": "08",
+  "generationMode": "built-in OpenAI ImageGen",
+  "approvedReference": {
+    "path": "visual-references/stage-references/stage-5-demoness-reference-view.jpg",
+    "role": "Authoritative user-approved Stage 5 Demoness reference",
+    "width": 925,
+    "height": 1644,
+    "channels": 3,
+    "hasAlpha": false,
+    "sha256": "6bdc58df781ed898a35d98d05dc5f8b47e38f0e79c018e2d1da3afe48eb740a1",
+    "provenance": "User-supplied Stage 5 reference retained verbatim in visual-references; used as the identity and costume authority for the native C08 redraw.",
+    "featureChecklist": [
+      "face",
+      "crown-hair",
+      "silhouette",
+      "closed-high-neck-costume",
+      "ember-copper-palette",
+      "proportions",
+      "hands",
+      "scale-dominance"
+    ]
+  },
+  "identityMaster": {
+    "path": "visual-references/cycle-08-sources/demoness-identity-master.png",
+    "role": "Demoness identity master",
+    "width": 987,
+    "height": 1593,
+    "channels": 3,
+    "hasAlpha": false,
+    "sha256": "aefdb9bc14c3cd86abd7089f3a8b18bd28d4f76d4dc910444180c72166512174"
+  },
+  "demonessFrames": [
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/idle/frame-0.png",
+      "role": "idle authored frame 0",
+      "width": 987,
+      "height": 1593,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "aefdb9bc14c3cd86abd7089f3a8b18bd28d4f76d4dc910444180c72166512174"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/idle/frame-1.png",
+      "role": "idle authored frame 1",
+      "width": 984,
+      "height": 1599,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "77da7499229775f8187139b66d33a01b31aa2fbcbe90b715915fa27e81426786"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/idle/frame-2.png",
+      "role": "idle authored frame 2",
+      "width": 984,
+      "height": 1599,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "7be3a9be6f464f1aae29c36722904efbe1c2720358b6911f2b8b9c3d26a0c0f1"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/idle/frame-3.png",
+      "role": "idle authored frame 3",
+      "width": 1024,
+      "height": 1536,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "fe2cbd003a89b1f3d9bde68752cfa87911c34a780d5cfb59874610634928fe60"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/idle/frame-4.png",
+      "role": "idle authored frame 4",
+      "width": 1023,
+      "height": 1537,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "8257af1e4d2d987e65831ee9c05e6e8252ab9950be4fef4fe618b8da591bc13c"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/idle/frame-5.png",
+      "role": "idle authored frame 5",
+      "width": 1023,
+      "height": 1537,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "3d352fa8516e3ad7a866bee31df5a9f4d51c59d73a25d8162ef60dc1ef38d56e"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/idle/frame-6.png",
+      "role": "idle authored frame 6",
+      "width": 1023,
+      "height": 1537,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "eb3bb234f3d602498127598f68978e0628934c43b744a3719bc7067c2963f47c"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/idle/frame-7.png",
+      "role": "idle authored frame 7",
+      "width": 1025,
+      "height": 1535,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "f991fd927cf421ecb610de106f1b19d1c3388278b64e563069c95bd7bed50368"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/cast/frame-0.png",
+      "role": "cast authored frame 0",
+      "width": 1023,
+      "height": 1537,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "322330d4159b5ff05f3a4d03d1bb5146ff6c2e38252bacd0bbeec7a3272e2caf"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/cast/frame-1.png",
+      "role": "cast authored frame 1",
+      "width": 1012,
+      "height": 1554,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "8783d072c73f416ae9544f320e876be0a08da957a89c8c32132643f18e1877da"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/cast/frame-2.png",
+      "role": "cast authored frame 2",
+      "width": 984,
+      "height": 1598,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "f5feeddd85c80dfc49bab7fd93e8bbcfaceaefa19996f530c9896d9e5996fedf"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/cast/frame-3.png",
+      "role": "cast authored frame 3",
+      "width": 984,
+      "height": 1599,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "d68fe56d3844060fc66d5d26d702338ac6d48afe403fc89918b13d002d30de12"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/cast/frame-4.png",
+      "role": "cast authored frame 4",
+      "width": 1023,
+      "height": 1537,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "62842f2cd1776e0f225f63f1ca73859376ebdf6c026a09c60df590cbdabf2f73"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/cast/frame-5.png",
+      "role": "cast authored frame 5",
+      "width": 983,
+      "height": 1600,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "4400fa086afe5348e4e6903aa1dcba277fda77f34d69c3ff2a81cb99dedd26ee"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/cast/frame-6.png",
+      "role": "cast authored frame 6",
+      "width": 1013,
+      "height": 1552,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "ac36849b17f82bd1906e02a35895bbcab47d97c1755b4f96c7bb976cf244ffab"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/cast/frame-7.png",
+      "role": "cast authored frame 7",
+      "width": 1013,
+      "height": 1553,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "b02abe4df33b0aa205cb0394f62111c4ff73d01ec0da4dcf3b3287235968514f"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/hold/frame-0.png",
+      "role": "hold authored frame 0",
+      "width": 987,
+      "height": 1593,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "13961c94be20000c62d79c930d1679c1cc9bdc447c1bcb654cc61630a310b681"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/hold/frame-1.png",
+      "role": "hold authored frame 1",
+      "width": 985,
+      "height": 1597,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "1bd5a16ae1f509b0d44ded5295b4fc408c6e89c46e887bc98c6d23fea2f561d5"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/hold/frame-2.png",
+      "role": "hold authored frame 2",
+      "width": 984,
+      "height": 1599,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "c3c254991d10e0acb7acbbace96fc8931376876c6674579971788a2d9e335f4a"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/hold/frame-3.png",
+      "role": "hold authored frame 3",
+      "width": 992,
+      "height": 1586,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "42a06dbd2a46444948f53b5d4d001ecf9ab0bb882e4933afb0c33aea59b2a23e"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/hold/frame-4.png",
+      "role": "hold authored frame 4",
+      "width": 1016,
+      "height": 1547,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "502e0ac9d30362b9dc7fea30e458a16d269a3fb6f65e5f8e5909646f1e52e9cd"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/hold/frame-5.png",
+      "role": "hold authored frame 5",
+      "width": 985,
+      "height": 1597,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "cc7baa9f5847c19f29818c5b108ab7a33623a2c2698bc27eeb6d55f949c10ce6"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/hold/frame-6.png",
+      "role": "hold authored frame 6",
+      "width": 987,
+      "height": 1593,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "36d6fbf14d7cb9f293a270f486c04d1c3e51073ef264a8bc3e3476c4bf374037"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/hold/frame-7.png",
+      "role": "hold authored frame 7",
+      "width": 985,
+      "height": 1597,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "eefdca0da87e54d887603437464fe890239ff6719ab6a0355e6bcf45a85e509e"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/recovery/frame-0.png",
+      "role": "recovery authored frame 0",
+      "width": 984,
+      "height": 1599,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "20fe02e9f9748312eda42d65919125e39b1a81b22d0e999937de2e8a0761ab2f"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/recovery/frame-1.png",
+      "role": "recovery authored frame 1",
+      "width": 984,
+      "height": 1599,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "c9d0eaf0aba25fa0eaddb45a8291cbff79ba57fc982883b067cbbd8e72c84639"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/recovery/frame-2.png",
+      "role": "recovery authored frame 2",
+      "width": 984,
+      "height": 1599,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "2987fad0d4d1bba500eaa6bc7c154cf7e27cf2673cf7f97f356b8456f9eda486"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/recovery/frame-3.png",
+      "role": "recovery authored frame 3",
+      "width": 991,
+      "height": 1587,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "e88e647d911eda2272cc1a1de549a1e07da211819170cc14a377e9f9b08df3ef"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/recovery/frame-4.png",
+      "role": "recovery authored frame 4",
+      "width": 1016,
+      "height": 1547,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "3ae7d379bbfc0812af6a874a62ebfb5c80467ae3331c96f124054630f71d7862"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/recovery/frame-5.png",
+      "role": "recovery authored frame 5",
+      "width": 1019,
+      "height": 1543,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "b86826c3ce3964c18248852a307f7a8c94ff447b72f0d28988c868b4178fd966"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/recovery/frame-6.png",
+      "role": "recovery authored frame 6",
+      "width": 1016,
+      "height": 1547,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "89c94e39b189ab80b7527d9718e96dcb960ec9786047c9ec0782bb715e047372"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-frames/recovery/frame-7.png",
+      "role": "recovery authored frame 7",
+      "width": 1019,
+      "height": 1543,
+      "channels": 3,
+      "hasAlpha": false,
+      "sha256": "358bbcb50884058b8320d76a0c42af2aeaeddfe441e13971eb4ddf28e4418a8a"
+    }
+  ],
+  "assembledSheets": [
+    {
+      "path": "visual-references/cycle-08-sources/demoness-idle-8-source.png",
+      "role": "idle cleaned 4x2 source sheet",
+      "width": 2048,
+      "height": 1664,
+      "channels": 4,
+      "hasAlpha": true,
+      "sha256": "9a768d1fc27d02b5bb7f80ae3e24342ac555a713eb6a804bcb3198f908a47b6d"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-cast-8-source.png",
+      "role": "cast cleaned 4x2 source sheet",
+      "width": 2048,
+      "height": 1664,
+      "channels": 4,
+      "hasAlpha": true,
+      "sha256": "478ba52e48538f573ac55247c4a1dd51bfc41f581266dfc3f60a7a83d0414517"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-hold-8-source.png",
+      "role": "hold cleaned 4x2 source sheet",
+      "width": 2048,
+      "height": 1664,
+      "channels": 4,
+      "hasAlpha": true,
+      "sha256": "5de67dc7063b86b1128a2620075efe23c1330b6aa244e944acb8eaa29f031ddd"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/demoness-recovery-8-source.png",
+      "role": "recovery cleaned 4x2 source sheet",
+      "width": 2048,
+      "height": 1664,
+      "channels": 4,
+      "hasAlpha": true,
+      "sha256": "b045f1390dc5ce3259248b5f51d5162e34cf65aec557593b568fbe12baf67b93"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/ash-servant-idle-8-source.png",
+      "role": "idle retained-and-cleaned 4x2 source sheet",
+      "width": 1024,
+      "height": 640,
+      "channels": 4,
+      "hasAlpha": true,
+      "sha256": "970f363aaf20dfaa4d288c55676d171e92c3e97530f3a60dc844a8d1e9695edb"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/ash-servant-inhale-8-source.png",
+      "role": "inhale retained-and-cleaned 4x2 source sheet",
+      "width": 1024,
+      "height": 640,
+      "channels": 4,
+      "hasAlpha": true,
+      "sha256": "64aa1bcf9ffb4607e520c7f28a07a09251b7781951a82be0a937ef429265c4d1"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/ash-servant-blow-8-source.png",
+      "role": "blow retained-and-cleaned 4x2 source sheet",
+      "width": 1024,
+      "height": 640,
+      "channels": 4,
+      "hasAlpha": true,
+      "sha256": "0573fbe5dbe0d237309587ea5e0da0356f1f5b433dc72badc1b076bf1655fc98"
+    },
+    {
+      "path": "visual-references/cycle-08-sources/ash-servant-recovery-8-source.png",
+      "role": "recovery retained-and-cleaned 4x2 source sheet",
+      "width": 1024,
+      "height": 640,
+      "channels": 4,
+      "hasAlpha": true,
+      "sha256": "3d4466561c56371ce49e2ae2151f72213a4ba4f563c42509ed59c47f93976be8"
+    }
+  ],
+  "nativeSourceGate": {
+    "demonessMinimumRawWidth": 983,
+    "demonessMinimumRawHeight": 1535,
+    "targetCell": [
+      512,
+      832
+    ],
+    "maxSourceToAtlasUpscale": 1,
+    "oldRasterUpscaleUsed": false
+  },
+  "servantLineage": {
+    "policy": "C07 accepted silhouettes and motion retained; source sheets copied losslessly before superseded runtime files were removed, then alpha/metadata rebuilt as v6",
+    "c07AtlasSha256": {
+      "idle": "9ac2921f64c1abad1f0caf35e179bf37db9d5517f6c9a7aa05ce56893f162388",
+      "inhale": "dd1f2193d8d81fa18ce0c8914bddac8ef8753c79f53adfa05213d482cd6181c0",
+      "blow": "5ee00f85cc19d4feca6085d608154817c4f90b1a1a4feae76affbcdb3d5c80ad",
+      "recovery": "c7c631a25ce0e6880d8924a2d31d81ad9e23d082bce8d2861f594b83729624bd"
+    }
+  },
+  "promptContract": {
+    "useCase": "identity-preserving full-body game character redraw",
+    "positive": "Use the high-resolution Demoness identity master and the supplied pose reference; preserve face, crown and hair, closed high-neck black armor, ember-copper palette and full-body silhouette; render crisp native detail and clear negative spaces around arms and inside bends.",
+    "negative": "No exposed chest, white matte, white halo, neutral residue inside limb gaps, blur, extra limbs, extra fingers, cropping, text or watermark."
+  },
+  "assembly": {
+    "checkerRemoval": "neutral checker tones converted to alpha before resize",
+    "servantContourCleanup": "legacy partial-alpha tiles without an adjacent opaque authored pixel are removed; the remaining one-pixel antialias band is defringed from opaque character colour",
+    "visibleFrameBox": [
+      500,
+      720
+    ],
+    "cell": [
+      512,
+      832
+    ],
+    "bottomGutter": 6,
+    "resizePolicy": "high-resolution raw portrait is trimmed, downscaled to 720px visible height, width capped at 500px without cropping hands, and bottom-rooted"
+  }
+}

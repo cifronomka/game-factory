@@ -1,8 +1,8 @@
-# Acceptance Criteria — «Зажги», corrective cycle 07 steam and clarity correction
+# Acceptance Criteria — «Зажги», corrective cycle 08 alpha, clarity and scale correction
 
-Это единственный stop contract. DONE разрешён только для одного финального clean exact build, когда все применимые строки ровно восьми групп ниже имеют `PASS`, evidence находится в `reports/corrective-cycle-07/<exact-build-id>/`, `validate-corrective-cycle-07-evidence.mjs` завершён с exit 0 и open Critical=0/High=0.
+Это единственный stop contract. DONE разрешён только для одного финального clean exact C08 build, когда все применимые строки ровно восьми групп ниже имеют `PASS`, evidence находится в `reports/corrective-cycle-08/<exact-build-id>/`, C08 evidence validator завершён с exit 0 и open Critical=0/High=0.
 
-Статусы: `NOT RUN`, `PASS`, `FAIL`, `BLOCKED`, `N/A — причина`. Новые Cycle 07 условия начинаются с `NOT RUN`. Cycle 02–06 visual evidence — `SUPERSEDED` для изменённых персонажей/effects/evidence workflow. Gameplay/audio/platform не меняются; их перенос разрешён только по exact source/asset fingerprint плюс neighboring/full regression.
+Статусы: `NOT RUN`, `PASS`, `FAIL`, `BLOCKED`, `N/A — причина`. Все новые Cycle 08 строки начинаются с `NOT RUN`. C07 строки и их `PASS` ниже сохраняют исторический результат принятого C07 build, но не закрывают C08 alpha/clarity/scale/evidence. Gameplay/audio/platform не меняются; C08 обязан заново доказать frozen fingerprints и neighboring/full regression.
 
 ## 1. Functional
 
@@ -17,6 +17,7 @@
 | F-07 | Servant и Demoness debuffs имеют независимые timers/sources; `min(2.50,1.80×1.50)=2.50`, tap power не меняется, duplicate application=0 | Mechanical parity fixture | PASS |
 | F-08 | HUD показывает servant-only, demoness-only и both-active как раздельные responsive rows с отдельными name/modifier/duration; overlap/truncation/shared timer=0 | Browser geometry/state trace | PASS |
 | F-09 | Cycle 07 diff не меняет core gameplay, platform contract, flame/environment design или audio mix/assets; frozen fingerprints равны baseline, кроме перечисленного presentation/visual/loading/evidence scope | Exact diff + fingerprint regression | PASS |
+| F-10 | Cycle 08 diff ограничен versioned character art/metadata, asset cleanup, Demoness internal draw placement, tests/docs/evidence; core gameplay, saves, platform adapters, flame/environment/host and audio source/runtime fingerprints равны accepted C07 baseline | Exact diff + frozen fingerprint matrix | NOT RUN |
 
 ## 2. Gameplay
 
@@ -30,6 +31,7 @@
 | G-06 | Close/error/unavailable даёт boost/reward/heat/score/cooldown consumption 0; тот же run может достичь Stage 7 без reward | Provider-unavailable cycle | PASS |
 | G-07 | Seven ranges, decay, score, bonuses, Heat Window, failures and Inferno hold совпадают с GAME_DESIGN; heat 0..1000, score 0..2147483647 | Deterministic/cross-doc suite | PASS |
 | G-08 | Frozen Cycle 07 before/after browser replay даёт те же accepted input IDs, stage/event sequence и final core snapshot; steam reach/collision/timestamps не мутируют core | Paired exact-build replay | PASS |
+| G-09 | Accepted C07 build и C08 candidate дают одинаковые accepted input IDs, encounter/stage/event sequence, effect timings and final core snapshot; art dimensions, alpha and socket metadata не мутируют core | Paired C07/C08 exact-build replay | NOT RUN |
 
 ## 3. Visual
 
@@ -59,6 +61,12 @@
 | V-22 | Servant, Demoness and host on black/dark-red/neutral backgrounds: visible white matte, chroma spill, rectangular residue and sticker edge=0; partial-alpha audit and Human-Eye veto PASS | Edge composites + audit | PASS |
 | V-23 | Accepted Inferno entry duration/composition unchanged; every rolling 5 s post-entry window contains visible authored internal movement in≥2 independent regions; whole-plate/crop-only drift, seam, loop pop=0 | Baseline diff + 15 s host clips | PASS |
 | V-24 | Blind review identifies `mouth→steam→flame` and `left palm + right palm→steam→flame` without HUD/debug labels; ambiguous source/target, snow/ice interpretation or one-hand-only reading=0 | Blind first observations + timestamp/frame links | PASS |
+| V-25 | Каждый production frame Ash Servant и Demoness имеет approved-mask→decoded-WebP exact alpha parity (`changedAlphaPixels=0`, `maxAlphaError=0`, low-alpha leak=0); Servant detached partial-alpha contour tiles=0; на black/dark-red/neutral-gray visible outer white halo, low-chroma fringe, rectangular residue, sticker edge and opaque white internal-gap islands=0; локти, руки/корпус, волосы/рога, одежда/подол/ноги покрыты; genuine pale details не удалены | Per-frame alpha SHA/parity + exterior/internal masks + three-background composites + Human-Eye veto | NOT RUN |
+| V-26 | Demoness redrawn from approved reference at native-or-higher source resolution; every packed cell exactly `512×832` RGBA; C08 frames are not resized C07 atlas pixels; genuine alpha and source/export/browser detail preserve face, crown/hair, hands, armor and identity; blur/morph/double-limb/fragment=0 | Provenance/hashes/dimensions + source/export/browser detail comparison | NOT RUN |
+| V-27 | Demoness common runtime draw box is exactly `504×840` in every state versus C07 `420×700`; both axis deltas are `+20%`; feet/root remains stable and growth is primarily upward; per-state scale override=0 | Runtime geometry trace + baseline/candidate comparison | NOT RUN |
+| V-28 | Minimum visible rendered Demoness alpha-bbox height across every required state/viewport/DPR is `≥1.25×` corresponding Servant bbox; critical flame/HUD overlap, clipping, teleport/sliding=0; effective upscale≤1.25× | Exact `sceneTransform`/DPR bbox matrix + browser frames | NOT RUN |
+| V-29 | Recomputed C08 root/mouth/leftHand/rightHand/anatomical metadata follows corrected frames; C07 stable-scale and mouth/two-palm steam semantics remain within V-20/V-21/V-16 tolerances in solo, concurrent, pause and reduced/forced-low scenarios | Socket/landmark matrix + normal/slow motion regression | NOT RUN |
+| V-30 | Every C08 frame records `sourceToAtlasUpscale≤1.0`; raw Demoness ImageGen frame dimensions/hashes prove native-or-higher redraw, while runtime exact-transform effective upscale separately remains≤1.25× | Source manifest + atlas metadata + transform matrix | NOT RUN |
 
 ## 4. Audio
 
@@ -69,6 +77,7 @@
 | A-03 | Pause/menu/background/ad достигает silence≤100 ms, блокирует stale one-shots и resumes once after all reasons clear | Lifecycle smoke | PASS |
 | A-04 | Cycle 07 leaves audio files, registry mapping, gain/mix constants and source fingerprints byte-equal the signed pre-C07 baseline; lifecycle smoke PASS | Fingerprints + lifecycle trace | PASS |
 | A-05 | Codec failure делает один bounded fallback или silent degradation; uncaught error/repeated per-tap refetch=0 | Forced failure trace | PASS |
+| A-06 | Cycle 08 audio files, registry mapping, gain/mix constants and source fingerprints are byte-equal accepted C07 baseline; lifecycle smoke remains PASS | Frozen fingerprints + lifecycle trace | NOT RUN |
 
 ## 5. Performance
 
@@ -82,6 +91,7 @@
 | PERF-06 | Quality downgrade silent: user-facing downgrade toast count=0; low/reduced сохраняют mouth steam, two-palm steam and host semantics plus identical core snapshot | Forced-load/reduced-motion browser test | PASS |
 | PERF-07 | Refresh-only 30/40/60/120 Hz, startup spikes and hidden/resume gaps produce auto-downgrade count=0; sustained measured render cost over≥2 windows produces one reasoned bounded downgrade | Controller matrix + browser telemetry | PASS |
 | PERF-08 | Instant decoded texture residency target≤56 MiB (documented exception required when exceeded) and hard≤64 MiB at startup/first attacks/overlap/Inferno/pause-resume; active-draw release, missing-frame flash, leaked handle, monotonic growth=0 | Clip lifecycle/residency trace | PASS |
+| PERF-09 | C08 Demoness uses `512×832` cells; an eight-frame `4×2` atlas is `2048×1664` and no texture side exceeds 2048 px; exactly one full Demoness atlas plus one bounded frame-cache is resident; total art/package and decoded residency remain within PERF-01/02/08 | Manifest + decoded handoff/performance trace | NOT RUN |
 
 ## 6. Yandex Platform
 
@@ -93,6 +103,7 @@
 | Y-04 | Best Score submits one improved integer [0,2147483647]; lower/duplicate/retry не уменьшает/дублирует | Adapter trace | PASS |
 | Y-05 | Reward provider optional, never progression permission; Yandex и explicit Web test provider mutually exclusive; unavailable mode достигает Stage 7 | Provider contract/cycles | PASS |
 | Y-06 | Reward success/cancel/error/unavailable/duplicate/late callbacks удовлетворяют G-05/G-06 и атомарно pause gameplay/audio/animation | Platform lifecycle trace | PASS |
+| Y-07 | Cycle 08 changes no platform adapter/API/manifest behavior; platform source fingerprints equal C07 and desktop/mobile fallback, pause and rewarded lifecycle regression remain PASS | Adapter diff/fingerprint + lifecycle regression | NOT RUN |
 
 ## 7. QA
 
@@ -106,6 +117,8 @@
 | Q-06 | Gate 6 повторяет full seven-stage mouse/touch-emulated cycle, required viewports, reduced motion, cross-browser и neighboring gameplay/audio/platform regression | Regression manifest | PASS |
 | Q-07 | Каждый Critical/High/Medium issue имеет severity/environment/steps/expected/actual/motion evidence/AC, Developer fix on new build, independent targeted retest and neighboring regression links; автор fix не закрывает issue; open Critical=0/High=0 | Defects/fixes/retests/signoff | PASS |
 | Q-08 | QA_PLAN/AC/source assets manifest/reports не противоречат друг другу; every PASS ссылается на nonempty inventoried exact-build evidence | Traceability audit | PASS |
+| Q-09 | Ordered C08 Gates 1–6 run on one final clean exact build; new validator and negative fixtures reject wrong dimensions, missing internal-gap/background coverage, matte/erased-highlight veto, upscaled source, ratio<1.25, stale C07 evidence and owner/link violations | Automation log + validator fixture results | NOT RUN |
+| Q-10 | C08 evidence inventories every affected frame/state, three-background composites, source/native-resolution proof, `420×700→504×840` geometry, full viewport/DPR bbox ratio, 1×/0.25× motion and independent issue→fix→retest→neighboring-regression signoff | C08 root/browser manifests + reviews | NOT RUN |
 
 ## 8. Release
 
@@ -117,5 +130,7 @@
 | RLS-04 | ZIP имеет один root `index.html`, нет wrapper/path traversal/local absolute URLs; matches dist and reaches READY over static HTTP | Package/unpacked smoke | PASS |
 | RLS-05 | Final report перечисляет Servant scale normalization, real-scene-transform Demoness sharpness, mouth/two-palm steam, obsolete snow/ice veto, inherited silent quality/host/residency, issue→fix→independent-retest→neighboring-regression links, evidence path, commands, reviewers, ZIP SHA/bytes и rollback | Release report audit | PASS |
 | RLS-06 | Все применимые F/G/V/A/PERF/Y/Q/RLS PASS, validator exit 0, Critical=0/High=0; QA, independent reviewer и Release Agent sign one exact build | Final stop audit | PASS |
+| RLS-07 | `reports/corrective-cycle-08/<exact-build-id>/`, dist manifest, commit, C07 baseline fingerprints, C08 source/reference/asset hashes and final reports identify one clean patch candidate; historical C07 artifact/report remains intact | C08 evidence validator + release report audit | NOT RUN |
+| RLS-08 | Every applicable legacy and new C08 row is PASS on the same candidate; C08 validator exit 0, Critical=0/High=0, skipped=0; QA, independent reviewer and Release Agent sign that exact build | Final C08 stop audit | NOT RUN |
 
-**Current decision:** DONE = YES при успешной валидации финального clean exact-build evidence. Все Cycle 07 строки `PASS`; authoritative evidence хранится в `reports/corrective-cycle-07/<exact-build-id>/`. Gameplay, audio и platform подтверждены frozen regression.
+**Current decision:** DONE = NO — CYCLE 08 `NOT RUN`. Cycle 07 остаётся исторически принятым для своего exact build, но новые C08 строки V-25…V-29, F-10, G-09, A-06, PERF-09, Y-07, Q-09/Q-10 и RLS-07/RLS-08 не имеют evidence и не могут быть объявлены PASS заранее.

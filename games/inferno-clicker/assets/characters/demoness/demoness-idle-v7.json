@@ -1,0 +1,449 @@
+{
+  "schemaVersion": 1,
+  "cycle": "08",
+  "atlasWidth": 2048,
+  "atlasHeight": 1664,
+  "frameWidth": 512,
+  "frameHeight": 832,
+  "pivot": [
+    0.5,
+    0.99
+  ],
+  "transparentGutterPixels": 6,
+  "packing": "Cycle 08 clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve",
+  "encoding": {
+    "codec": "WebP",
+    "quality": 66,
+    "alphaQuality": 100,
+    "smartSubsample": true,
+    "effort": 6
+  },
+  "alphaCleanup": {
+    "strategy": "source-alpha-preferred",
+    "sourceTransparentPixelCount": 2023144,
+    "sourcePartialAlphaPixelCount": 251185,
+    "sourceTransparentRatio": 0.59367,
+    "sourceBorderTransparentRatio": 1,
+    "inferredBackgroundRgb": [
+      0,
+      0,
+      0
+    ],
+    "inferredBackgroundDominance": 0.99435,
+    "borderBackgroundPixelsRemoved": 0,
+    "enclosedBackgroundPixelsRemoved": 4,
+    "enclosedBackgroundRegionsRemoved": 1,
+    "contaminatedContourPixelsRemoved": 0
+  },
+  "strictAlphaAudit": {
+    "matteRatioMax": 0.01,
+    "internalNeutralResidueRatioMax": 0.005,
+    "edgeAlphaPixelsMax": 0,
+    "transparentGutterPixelsMin": 4,
+    "sourceToAtlasUpscaleMax": 1,
+    "encodedAlphaExact": true
+  },
+  "sourceSheet": "visual-references/cycle-08-sources/demoness-idle-8-source.png",
+  "sourceSheetSha256": "9a768d1fc27d02b5bb7f80ae3e24342ac555a713eb6a804bcb3198f908a47b6d",
+  "atlasSha256": "ee42b00c10ea9dd16023d199b91200c0c3b99dde70bc112f6cff1a71d91daeac",
+  "clips": {
+    "idle": {
+      "fps": 1.2,
+      "loop": true,
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 512,
+          "h": 832,
+          "durationMs": 833.33,
+          "sha256": "8ebc471e79601c9d4249dd91893033614d3bf84ee201f6d184b18b1c9302c7f3",
+          "alphaSha256": "af4514c39395111863d40c10911e4c3aa6843ae7a471a0a25e8d6fb915af46df",
+          "provenance": "Cycle 08 ImageGen Cycle 08 source demoness-idle-8-source.png; idle authored frame 0; alpha defringe, stable-root fit and quality-66/alpha-100 WebP export only",
+          "sockets": {
+            "leftHand": [
+              0.3091,
+              0.549
+            ],
+            "rightHand": [
+              0.6461,
+              0.5454
+            ]
+          },
+          "anatomicalScale": 1,
+          "defringedPixelCount": 41919,
+          "sourceFrameWidth": 512,
+          "sourceFrameHeight": 832,
+          "sourceToAtlasUpscale": 1,
+          "alphaBBox": [
+            34,
+            106,
+            477,
+            825
+          ],
+          "rootY": 825,
+          "centroidX": 254.12,
+          "edgeAlphaPixels": 0,
+          "transparentGutterPixels": 6,
+          "visiblePixelCount": 172980,
+          "transparentPixelCount": 253004,
+          "opaquePixelCount": 133346,
+          "partialAlphaPixelCount": 42068,
+          "detachedPartialAlphaPixelCount": 7983,
+          "brightNeutralEdgePixelCount": 0,
+          "brightNeutralInteriorPixelCount": 0,
+          "connectedComponentCount": 1,
+          "alphaCoverageRatio": 0.40607,
+          "largestComponentRatio": 1,
+          "matteRatio": 0,
+          "internalNeutralResidueRatio": 0,
+          "encodedAlphaSha256": "af4514c39395111863d40c10911e4c3aa6843ae7a471a0a25e8d6fb915af46df",
+          "encodedAlphaExact": true
+        },
+        {
+          "x": 512,
+          "y": 0,
+          "w": 512,
+          "h": 832,
+          "durationMs": 833.33,
+          "sha256": "51329d42cc78ad3cde3958636112d1d0a36684d80ff3adff08505ff709801e88",
+          "alphaSha256": "97707e58b932f8c62ac933589734fe72bf7441fc3ef2e5c9d34b2452b8790210",
+          "provenance": "Cycle 08 ImageGen Cycle 08 source demoness-idle-8-source.png; idle authored frame 1; alpha defringe, stable-root fit and quality-66/alpha-100 WebP export only",
+          "sockets": {
+            "leftHand": [
+              0.2275,
+              0.4762
+            ],
+            "rightHand": [
+              0.686,
+              0.4961
+            ]
+          },
+          "anatomicalScale": 1,
+          "defringedPixelCount": 28237,
+          "sourceFrameWidth": 512,
+          "sourceFrameHeight": 832,
+          "sourceToAtlasUpscale": 1,
+          "alphaBBox": [
+            25,
+            106,
+            487,
+            825
+          ],
+          "rootY": 825,
+          "centroidX": 257.24,
+          "edgeAlphaPixels": 0,
+          "transparentGutterPixels": 6,
+          "visiblePixelCount": 168963,
+          "transparentPixelCount": 257021,
+          "opaquePixelCount": 142368,
+          "partialAlphaPixelCount": 28314,
+          "detachedPartialAlphaPixelCount": 4219,
+          "brightNeutralEdgePixelCount": 0,
+          "brightNeutralInteriorPixelCount": 0,
+          "connectedComponentCount": 1,
+          "alphaCoverageRatio": 0.39664,
+          "largestComponentRatio": 1,
+          "matteRatio": 0,
+          "internalNeutralResidueRatio": 0,
+          "encodedAlphaSha256": "97707e58b932f8c62ac933589734fe72bf7441fc3ef2e5c9d34b2452b8790210",
+          "encodedAlphaExact": true
+        },
+        {
+          "x": 1024,
+          "y": 0,
+          "w": 512,
+          "h": 832,
+          "durationMs": 833.33,
+          "sha256": "625455ea9b0cd5e4a0966ba0d2f8d7d279161917e7c6eabc4e14f0888aeeffa2",
+          "alphaSha256": "8fa1050afe5a24bab8994712169e646858f71c0a82382e9575d59c5e12a765f3",
+          "provenance": "Cycle 08 ImageGen Cycle 08 source demoness-idle-8-source.png; idle authored frame 2; alpha defringe, stable-root fit and quality-66/alpha-100 WebP export only",
+          "sockets": {
+            "leftHand": [
+              0.0775,
+              0.3408
+            ],
+            "rightHand": [
+              0.7816,
+              0.4635
+            ]
+          },
+          "anatomicalScale": 1,
+          "defringedPixelCount": 33324,
+          "sourceFrameWidth": 512,
+          "sourceFrameHeight": 832,
+          "sourceToAtlasUpscale": 1,
+          "alphaBBox": [
+            34,
+            106,
+            478,
+            825
+          ],
+          "rootY": 825,
+          "centroidX": 256.31,
+          "edgeAlphaPixels": 0,
+          "transparentGutterPixels": 6,
+          "visiblePixelCount": 175050,
+          "transparentPixelCount": 250934,
+          "opaquePixelCount": 143573,
+          "partialAlphaPixelCount": 33457,
+          "detachedPartialAlphaPixelCount": 5106,
+          "brightNeutralEdgePixelCount": 0,
+          "brightNeutralInteriorPixelCount": 0,
+          "connectedComponentCount": 1,
+          "alphaCoverageRatio": 0.41093,
+          "largestComponentRatio": 1,
+          "matteRatio": 0,
+          "internalNeutralResidueRatio": 0,
+          "encodedAlphaSha256": "8fa1050afe5a24bab8994712169e646858f71c0a82382e9575d59c5e12a765f3",
+          "encodedAlphaExact": true
+        },
+        {
+          "x": 1536,
+          "y": 0,
+          "w": 512,
+          "h": 832,
+          "durationMs": 833.33,
+          "sha256": "44e93ab98dc6d9b96492fdfe91565689e8d648cc5ce903429180098b59f5260f",
+          "alphaSha256": "16e8f18d084120fc3bee9d5421a4e25fef39dce7a7dfd77fdd9b0e206cc66d47",
+          "provenance": "Cycle 08 ImageGen Cycle 08 source demoness-idle-8-source.png; idle authored frame 3; alpha defringe, stable-root fit and quality-66/alpha-100 WebP export only",
+          "sockets": {
+            "leftHand": [
+              0.1304,
+              0.3612
+            ],
+            "rightHand": [
+              0.5416,
+              0.4365
+            ]
+          },
+          "anatomicalScale": 1,
+          "defringedPixelCount": 31359,
+          "sourceFrameWidth": 512,
+          "sourceFrameHeight": 832,
+          "sourceToAtlasUpscale": 1,
+          "alphaBBox": [
+            19,
+            106,
+            492,
+            825
+          ],
+          "rootY": 825,
+          "centroidX": 248.61,
+          "edgeAlphaPixels": 0,
+          "transparentGutterPixels": 6,
+          "visiblePixelCount": 177948,
+          "transparentPixelCount": 248036,
+          "opaquePixelCount": 148315,
+          "partialAlphaPixelCount": 31521,
+          "detachedPartialAlphaPixelCount": 4908,
+          "brightNeutralEdgePixelCount": 0,
+          "brightNeutralInteriorPixelCount": 0,
+          "connectedComponentCount": 1,
+          "alphaCoverageRatio": 0.41773,
+          "largestComponentRatio": 1,
+          "matteRatio": 0,
+          "internalNeutralResidueRatio": 0,
+          "encodedAlphaSha256": "16e8f18d084120fc3bee9d5421a4e25fef39dce7a7dfd77fdd9b0e206cc66d47",
+          "encodedAlphaExact": true
+        },
+        {
+          "x": 0,
+          "y": 832,
+          "w": 512,
+          "h": 832,
+          "durationMs": 833.33,
+          "sha256": "82fa739bdb228d57969a47cf0c1d1f94f56125465e0a1ecfe30e648785a55a4c",
+          "alphaSha256": "6ed8d9e799a159f3b7a2fef060527a92ec7e2005397b358d919ef725d64840db",
+          "provenance": "Cycle 08 ImageGen Cycle 08 source demoness-idle-8-source.png; idle authored frame 4; alpha defringe, stable-root fit and quality-66/alpha-100 WebP export only",
+          "sockets": {
+            "leftHand": [
+              0.1462,
+              0.3348
+            ],
+            "rightHand": [
+              0.4096,
+              0.4111
+            ]
+          },
+          "anatomicalScale": 1,
+          "defringedPixelCount": 31713,
+          "sourceFrameWidth": 512,
+          "sourceFrameHeight": 832,
+          "sourceToAtlasUpscale": 1,
+          "alphaBBox": [
+            33,
+            106,
+            478,
+            825
+          ],
+          "rootY": 825,
+          "centroidX": 254.15,
+          "edgeAlphaPixels": 0,
+          "transparentGutterPixels": 6,
+          "visiblePixelCount": 167839,
+          "transparentPixelCount": 258145,
+          "opaquePixelCount": 137777,
+          "partialAlphaPixelCount": 31859,
+          "detachedPartialAlphaPixelCount": 4910,
+          "brightNeutralEdgePixelCount": 0,
+          "brightNeutralInteriorPixelCount": 0,
+          "connectedComponentCount": 1,
+          "alphaCoverageRatio": 0.394,
+          "largestComponentRatio": 1,
+          "matteRatio": 0,
+          "internalNeutralResidueRatio": 0,
+          "encodedAlphaSha256": "6ed8d9e799a159f3b7a2fef060527a92ec7e2005397b358d919ef725d64840db",
+          "encodedAlphaExact": true
+        },
+        {
+          "x": 512,
+          "y": 832,
+          "w": 512,
+          "h": 832,
+          "durationMs": 833.33,
+          "sha256": "c54a293ba949f36d8858b610d2fcf8055e37a025a786526ede68b1024fda18d1",
+          "alphaSha256": "73a29838dd22678dc20d3450b861c153108b0ea04dcaef400830576f2a3b99b9",
+          "provenance": "Cycle 08 ImageGen Cycle 08 source demoness-idle-8-source.png; idle authored frame 5; alpha defringe, stable-root fit and quality-66/alpha-100 WebP export only",
+          "sockets": {
+            "leftHand": [
+              0.1596,
+              0.3129
+            ],
+            "rightHand": [
+              0.4307,
+              0.3855
+            ]
+          },
+          "anatomicalScale": 1,
+          "defringedPixelCount": 31782,
+          "sourceFrameWidth": 512,
+          "sourceFrameHeight": 832,
+          "sourceToAtlasUpscale": 1,
+          "alphaBBox": [
+            21,
+            106,
+            490,
+            825
+          ],
+          "rootY": 825,
+          "centroidX": 246.48,
+          "edgeAlphaPixels": 0,
+          "transparentGutterPixels": 6,
+          "visiblePixelCount": 179667,
+          "transparentPixelCount": 246317,
+          "opaquePixelCount": 149893,
+          "partialAlphaPixelCount": 32020,
+          "detachedPartialAlphaPixelCount": 5483,
+          "brightNeutralEdgePixelCount": 0,
+          "brightNeutralInteriorPixelCount": 0,
+          "connectedComponentCount": 1,
+          "alphaCoverageRatio": 0.42177,
+          "largestComponentRatio": 1,
+          "matteRatio": 0,
+          "internalNeutralResidueRatio": 0,
+          "encodedAlphaSha256": "73a29838dd22678dc20d3450b861c153108b0ea04dcaef400830576f2a3b99b9",
+          "encodedAlphaExact": true
+        },
+        {
+          "x": 1024,
+          "y": 832,
+          "w": 512,
+          "h": 832,
+          "durationMs": 833.33,
+          "sha256": "897737d4df5a26a624c14c8bcd86b557ee9fed2d098bdb487272782295899d1a",
+          "alphaSha256": "b798bd6cd6adb0c54db34cc4ab13b3422300bc394be05a535a2c12e1009f7088",
+          "provenance": "Cycle 08 ImageGen Cycle 08 source demoness-idle-8-source.png; idle authored frame 6; alpha defringe, stable-root fit and quality-66/alpha-100 WebP export only",
+          "sockets": {
+            "leftHand": [
+              0.1735,
+              0.3366
+            ],
+            "rightHand": [
+              0.3515,
+              0.4006
+            ]
+          },
+          "anatomicalScale": 1,
+          "defringedPixelCount": 28605,
+          "sourceFrameWidth": 512,
+          "sourceFrameHeight": 832,
+          "sourceToAtlasUpscale": 1,
+          "alphaBBox": [
+            31,
+            106,
+            480,
+            825
+          ],
+          "rootY": 825,
+          "centroidX": 249.04,
+          "edgeAlphaPixels": 0,
+          "transparentGutterPixels": 6,
+          "visiblePixelCount": 167849,
+          "transparentPixelCount": 258135,
+          "opaquePixelCount": 140995,
+          "partialAlphaPixelCount": 28799,
+          "detachedPartialAlphaPixelCount": 4737,
+          "brightNeutralEdgePixelCount": 0,
+          "brightNeutralInteriorPixelCount": 0,
+          "connectedComponentCount": 1,
+          "alphaCoverageRatio": 0.39403,
+          "largestComponentRatio": 1,
+          "matteRatio": 0,
+          "internalNeutralResidueRatio": 0,
+          "encodedAlphaSha256": "b798bd6cd6adb0c54db34cc4ab13b3422300bc394be05a535a2c12e1009f7088",
+          "encodedAlphaExact": true
+        },
+        {
+          "x": 1536,
+          "y": 832,
+          "w": 512,
+          "h": 832,
+          "durationMs": 833.33,
+          "sha256": "a0b977ff353b10205ad43342bff68dfcd8835c3f9c1608036ec1dd91fbe2e270",
+          "alphaSha256": "ae96c983243ff6dc0b6a51416cd6eb6dad439e051b7be4bebb0b8f68f5d29bb7",
+          "provenance": "Cycle 08 ImageGen Cycle 08 source demoness-idle-8-source.png; idle authored frame 7; alpha defringe, stable-root fit and quality-66/alpha-100 WebP export only",
+          "sockets": {
+            "leftHand": [
+              0.1902,
+              0.3013
+            ],
+            "rightHand": [
+              0.3552,
+              0.336
+            ]
+          },
+          "anatomicalScale": 1,
+          "defringedPixelCount": 29012,
+          "sourceFrameWidth": 512,
+          "sourceFrameHeight": 832,
+          "sourceToAtlasUpscale": 1,
+          "alphaBBox": [
+            27,
+            106,
+            484,
+            825
+          ],
+          "rootY": 825,
+          "centroidX": 245.59,
+          "edgeAlphaPixels": 0,
+          "transparentGutterPixels": 6,
+          "visiblePixelCount": 170384,
+          "transparentPixelCount": 255600,
+          "opaquePixelCount": 143063,
+          "partialAlphaPixelCount": 29139,
+          "detachedPartialAlphaPixelCount": 5035,
+          "brightNeutralEdgePixelCount": 0,
+          "brightNeutralInteriorPixelCount": 0,
+          "connectedComponentCount": 1,
+          "alphaCoverageRatio": 0.39998,
+          "largestComponentRatio": 1,
+          "matteRatio": 0,
+          "internalNeutralResidueRatio": 0,
+          "encodedAlphaSha256": "ae96c983243ff6dc0b6a51416cd6eb6dad439e051b7be4bebb0b8f68f5d29bb7",
+          "encodedAlphaExact": true
+        }
+      ]
+    }
+  }
+}

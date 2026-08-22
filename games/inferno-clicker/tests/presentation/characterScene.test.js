@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import {
   CharacterScene,
+  DEMONESS_RESIDENCY_CONTRACT,
   INFERNO_HOST_REGIONS,
   demonessDisapprovalGesture,
   demonessEffectiveUpscale,
@@ -156,7 +157,7 @@ test('Inferno host exposes independent authored-motion roles and advances a five
   assert.notEqual(frames.main, frames.sentinel, 'separate host parts remain on independent authored phases');
 });
 
-test('Demoness keeps a calm idle and performs one restrained disapproval gesture every 5-9 active seconds', () => {
+test('Cycle 08 Demoness is 20% larger and keeps a calm idle with restrained disapproval', () => {
   const scene = new CharacterScene();
   scene.setState(state({ stage: 5 }));
   advance(scene, 1.05);
@@ -170,7 +171,11 @@ test('Demoness keeps a calm idle and performs one restrained disapproval gesture
   assert.equal(recovered.state, 'idle');
   assert.equal(recovered.disapprovalCount, 1);
   assert.ok(recovered.nextDisapprovalMs >= 5_000 && recovered.nextDisapprovalMs <= 9_000);
-  assert.deepEqual(recovered.size, [420, 700]);
+  assert.deepEqual(recovered.size, [504, 840]);
+  assert.equal(recovered.size[0] / 420, 1.2);
+  assert.equal(recovered.size[1] / 700, 1.2);
+  assert.ok(recovered.size[1] / scene.getDiagnostics().servant.size[1] >= 1.25);
+  assert.ok(Math.abs(recovered.anchor[1] - 1_235) <= 8, 'the 20% growth stays bottom-anchored and extends upward');
 });
 
 test('Demoness disapproval follows ordered gaze phases without a dance loop', () => {
@@ -181,13 +186,18 @@ test('Demoness disapproval follows ordered gaze phases without a dance loop', ()
   assert.equal(demonessDisapprovalGesture(1.9).phase, 'return');
 });
 
-test('Cycle 07 uses authored per-frame mouth and dual-palm sockets', () => {
-  assert.deepEqual(servantMouthSocket('blow', 0), [0.790, 0.515]);
-  assert.deepEqual(servantMouthSocket('blow', 7), [0.705, 0.560]);
-  assert.deepEqual(demonessHandSockets('cast', 0), { leftHand: [0.2886, 0.5665], rightHand: [0.6600, 0.5665] });
-  assert.deepEqual(demonessHandSockets('cast', 7), { leftHand: [0.1686, 0.3618], rightHand: [0.3171, 0.3803] });
-  assert.deepEqual(demonessHandSockets('hold', 0), { leftHand: [0.0948, 0.3978], rightHand: [0.3556, 0.4656] });
-  assert.deepEqual(demonessHandSockets('hold', 3), { leftHand: [0.1059, 0.3164], rightHand: [0.3168, 0.4023] });
+test('Cycle 08 exposes normalized authored mouth and dual-palm sockets', () => {
+  for (const frame of [0, 3, 7]) {
+    const mouth = servantMouthSocket('blow', frame);
+    assert.equal(mouth.length, 2);
+    assert.ok(mouth.every((coordinate) => coordinate >= 0 && coordinate <= 1));
+    for (const clip of ['cast', 'hold']) {
+      const hands = demonessHandSockets(clip, frame);
+      assert.ok(hands.leftHand.every((coordinate) => coordinate >= 0 && coordinate <= 1));
+      assert.ok(hands.rightHand.every((coordinate) => coordinate >= 0 && coordinate <= 1));
+      assert.notDeepEqual(hands.leftHand, hands.rightHand);
+    }
+  }
 });
 
 test('stage-down waits for authored recovery before hiding or returning to silhouette', () => {
@@ -312,7 +322,149 @@ test('character atlases preload immediately before their stage dependencies', ()
   scene.setState(state({ stage: 3, stageProgress: 0.61 }));
   assert.equal(created, 3);
   scene.setState(state({ stage: 5, stageProgress: 0.61 }));
-  assert.equal(created, 6);
+  assert.equal(created, 5, 'Demoness warm-up is hint-only and does not decode a second atlas');
+  const demoness = scene.getDiagnostics().demoness;
+  assert.equal(demoness.warmClip, 'cast');
+  assert.deepEqual(demoness.residentClips, ['idle']);
+  assert.equal(demoness.withinResidencyLimit, true);
+});
+
+test('production Demoness swaps use one bounded 512x832 canvas frame and at most one decoded atlas', async () => {
+  const images = [];
+  const cacheSurfaces = [];
+  const imageFactory = () => {
+    const listeners = {};
+    const image = {
+      complete: false, naturalWidth: 0, naturalHeight: 0, decoding: 'auto', src: '',
+      addEventListener(type, listener) { listeners[type] = listener; },
+      resolve() { image.naturalWidth = 2_048; image.naturalHeight = 1_664; listeners.load?.(); },
+    };
+    images.push(image);
+    return image;
+  };
+  const demonessFrameCacheFactory = (width, height) => {
+    const draws = [];
+    const surface = {
+      width,
+      height,
+      draws,
+      getContext() {
+        return {
+          clearRect() {},
+          drawImage(...args) { draws.push(args); },
+        };
+      },
+    };
+    cacheSurfaces.push(surface);
+    return /** @type {any} */ (surface);
+  };
+  const scene = new CharacterScene({ imageFactory, demonessFrameCacheFactory });
+  scene.requestClipAsset('demoness', 'idle');
+  images[0].resolve();
+  await Promise.resolve();
+  scene.demonessVisible = true;
+  scene.demonessRevealed = true;
+  scene.demonessAnimator.setClip('idle');
+  scene.demonessAnimator.elapsed = 3 / 1.2;
+  assert.deepEqual(scene.getDiagnostics().demoness.residentClips, ['idle']);
+
+  scene.warmClipAsset('demoness', 'cast');
+  assert.equal(images.length, 1, 'warm-up records intent without allocating an Image');
+  scene.requestClipAsset('demoness', 'cast');
+  let diagnostics = scene.getDiagnostics().demoness;
+  assert.deepEqual(diagnostics.residentClips, [], 'the old atlas is released before replacement decode starts');
+  assert.equal(diagnostics.residentClipCount, 0);
+  assert.equal(diagnostics.withinResidencyLimit, true);
+  assert.deepEqual(diagnostics.residencyContract, DEMONESS_RESIDENCY_CONTRACT);
+  assert.equal(diagnostics.residencyContract.cachedFrameDecodedBytes, 1_703_936);
+  assert.deepEqual(diagnostics.frameCache, {
+    mode: 'canvas-frame',
+    frameCount: 1,
+    maxFrames: 1,
+    size: [512, 832],
+    sourceClip: 'idle',
+    sourceAnimationClip: 'idle',
+    sourceFrame: 3,
+  });
+  assert.equal(images[0].src, '', 'the 2048x1664 idle atlas backing image is released');
+  assert.deepEqual(cacheSurfaces[0].draws[0].slice(1), [1_536, 0, 512, 832, 0, 0, 512, 832]);
+
+  const rendered = [];
+  const context = { ...drawingContext(), drawImage(...args) { rendered.push(args); } };
+  scene.draw(/** @type {any} */ (context), state({ stage: 5 }), 0);
+  assert.equal(rendered[0][0], cacheSurfaces[0], 'the single cached cell remains visible until commit');
+
+  scene.requestClipAsset('demoness', 'hold');
+  diagnostics = scene.getDiagnostics().demoness;
+  assert.equal(cacheSurfaces.length, 1, 'replacing an in-flight request reuses the same one-frame cache');
+  assert.equal(diagnostics.frameCache.frameCount, 1);
+  assert.equal(images[1].src, '', 'the obsolete cast request is released before hold starts');
+  images[1].resolve();
+  await Promise.resolve();
+  assert.deepEqual(scene.getDiagnostics().demoness.residentClips, []);
+
+  images[2].resolve();
+  await Promise.resolve();
+  diagnostics = scene.getDiagnostics().demoness;
+  assert.deepEqual(diagnostics.residentClips, ['hold']);
+  assert.equal(diagnostics.residentClipCount, 1);
+  assert.equal(diagnostics.withinResidencyLimit, true);
+  assert.equal(diagnostics.frameCache.frameCount, 0);
+  assert.equal(cacheSurfaces[0].width, 0, 'the cache backing store is released on atlas commit');
+});
+
+test('non-canvas Demoness fallback retains only the previous atlas until replacement commit', async () => {
+  const images = [];
+  const imageFactory = () => {
+    const listeners = {};
+    const image = {
+      complete: false, naturalWidth: 0, naturalHeight: 0, decoding: 'auto', src: '',
+      addEventListener(type, listener) { listeners[type] = listener; },
+      resolve() { image.naturalWidth = 2_048; image.naturalHeight = 1_664; listeners.load?.(); },
+    };
+    images.push(image);
+    return image;
+  };
+  const scene = new CharacterScene({ imageFactory, demonessFrameCacheFactory: () => null });
+  scene.requestClipAsset('demoness', 'idle');
+  images[0].resolve();
+  await Promise.resolve();
+  scene.requestClipAsset('demoness', 'cast');
+  let diagnostics = scene.getDiagnostics().demoness;
+  assert.deepEqual(diagnostics.residentClips, ['idle']);
+  assert.equal(diagnostics.frameCache.mode, 'retained-atlas-fallback');
+  assert.equal(diagnostics.frameCache.frameCount, 0);
+  assert.equal(diagnostics.frameCache.sourceClip, 'idle');
+  assert.equal(diagnostics.residencyContract.noCanvasFallback, 'node-only-retain-current-atlas-until-commit');
+  assert.equal(diagnostics.residencyContract.browserCanvasFailure, 'release-current-atlas-before-load');
+
+  images[1].resolve();
+  await Promise.resolve();
+  diagnostics = scene.getDiagnostics().demoness;
+  assert.deepEqual(diagnostics.residentClips, ['cast']);
+  assert.equal(diagnostics.residentClipCount, 1);
+  assert.equal(diagnostics.frameCache.mode, 'none');
+  assert.equal(images[0].src, '');
+});
+
+test('declared one-atlas Demoness residency plus its single frame cache remains under 64 MiB', async () => {
+  const manifest = JSON.parse(await readFile(new URL('../../assets/assets-manifest.json', import.meta.url), 'utf8'));
+  const grouped = new Map();
+  let decodedBytes = 0;
+  for (const asset of manifest.assets) {
+    const bytes = asset.decodedBytes ?? asset.width * asset.height * 4;
+    if (!asset.residencyGroup) decodedBytes += bytes;
+    else grouped.set(asset.residencyGroup, [...grouped.get(asset.residencyGroup) ?? [], bytes]);
+  }
+  for (const [name, values] of grouped) {
+    const group = manifest.residencyGroups[name];
+    decodedBytes += values.sort((left, right) => right - left).slice(0, group.maxResident).reduce((sum, value) => sum + value, 0);
+    decodedBytes += (group.maxCachedFrames ?? 0) * (group.cachedFrameDecodedBytes ?? 0);
+  }
+  assert.equal(manifest.residencyGroups['demoness-clips'].maxResident, 1);
+  assert.equal(manifest.residencyGroups['demoness-clips'].maxCachedFrames, 1);
+  assert.equal(decodedBytes, 64_814_080);
+  assert.ok(decodedBytes <= 64 * 1_024 * 1_024);
 });
 
 test('Demoness steam curve has deliberate look, gather, stable hold and release', () => {
@@ -325,16 +477,16 @@ test('Demoness steam curve has deliberate look, gather, stable hold and release'
   assert.ok(release.strength < 1);
 });
 
-test('runtime emission sockets exactly match Cycle 07 atlas metadata', async () => {
+test('runtime emission sockets exactly match Cycle 08 atlas metadata', async () => {
   const load = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
-  for (const clip of ['inhale', 'blow']) {
-    const servant = await load(`../../assets/characters/ash-servant/ash-servant-${clip}-v5.json`);
+  for (const clip of ['idle', 'inhale', 'blow', 'recovery']) {
+    const servant = await load(`../../assets/characters/ash-servant/ash-servant-${clip}-v6.json`);
     servant.clips[clip].frames.forEach((frame, index) => {
       assert.deepEqual(servantMouthSocket(clip, index), frame.sockets.mouth);
     });
   }
   for (const clip of ['cast', 'hold']) {
-    const metadata = await load(`../../assets/characters/demoness/demoness-${clip}-v6.json`);
+    const metadata = await load(`../../assets/characters/demoness/demoness-${clip}-v7.json`);
     metadata.clips[clip].frames.forEach((frame, index) => {
       assert.deepEqual(demonessHandSockets(clip, index), frame.sockets);
     });
@@ -343,7 +495,7 @@ test('runtime emission sockets exactly match Cycle 07 atlas metadata', async () 
 
 test('Demoness renders two bounded streams at the current palm sockets and cleans them up immediately', () => {
   const imageFactory = () => ({
-    complete: true, naturalWidth: 1_648, naturalHeight: 1_328, decoding: 'auto', src: '', addEventListener() {},
+    complete: true, naturalWidth: 2_048, naturalHeight: 1_664, decoding: 'auto', src: '', addEventListener() {},
   });
   const scene = new CharacterScene({ imageFactory });
   scene.setState(state({ stage: 5 }));
@@ -354,9 +506,10 @@ test('Demoness renders two bounded streams at the current palm sockets and clean
   scene.drawSteamFx(/** @type {any} */ (drawingContext()));
   const active = scene.getDiagnostics().demoness;
   const sockets = demonessHandSockets('hold', 3);
+  const [anchorX, anchorY] = active.anchor;
   assert.deepEqual(active.spell.origins, {
-    leftHand: { x: 850 + (sockets.leftHand[0] - 0.5) * 420, y: 1_235 + (sockets.leftHand[1] - 0.99) * 700 },
-    rightHand: { x: 850 + (sockets.rightHand[0] - 0.5) * 420, y: 1_235 + (sockets.rightHand[1] - 0.99) * 700 },
+    leftHand: { x: anchorX + (sockets.leftHand[0] - 0.5) * 504, y: anchorY + (sockets.leftHand[1] - 0.99) * 840 },
+    rightHand: { x: anchorX + (sockets.rightHand[0] - 0.5) * 504, y: anchorY + (sockets.rightHand[1] - 0.99) * 840 },
   });
   assert.equal(active.spell.contact, true);
   assert.deepEqual(active.spell.target, { x: 517, y: 982 });
@@ -368,11 +521,13 @@ test('Demoness renders two bounded streams at the current palm sockets and clean
   assert.equal(cleaned.spell.contact, false);
 });
 
-test('Demoness source cells stay within 1.25x effective upscale at required DPR2 viewports', () => {
-  for (const [width, height] of [[390, 844], [1366, 768], [768, 1024]]) {
-    assert.ok(demonessEffectiveUpscale(width, height, 2) <= 1.25, `${width}x${height} exceeds the source-resolution contract`);
+test('Demoness source cells stay within 1.25x effective upscale across the required viewport and DPR matrix', () => {
+  for (const [width, height] of [[390, 844], [768, 1024], [1366, 768], [800, 360]]) {
+    for (const dpr of [1, 2]) {
+      assert.ok(demonessEffectiveUpscale(width, height, dpr) <= 1.25, `${width}x${height} DPR${dpr} exceeds the source-resolution contract`);
+    }
   }
-  assert.ok(Math.abs(demonessEffectiveUpscale(1366, 768, 2) - 1.2456) < 0.0001, 'landscape uses the exact scene transform and 412x664 source cell');
+  assert.ok(Math.abs(demonessEffectiveUpscale(1366, 768, 2) - 1.1929) < 0.0001, 'landscape uses the exact scene transform and 512x832 source cell');
 });
 
 test('delayed clip decode freezes the last valid atlas frame until the requested atlas is ready', async () => {

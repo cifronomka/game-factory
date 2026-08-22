@@ -8,6 +8,9 @@ import sharp from 'sharp';
 import { gameRoot as defaultGameRoot } from './lib.mjs';
 
 const SHA256 = /^[a-f0-9]{64}$/;
+const CYCLE08_MATTE_RATIO_MAX = 0.01;
+const CYCLE08_INTERNAL_NEUTRAL_RESIDUE_RATIO_MAX = 0.005;
+const CYCLE08_SOURCE_TO_ATLAS_UPSCALE_MAX = 1;
 
 /** @param {Buffer|string} value */
 function digest(value) { return createHash('sha256').update(value).digest('hex'); }
@@ -33,26 +36,73 @@ async function auditEncodedCharacterPixels(path, entry, frames) {
   let partialPixels = 0;
   let neutralBrightPartial = 0;
   let edgeAlphaPixels = 0;
+  let visiblePixels = 0;
+  let brightNeutralInteriorPixels = 0;
+  let exactAlphaFrames = 0;
+  let detachedPartialAlphaPixels = 0;
   for (const frame of frames) {
+    const encodedAlpha = Buffer.alloc(frame.w * frame.h);
     for (let y = frame.y; y < frame.y + frame.h; y += 1) {
       for (let x = frame.x; x < frame.x + frame.w; x += 1) {
         const offset = (y * info.width + x) * 4;
         const alpha = data[offset + 3];
+        encodedAlpha[(y - frame.y) * frame.w + x - frame.x] = alpha;
+        if (alpha > 12) visiblePixels += 1;
         const edge = x < frame.x + 4 || y < frame.y + 4 || x >= frame.x + frame.w - 4 || y >= frame.y + frame.h - 4;
         if (edge && alpha > 0) edgeAlphaPixels += 1;
         if (alpha > 0 && alpha < 245) {
           partialPixels += 1;
           const r = data[offset]; const g = data[offset + 1]; const b = data[offset + 2];
           if (Math.max(r, g, b) - Math.min(r, g, b) < 24 && (r + g + b) / 3 > 160) neutralBrightPartial += 1;
+          let adjacentOpaque = false;
+          for (let oy = -1; oy <= 1 && !adjacentOpaque; oy += 1) {
+            for (let ox = -1; ox <= 1; ox += 1) {
+              if ((ox === 0 && oy === 0) || x + ox < frame.x || y + oy < frame.y || x + ox >= frame.x + frame.w || y + oy >= frame.y + frame.h) continue;
+              if (data[((y + oy) * info.width + x + ox) * 4 + 3] >= 245) { adjacentOpaque = true; break; }
+            }
+          }
+          if (!adjacentOpaque) detachedPartialAlphaPixels += 1;
         }
+      }
+    }
+    if (entry.id.endsWith('-C08')) {
+      const encodedAlphaSha256 = digest(encodedAlpha);
+      invariant(SHA256.test(String(frame.alphaSha256 ?? '')), `${entry.id}: approved alpha SHA-256 is missing`);
+      invariant(frame.encodedAlphaExact === true && frame.encodedAlphaSha256 === encodedAlphaSha256 && frame.alphaSha256 === encodedAlphaSha256, `${entry.id}: decoded WebP alpha differs from the approved source mask`);
+      exactAlphaFrames += 1;
+    }
+    for (let y = frame.y + 1; y < frame.y + frame.h - 1; y += 1) {
+      for (let x = frame.x + 1; x < frame.x + frame.w - 1; x += 1) {
+        const offset = (y * info.width + x) * 4;
+        if (data[offset + 3] < 245) continue;
+        const r = data[offset]; const g = data[offset + 1]; const b = data[offset + 2];
+        if (Math.max(r, g, b) - Math.min(r, g, b) >= 24 || r * 0.2126 + g * 0.7152 + b * 0.0722 < 218) continue;
+        let enclosed = true;
+        for (let oy = -1; oy <= 1 && enclosed; oy += 1) {
+          for (let ox = -1; ox <= 1; ox += 1) {
+            if (data[((y + oy) * info.width + x + ox) * 4 + 3] <= 12) { enclosed = false; break; }
+          }
+        }
+        if (enclosed) brightNeutralInteriorPixels += 1;
       }
     }
   }
   const matteRatio = neutralBrightPartial / Math.max(1, partialPixels);
+  const internalNeutralResidueRatio = brightNeutralInteriorPixels / Math.max(1, visiblePixels);
   invariant(edgeAlphaPixels === 0, `${entry.id}: encoded alpha touches atlas-cell edge`);
-  const matteLimit = entry.id.endsWith('-C07') ? 0.15 : 0.03;
+  const matteLimit = entry.id.endsWith('-C08') ? CYCLE08_MATTE_RATIO_MAX : entry.id.endsWith('-C07') ? 0.15 : 0.03;
   invariant(matteRatio <= matteLimit, `${entry.id}: encoded neutral bright matte ratio exceeds ${Math.round(matteLimit * 100)}%`);
-  return { edgeAlphaPixels, matteRatio: Math.round(matteRatio * 100000) / 100000, partialPixels };
+  if (entry.id.endsWith('-C08')) invariant(internalNeutralResidueRatio <= CYCLE08_INTERNAL_NEUTRAL_RESIDUE_RATIO_MAX, `${entry.id}: encoded internal neutral residue ratio exceeds ${CYCLE08_INTERNAL_NEUTRAL_RESIDUE_RATIO_MAX}`);
+  if (entry.id.startsWith('CH-ASH-SERVANT-') && entry.id.endsWith('-C08')) invariant(detachedPartialAlphaPixels === 0, `${entry.id}: encoded alpha contains detached block/tile contour pixels`);
+  return {
+    edgeAlphaPixels,
+    matteRatio: Math.round(matteRatio * 100000) / 100000,
+    internalNeutralResidueRatio: Math.round(internalNeutralResidueRatio * 100000) / 100000,
+    partialPixels,
+    brightNeutralInteriorPixels,
+    exactAlphaFrames,
+    detachedPartialAlphaPixels,
+  };
 }
 
 /**
@@ -104,8 +154,20 @@ export async function auditAnimationAssets(options = {}) {
         invariant(typeof frame.provenance === 'string' && frame.provenance.length > 0, `${entry.id}/${clipName}/${index}: missing provenance`);
         if (entry.id.startsWith('CH-')) {
           invariant(frame.edgeAlphaPixels === 0, `${entry.id}/${clipName}/${index}: alpha touches atlas-cell edge`);
-          const matteLimit = entry.id.endsWith('-C07') ? 0.15 : 0.1;
+          const matteLimit = entry.id.endsWith('-C08') ? CYCLE08_MATTE_RATIO_MAX : entry.id.endsWith('-C07') ? 0.15 : 0.1;
           invariant(Number(frame.matteRatio) <= matteLimit, `${entry.id}/${clipName}/${index}: neutral bright matte ratio exceeds ${Math.round(matteLimit * 100)}%`);
+          if (entry.id.endsWith('-C08')) {
+            invariant(SHA256.test(String(frame.alphaSha256 ?? '')), `${entry.id}/${clipName}/${index}: approved alpha SHA-256 is required`);
+            invariant(SHA256.test(String(frame.encodedAlphaSha256 ?? '')) && frame.encodedAlphaExact === true, `${entry.id}/${clipName}/${index}: exact encoded-alpha proof is required`);
+            invariant(Number.isFinite(frame.internalNeutralResidueRatio), `${entry.id}/${clipName}/${index}: internalNeutralResidueRatio is required`);
+            invariant(frame.internalNeutralResidueRatio <= CYCLE08_INTERNAL_NEUTRAL_RESIDUE_RATIO_MAX, `${entry.id}/${clipName}/${index}: internal neutral residue ratio exceeds ${CYCLE08_INTERNAL_NEUTRAL_RESIDUE_RATIO_MAX}`);
+            invariant(Number.isInteger(frame.sourceFrameWidth) && frame.sourceFrameWidth > 0 && Number.isInteger(frame.sourceFrameHeight) && frame.sourceFrameHeight > 0, `${entry.id}/${clipName}/${index}: source frame dimensions are required`);
+            invariant(Number.isFinite(frame.sourceToAtlasUpscale), `${entry.id}/${clipName}/${index}: sourceToAtlasUpscale is required`);
+            const measuredUpscale = Math.max(frame.w / frame.sourceFrameWidth, frame.h / frame.sourceFrameHeight);
+            invariant(Math.abs(frame.sourceToAtlasUpscale - measuredUpscale) <= 0.00001, `${entry.id}/${clipName}/${index}: source-to-atlas upscale does not match source dimensions`);
+            invariant(frame.sourceToAtlasUpscale <= CYCLE08_SOURCE_TO_ATLAS_UPSCALE_MAX, `${entry.id}/${clipName}/${index}: source-to-atlas upscale exceeds ${CYCLE08_SOURCE_TO_ATLAS_UPSCALE_MAX}`);
+            if (entry.id.startsWith('CH-ASH-SERVANT-')) invariant(frame.detachedPartialAlphaPixelCount === 0, `${entry.id}/${clipName}/${index}: detached block/tile contour pixels remain`);
+          }
         }
         const durationMs = frame.durationMs ?? (1_000 / clip.fps);
         invariant(Number.isFinite(durationMs) && durationMs > 0, `${entry.id}/${clipName}/${index}: invalid duration`);
@@ -139,12 +201,12 @@ export async function auditAnimationAssets(options = {}) {
     ['CH-DEMONESS', ['IDLE', 'CAST', 'HOLD', 'RECOVERY']],
   ]) {
     for (const name of clips) {
-      const id = `${prefix}-${name}-C07`;
+      const id = `${prefix}-${name}-C08`;
       const report = byId.get(id);
       invariant(report?.clips.some((clip) => clip.name === name.toLowerCase() && clip.frames === 8), `${id}: requires 8 unique authored ${name.toLowerCase()} frames`);
     }
   }
-  for (const entry of manifest.assets.filter((asset) => asset.id?.endsWith('-C07'))) {
+  for (const entry of manifest.assets.filter((asset) => asset.id?.endsWith('-C08'))) {
     const metadata = JSON.parse(await readFile(inside(root, entry.metadata), 'utf8'));
     for (const [clipName, clip] of Object.entries(metadata.clips)) {
       const roots = clip.frames.map((frame) => Number(frame.rootY));
@@ -155,7 +217,7 @@ export async function auditAnimationAssets(options = {}) {
         if (entry.id.startsWith('CH-ASH-SERVANT')) {
           invariant(Array.isArray(frame.sockets?.mouth) && frame.sockets.mouth.length === 2, `${entry.id}/${clipName}/${index}: mouth socket missing`);
         }
-        if (entry.id.startsWith('CH-DEMONESS') && ['cast', 'hold'].includes(clipName)) {
+        if (entry.id.startsWith('CH-DEMONESS')) {
           invariant(Array.isArray(frame.sockets?.leftHand) && Array.isArray(frame.sockets?.rightHand), `${entry.id}/${clipName}/${index}: two palm sockets required`);
           invariant(frame.sockets.leftHand.length === 2 && frame.sockets.rightHand.length === 2, `${entry.id}/${clipName}/${index}: invalid palm socket`);
         }

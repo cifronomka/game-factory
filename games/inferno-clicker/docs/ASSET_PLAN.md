@@ -1,19 +1,19 @@
 # Asset Plan — «Зажги»
 
-## Corrective Cycle 07 active production contract
+## Corrective Cycle 08 active production contract
 
-Cycle 07 сохраняет flame bitmap design, Inferno-host work и все audio recordings/mix byte-identical. Character assets version bump сохраняет key poses/identity, но стабилизирует анатомический scale Ash Servant, повышает фактическую резкость Demoness и заменяет C06 snow/ice FX единым bounded steam system из фактических sockets. Конкретные filenames, dimensions, counts and hashes становятся authoritative только после записи в manifest; C05/C06 character/FX rows считаются superseded inventory, а не target.
+Cycle 08 наследует C07 flame, Inferno host, authored character motion, mouth/two-palm steam и все audio recordings/mix byte-identical. Новый character asset version bump сохраняет identity/key poses/timings, очищает внешний и внутренний white matte у Ash Servant и Demoness, а Demoness перерисовывается нативно чёткой и размещается на 20% крупнее. Конкретные filenames, counts and hashes становятся authoritative только после записи в manifest; принятые C07 character atlases сохраняются как исторический baseline и не перезаписываются.
 
-### Cycle 07 required registry delta
+### Cycle 08 required registry delta
 
 | ID | Required production artifact | Measurable contract | Load/residency |
 |---|---|---|---|
-| CH-ASH-SERVANT-C07 | Versioned clip atlases + JSON for appearance/idle/inhale/blow/recovery | retained identity/key poses; one family-wide scale reference; per-frame root/mouth/anatomical landmarks; root drift≤2 logical px; anatomical scale drift≤2%; clean alpha | preload appearance/idle before Stage 3; attack clip ahead of first event; release inactive clips |
-| FX-STEAM-C07 | Reproducible bounded steam sprites/JSON or vector-particle draw contract shared by actors | soft translucent vapor, no crystalline/snow silhouette; independent source IDs; mouth origin≤8 px, each palm origin≤12 px, target≤12 px; pause/cleanup safe | load with first Servant attack; bounded density/lifetime per quality tier |
-| CH-DEMONESS-C07 | Higher-resolution versioned clip atlases + JSON | exact `sceneTransform` effective upscale≤1.25× on full viewport/DPR matrix; unique authored cells; per-frame root/leftHand/rightHand sockets; scale drift≤2%; clean alpha | preload idle before Stage 5; cast/recovery ahead of first event; release inactive clips |
-| CH-INFERNO-HOST-{MAIN,SENTINEL}-C06 | Unchanged accepted Cycle 06 authored atlases + JSON | accepted 1.5 s entry and post-entry independent motion preserved byte-identical | preload before Stage 7; release at run teardown |
+| CH-ASH-SERVANT-C08 | `ash-servant-{idle,inhale,blow,recovery}-v6.{webp,json}` | Four `1024×640` atlases, 8 unique `256×320` cells each; C07 identity/scale/motion preserved; genuine exterior/internal-gap alpha; visible white matte/fringe/islands and detached contour tiles=0; lossless decoded-alpha parity; recomputed root/mouth/anatomical landmarks and alpha bbox; source→atlas≤1.0 | same C07 preload groups; active plus one imminent clip at most |
+| CH-DEMONESS-C08 | `demoness-{idle,cast,hold,recovery}-v7.{webp,json}` | Four `2048×1664` atlases, 8 unique native-redrawn `512×832` cells each; genuine exterior/internal alpha with lossless decoded-alpha parity; draw box `504×840`; per-frame root/leftHand/rightHand/alpha bbox; rendered bbox height≥1.25× Servant; source→atlas≤1.0 | one resident full atlas; one bounded `512×832` frame-cache during decode handoff |
+| FX-STEAM-C07 | Accepted C07 bounded steam implementation and assets, unchanged | mouth origin≤8 px, each palm origin≤12 px, target≤12 px; new frame sockets remeasured without changing semantics/timing | inherited load/lifetime/quality-tier policy |
+| CH-INFERNO-HOST-{MAIN,SENTINEL}-C06 | Unchanged accepted authored atlases + JSON | accepted 1.5 s entry and post-entry independent motion preserved byte-identical | preload before Stage 7; release at run teardown |
 
-`FX-SERVANT-SNOW-C06`, `FX-DEMONESS-ICE-C06` and their snowflake/icicle/shard draw contracts are `SUPERSEDED BY C07` and must not be loaded, rendered or accepted as fallback. Existing C06 steam-at-contact semantics are likewise superseded: C07 steam originates directly from the Servant mouth and both Demoness palms.
+`FX-SERVANT-SNOW-C06`, `FX-DEMONESS-ICE-C06` and their snowflake/icicle/shard draw contracts remain `SUPERSEDED BY C07` and must not be loaded, rendered or accepted as fallback. C08 does not change accepted steam behavior; it updates sockets only as needed to follow corrected frames.
 
 Все runtime paths указаны относительно корня игры. Точный размер, SHA-256, preload group, codec и длительность являются машиночитаемой частью `assets/assets-manifest.json`; источники и лицензии — `assets/PROVENANCE.md` и `assets/AUDIO_CREDITS.txt`.
 
@@ -29,8 +29,8 @@ Cycle 07 сохраняет flame bitmap design, Inferno-host work и все aud
 | FL-HIGH-CORE | Высокое ветвящееся ядро/Inferno column | 6–7 | `/assets/flame/atlases/core-high-v2.webp` + JSON, 1536×1280 | Yes | 12 frames, 11 fps loop | Yes | No body synthesis | Yes | READY — preload S5 60% |
 | FL-HIGH-OUTER | Высокие внешние языки | 6–7 | `/assets/flame/atlases/outer-high-v2.webp` + JSON, 1536×1280 | Yes | 12 frames, 11 fps loop, phase +4 | Yes | No body synthesis | Yes | READY — preload S5 60% |
 | FX-STAGE-FLARE | Скрывает texture swap и подчёркивает каждый stage boundary | 1–7 | `/assets/flame/transitions/stage-flare-v2.webp` + JSON, 1024×1024 | Yes | 8 frames at 8 fps; forward upward, reverse + cool tint downward; family crossfade 1.05 s, entry S7 1.5 s | Yes | Runtime tint/light | Yes | READY — preload S1 60% |
-| CH-ASH-SERVANT | Cycle 05 historical baseline; C06 clip set also historical under C07 | 3–7 | `/assets/characters/ash-servant/ash-servant-states-v3.webp` + JSON | Yes | Sparse baseline used only for retained-key-pose/fingerprint comparison | Existing generated source | N/A — historical | Yes | SUPERSEDED BY C07 |
-| CH-DEMONESS | Cycle 05 historical baseline; C06 clip set also historical under C07 | 4–7 | `/assets/characters/demoness/demoness-states-v4.webp` + JSON | Yes | Sparse/duplicated baseline used only for identity comparison | ImageGen Cycle 05 | N/A — historical ribbon | Yes | SUPERSEDED BY C07 |
+| CH-ASH-SERVANT | Historical pre-C08 lineage, including accepted C07 clip family | 3–7 | exact C07 paths/hashes recorded in C08 baseline evidence | Yes | Retained identity/key poses/motion and C08 before/after comparison only | Existing generated source | N/A — historical | Yes | SUPERSEDED BY C08 FOR ALPHA CLEANUP |
+| CH-DEMONESS | Historical pre-C08 lineage, including accepted C07 clip family | 4–7 | exact C07 paths/hashes recorded in C08 baseline evidence | Yes | Identity/pose/`420×700` runtime baseline only; not a source to upscale | Existing generated source | N/A — historical | Yes | SUPERSEDED BY C08 FOR REDRAW/SCALE |
 | CH-INFERNO-HOST | Cycle 05 historical baseline; entry reference only | 6–7 | `/assets/characters/character-inferno-host.webp` + JSON | Yes | Accepted entry/composition reference; post-entry crop motion superseded | Yes | N/A — historical | Spatial crop | SUPERSEDED BY C06 |
 
 ### Multilayer flame contract
@@ -47,6 +47,9 @@ Cycle 07 сохраняет flame bitmap design, Inferno-host work и все aud
 - Recovery использует все authored settle frames: 800 ms Servant и 1000 ms Demoness.
 - `encounters[]` допускает одновременную работу обоих actors. HUD получает отдельные `debuffs[]` rows и общий capped factor, но не влияет на animation/gameplay clocks.
 - Reduced Motion сохраняет authored poses/frames с уменьшенной частотой эффектов; static cutout fallback отсутствует.
+- C08 alpha masks cover exterior background and enclosed negative spaces for every Servant/Demoness state. Partial-alpha edge RGB is decontaminated from adjacent character material; fully opaque pale highlights are preserved and cannot be deleted by a global white threshold. Approved per-frame alpha SHA-256 must equal decoded WebP alpha SHA-256; changed/max-error/low-alpha-leak counts are all zero.
+- Demoness uses exactly `512×832` cells. The common logical draw box is exactly `504×840` instead of C07 `420×700`; one stable feet/root anchor and scale apply across states. An eight-frame clip is planned as a `2048×1664` (`4×2`) atlas, within the `2048 px` side limit.
+- `appearance` and `disapproval` reuse authored frames from `demoness-idle-v7`; they do not create duplicate unregistered atlases. All 32 raw Demoness redraws and assembled-source hashes live in `visual-references/cycle-08-sources/source-manifest.json`.
 
 ## Audio registry
 
@@ -68,19 +71,19 @@ Accepted taps объединяются в окно 120 ms, новый fan voice 
 - Stage flare начинает грузиться при 60% Stage 1; mid + Servant — при 60% Stage 2; Demoness — при 60% Stage 3; high + host — при 60% Stage 5.
 - Ошибка critical image даёт bounded retry/safe darkness. Optional late asset остаётся невидимым до успешной загрузки; старые static-card ассеты не являются fallback.
 - Audio создаёт graph и загружает media только после trusted gesture. Failed codec pair деградирует конкретный asset до silence без повторного fetch на каждый tap.
-- Large character animation partitioned into independently disposable clip resources. Active plus one imminent clip are pinned; inactive optional clips are released immediately after the requested atlas commits. Flame families likewise retain at most the two families needed by a boundary transition. A delayed decode freezes the last valid authored cell instead of interpreting an old atlas with new-clip timing.
+- Large character animation is partitioned into independently disposable clip resources. Servant may pin active plus one imminent clip. Demoness pins exactly one full atlas; a single decoded frame is cached before the old atlas is released and remains visible until the requested atlas commits. Flame families retain at most the two families needed by a boundary transition.
 
-## Cycle 07 budget gate
+## Cycle 08 budget gate
 
-| Budget | Pre-C07 baseline | Hard limit | Cycle 07 status |
+| Budget | Last accepted baseline | Hard limit | Cycle 08 status |
 |---|---:|---:|---|
-| Startup critical art | 818,566 B | 1.5 MiB | NOT RUN — corrected characters are optional ahead-of-need groups but exact manifest must confirm no startup delta |
-| Total registered art | 9,703,758 B | 9.8 MiB | NOT RUN — recompute after C07 sources/obsolete FX removal |
-| Worst decoded bitmap residency | 64,838,656 B (61.84 MiB) | 64 MiB; target≤56 MiB | NOT RUN — exact instantaneous overlap trace required; pre-C07 exception is not carried forward |
+| Startup critical art | 818,566 B | 1.5 MiB | NOT RUN — C08 characters remain optional ahead-of-need groups; exact manifest must confirm no startup delta |
+| Total registered art | 10,235,636 B | 9.8 MiB | PASS in asset audit candidate; 40,408 B headroom; exact clean-build evidence still required |
+| Worst decoded bitmap residency | 64,814,080 B (61.81 MiB), including one `512×832×4` Demoness frame-cache | 64 MiB; target≤56 MiB | HARD PASS / documented target exception; browser lifecycle trace NOT RUN |
 | Both stored audio codec packs | 675,540 B | 2.2 MiB | NOT RUN — fingerprint equality must confirm unchanged bytes |
-| Largest texture side | 1600 px | 2048 px | NOT RUN — recompute after sharp Demoness export |
-| Working production package | 8,430,646 B / 71 files | 15 MiB | NOT RUN — rebuild exact candidate and exclude superseded snow/ice resources |
+| Largest texture side | 2048 px | 2048 px | PASS in manifest/asset audit candidate; exact clean-build evidence still required |
+| Working production package | pending final `dist/build-manifest.json` | 15 MiB | NOT RUN — rebuild exact C08 candidate; superseded character versions are excluded from `assets/` |
 
 ## Verification status and remaining risk
 
-Cycle 07 status is `NOT RUN`: manifests must list every clip, unique frame hash, root/mouth/leftHand/rightHand/anatomical landmarks, partial-alpha edge metrics, real-scene-transform upscale matrix, preload/release group and decoded byte count. Scale stability, sharpness, source attachment and semantic readability require exact-build continuous browser motion plus timestamp-linked hashed frames. Audio remains frozen and is verified by fingerprint equality plus lifecycle regression; no new listening classification is opened unless a fingerprint changes.
+Cycle 08 status is `NOT RUN`: manifests must list every clip, unique frame hash, native source and `512×832` cell dimensions, `504×840` draw size, root/mouth/leftHand/rightHand/anatomical landmarks, visible alpha bbox, exterior/internal-gap and partial-alpha metrics, real-scene-transform upscale/height-ratio matrix, preload/release group and decoded byte count. C07 evidence remains the comparison baseline but cannot prove corrected pixels or geometry. Audio remains frozen and is verified only by fingerprint equality plus lifecycle regression; no new listening classification is opened unless a fingerprint changes.

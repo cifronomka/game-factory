@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 
 const captureDir = new URL('../../reports/screenshots/corrective/', import.meta.url);
+const packageJson = JSON.parse(await readFile(new URL('../../package.json', import.meta.url), 'utf8'));
 
 test('corrective browser matrix is valid when generated release evidence is present', async () => {
   let entries;
@@ -21,7 +22,7 @@ test('corrective browser matrix is valid when generated release evidence is pres
   assert.equal(files.length, 17);
   assert.deepEqual(files, manifest.captures.map((capture) => capture.file).sort());
   assert.equal(new Set(manifest.captures.map((capture) => capture.viewport)).size, 5);
-  assert.match(manifest.buildId, /^0\.1\.0\+(?:[a-f0-9]{12}|working\.[a-f0-9]{12})$/);
+  assert.match(manifest.buildId, new RegExp(`^${packageJson.version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\+(?:[a-f0-9]{12}|working\\.[a-f0-9]{12})$`));
   for (const capture of manifest.captures) {
     assert.ok(Math.abs(capture.actualHeat - capture.targetHeat) <= 5, `${capture.file} heat drift`);
     const bytes = await readFile(new URL(capture.file, captureDir));
