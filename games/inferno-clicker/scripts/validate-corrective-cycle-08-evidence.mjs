@@ -151,7 +151,7 @@ async function verifyRuntimeAssets(distRoot, evidenceAtlases, budgets) {
       const decodedAlphaSha256 = digest(frameAlpha(decoded.data, decoded.info, frame));
       const extracted = await extractCell(normalized, 4, 2, frameIndex, frame.w, frame.h, 'largest', true, 1);
       const approvedFrame = scrubPartialNeutralMatte(defringe(extracted, frame.w, frame.h), frame.w, frame.h);
-      const approvedAlphaSha256 = digest(frameAlpha(approvedFrame, frame.w, { x: 0, y: 0, w: frame.w, h: frame.h }));
+      const approvedAlphaSha256 = digest(frameAlpha(approvedFrame, { width: frame.w, channels: 4 }, { x: 0, y: 0, w: frame.w, h: frame.h }));
       invariant(digest(approvedFrame) === frame.sha256 && approvedAlphaSha256 === frame.alphaSha256, `${expected.id}: metadata does not reproduce from the approved source cleanup pipeline`);
       invariant(decodedAlphaSha256 === frame.alphaSha256 && decodedAlphaSha256 === frame.encodedAlphaSha256 && frame.encodedAlphaExact === true, `${expected.id}: decoded frame alpha differs from approved source mask`);
       decodedMetrics.push(pixelMetrics(decoded.data, decoded.info.width, frame));
