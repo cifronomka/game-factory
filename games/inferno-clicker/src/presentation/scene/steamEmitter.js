@@ -31,7 +31,7 @@ export function steamStreamGeometry(source, target, reach = FULL_REACH) {
 /**
  * A deterministic, fixed-size particle sample. It has no retained particle
  * state, so pause freezes it with the scene clock and cleanup is immediate.
- * @param {{time:number,strength:number,source:{x:number,y:number},target:{x:number,y:number},reach?:number,reducedMotion?:boolean,seed?:number}} options
+ * @param {{time:number,strength:number,source:{x:number,y:number},target:{x:number,y:number},reach?:number,reducedMotion?:boolean,seed?:number,laneScale?:number,particleScale?:number,opacityScale?:number}} options
  */
 export function steamParticles(options) {
   const geometry = steamStreamGeometry(options.source, options.target, options.reach ?? FULL_REACH);
@@ -39,6 +39,9 @@ export function steamParticles(options) {
   if (strength <= 0 || geometry.reach <= 0) return Object.freeze([]);
   const count = options.reducedMotion ? 32 : 64;
   const seed = Number(options.seed) || 0;
+  const laneScale = clamp(Number(options.laneScale) || 1, 0.2, 1.5);
+  const particleScale = clamp(Number(options.particleScale) || 1, 0.4, 1.5);
+  const opacityScale = clamp(Number(options.opacityScale) || 1, 0.5, 1.5);
   const axisX = geometry.target.x - geometry.source.x;
   const axisY = geometry.target.y - geometry.source.y;
   const axisLength = Math.max(1, Math.hypot(axisX, axisY));
@@ -48,14 +51,14 @@ export function steamParticles(options) {
     const cycle = ((options.time * (0.08 + index * 0.0007) + (index + 0.35) / count + seed * 0.031) % 1 + 1) % 1;
     const progress = cycle * geometry.reach;
     const envelope = Math.sin(Math.PI * progress);
-    const lateral = Math.sin(index * 4.137 + options.time * 1.31 + seed) * (5 + progress * 17) * envelope;
-    const curl = Math.cos(index * 2.73 + options.time * 0.83) * 6 * envelope;
+    const lateral = Math.sin(index * 4.137 + options.time * 1.31 + seed) * (5 + progress * 17) * envelope * laneScale;
+    const curl = Math.cos(index * 2.73 + options.time * 0.83) * 6 * envelope * laneScale;
     return Object.freeze({
       x: geometry.source.x + axisX * progress + normalX * lateral,
       y: geometry.source.y + axisY * progress + normalY * lateral - curl,
       progress,
-      radius: 7 + progress * 8 + index % 3 * 1.5,
-      alpha: (0.065 + envelope * 0.085) * strength,
+      radius: (7 + progress * 8 + index % 3 * 1.5) * particleScale,
+      alpha: (0.065 + envelope * 0.085) * strength * opacityScale,
     });
   }));
 }
@@ -63,7 +66,7 @@ export function steamParticles(options) {
 /**
  * Draws a soft directed vapor stream whose first mark is exactly at source.
  * @param {CanvasRenderingContext2D} context
- * @param {{time:number,strength:number,source:{x:number,y:number},target:{x:number,y:number},reach?:number,reducedMotion?:boolean,seed?:number,tint?:'warm'|'neutral'}} options
+ * @param {{time:number,strength:number,source:{x:number,y:number},target:{x:number,y:number},reach?:number,reducedMotion?:boolean,seed?:number,tint?:'warm'|'neutral',laneScale?:number,particleScale?:number,opacityScale?:number,sourceScale?:number}} options
  */
 export function drawSteamStream(context, options) {
   const geometry = steamStreamGeometry(options.source, options.target, options.reach ?? FULL_REACH);
@@ -71,6 +74,7 @@ export function drawSteamStream(context, options) {
   if (strength <= 0 || geometry.reach <= 0) return geometry;
   const warm = options.tint === 'warm';
   const particles = steamParticles(options);
+  const sourceScale = clamp(Number(options.sourceScale) || 1, 0.6, 1.5);
 
   context.save();
   context.globalCompositeOperation = 'source-over';
@@ -80,7 +84,7 @@ export function drawSteamStream(context, options) {
     ? `rgba(215,213,208,${0.36 * strength})`
     : `rgba(205,207,204,${0.38 * strength})`;
   context.beginPath();
-  context.ellipse(geometry.source.x, geometry.source.y, 5 + strength * 2, 3 + strength, 0, 0, Math.PI * 2);
+  context.ellipse(geometry.source.x, geometry.source.y, (5 + strength * 2) * sourceScale, (3 + strength) * sourceScale, 0, 0, Math.PI * 2);
   context.fill();
   for (const [index, particle] of particles.entries()) {
     context.fillStyle = warm

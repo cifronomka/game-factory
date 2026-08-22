@@ -678,11 +678,13 @@ export class CharacterScene {
         const effectStrength = this.demonessStrength * (state.reducedMotion ? 0.6 : 1);
         const leftOptions = Object.freeze({
           time: timeSeconds, strength: effectStrength, source: origins.leftHand, target: this.flameTarget,
-          reach: this.demonessSpellReach, reducedMotion: Boolean(state.reducedMotion), seed: 3,
+          reach: this.demonessSpellReach, reducedMotion: Boolean(state.reducedMotion), seed: 2,
+          laneScale: 0.3, particleScale: 0.55, opacityScale: 1.35, sourceScale: 1.25,
         });
         const rightOptions = Object.freeze({
           time: timeSeconds, strength: effectStrength, source: origins.rightHand, target: this.flameTarget,
           reach: this.demonessSpellReach, reducedMotion: Boolean(state.reducedMotion), seed: 7,
+          laneScale: 0.3, particleScale: 0.55, opacityScale: 1.35, sourceScale: 1.25,
         });
         this.demonessSteamOptions = Object.freeze({ left: leftOptions, right: rightOptions });
         const leftStream = steamStreamGeometry(leftOptions.source, leftOptions.target, leftOptions.reach);

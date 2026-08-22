@@ -25,6 +25,14 @@ test('steam sampling is deterministic, bounded, and reduced-motion aware', () =>
   assert.ok(first.every(({ progress }) => progress >= 0 && progress <= 0.62));
   assert.equal(steamParticles({ ...options, reducedMotion: true }).length, 32);
   assert.deepEqual(steamParticles({ ...options, strength: 0 }), []);
+  const narrow = steamParticles({ ...options, laneScale: 0.3, particleScale: 0.55, opacityScale: 1.35 });
+  assert.ok(narrow.every((particle, index) => Math.abs(particle.radius / first[index].radius - 0.55) < 1e-9));
+  assert.ok(narrow.every((particle, index) => particle.alpha > first[index].alpha));
+  const offset = (particle) => Math.hypot(
+    particle.x - (options.source.x + (options.target.x - options.source.x) * particle.progress),
+    particle.y - (options.source.y + (options.target.y - options.source.y) * particle.progress),
+  );
+  assert.ok(narrow.every((particle, index) => offset(first[index]) < 1e-9 || Math.abs(offset(particle) / offset(first[index]) - 0.3) < 1e-9));
 });
 
 test('stream contact cannot precede the authored travel threshold', () => {
