@@ -31,9 +31,15 @@ const REQUIRED_FILES = Object.freeze([
 ]);
 const FLAME_CASES = ['flame-p05', 'flame-p35', 'flame-p65', 'flame-p100', 'flame-reduced-motion', 'flame-tap-continuity', 'flame-loop-seam'];
 const TRANSITION_CASES = [1, 2, 3, 4, 5, 6].flatMap((from) => [`transition-up-${from}-${from + 1}`, `transition-down-${from + 1}-${from}`]);
-const CHARACTER_CASES = [
+const LEGACY_CHARACTER_CASES = [
   'servant-appearance', 'servant-idle', 'servant-long-inhale-exhale-fire-reaction',
   'demoness-silhouette-reveal', 'demoness-calm-idle', 'demoness-disapproval-head-shake', 'demoness-full-cold-cast',
+  'debuff-servant-only', 'debuff-demoness-only', 'debuff-both-active',
+  'inferno-stage-6-to-7-payoff', 'inferno-sustained-30s',
+];
+const CYCLE_07_CHARACTER_CASES = [
+  'servant-appearance', 'servant-idle', 'servant-long-inhale-exhale-steam-reaction',
+  'demoness-silhouette-reveal', 'demoness-calm-idle', 'demoness-disapproval-head-shake', 'demoness-full-steam-cast',
   'debuff-servant-only', 'debuff-demoness-only', 'debuff-both-active',
   'inferno-stage-6-to-7-payoff', 'inferno-sustained-30s',
 ];
@@ -110,12 +116,43 @@ async function walk(root) {
   return paths.sort();
 }
 
-/** @param {string} path @param {string} label */
-async function assertSignedReview(path, label) {
+/**
+ * @param {string} path
+ * @param {string} label
+ * @param {{cycle07?:boolean,motionFrames?:Map<string,{scenarioId:string,captureMs:number}>}=} options
+ */
+async function assertSignedReview(path, label, options = {}) {
   const text = await readFile(path, 'utf8');
   const reviewer = text.match(/^Reviewer-ID:\s*(\S+)/m)?.[1];
   invariant(reviewer, `${label}: missing Reviewer-ID`);
   invariant(/^Independence:\s*PASS$/m.test(text) && /^Decision:\s*PASS$/m.test(text), `${label}: unsigned or failing review`);
+  if (options.cycle07) {
+    invariant(/^Blind:\s*PASS$/m.test(text) && /^HUD-Hidden:\s*PASS$/m.test(text) && /^Debug-Labels-Hidden:\s*PASS$/m.test(text), `${label}: Cycle 07 review must be blind with HUD/debug labels hidden`);
+    invariant(/^Fix-Disclosed-Before-Observations:\s*NO$/m.test(text), `${label}: Cycle 07 fix details must remain hidden until first observations are recorded`);
+    const observations = [...text.matchAll(/^First-Observation:\s*(C07-\S+)\s*\|\s*(.+)$/gm)];
+    const links = [...text.matchAll(/^Timestamp-Frame-Link:\s*(C07-\S+)\s*\|\s*(\S+)\s*\|\s*(\d+(?:\.\d+)?)\s*\|\s*(\S+)$/gm)];
+    invariant(observations.length >= 4, `${label}: Cycle 07 requires at least four blind first observations`);
+    const observationIds = new Set();
+    const observationTexts = new Set();
+    for (const [, issueId, observation] of observations) {
+      invariant(observation.trim().length >= 48 && new Set(observation.trim().toLowerCase().split(/\s+/)).size >= 8, `${label}: Cycle 07 first observation is not substantive`);
+      observationIds.add(issueId);
+      observationTexts.add(observation.trim().toLowerCase());
+    }
+    invariant(observationIds.size >= 4 && observationTexts.size === observations.length, `${label}: Cycle 07 first observations must be distinct and issue-specific`);
+    const observationByPrefix = new Map(observations.map(([, issueId, observation]) => [issueId.slice(0, 6), observation.toLowerCase()]));
+    invariant(/servant/.test(observationByPrefix.get('C07-01') ?? '') && /(scale|shrink|size)/.test(observationByPrefix.get('C07-01') ?? ''), `${label}: Cycle 07 Servant scale observation is missing`);
+    invariant(/servant/.test(observationByPrefix.get('C07-02') ?? '') && /steam/.test(observationByPrefix.get('C07-02') ?? '') && /mouth/.test(observationByPrefix.get('C07-02') ?? ''), `${label}: Cycle 07 Servant mouth-steam observation is missing`);
+    invariant(/demoness/.test(observationByPrefix.get('C07-03') ?? '') && /(sharp|blur)/.test(observationByPrefix.get('C07-03') ?? ''), `${label}: Cycle 07 Demoness sharpness observation is missing`);
+    invariant(/demoness/.test(observationByPrefix.get('C07-04') ?? '') && /steam/.test(observationByPrefix.get('C07-04') ?? '') && /(hand|palm)/.test(observationByPrefix.get('C07-04') ?? ''), `${label}: Cycle 07 Demoness hand-steam observation is missing`);
+    const linkedIssues = new Set();
+    for (const [, issueId, scenarioId, captureMsText, framePath] of links) {
+      const captured = options.motionFrames?.get(framePath);
+      invariant(captured && captured.scenarioId === scenarioId && captured.captureMs === Number(captureMsText), `${label}: Cycle 07 timestamp/frame link does not resolve to motion evidence`);
+      linkedIssues.add(issueId);
+    }
+    for (const issueId of observationIds) invariant(linkedIssues.has(issueId), `${label}: Cycle 07 first observation lacks a timestamp/frame link`);
+  }
   return reviewer;
 }
 
@@ -129,6 +166,9 @@ export async function validateAnimationEvidence(evidenceRoot, expected = {}) {
   const root = resolve(evidenceRoot);
   const manifest = await json(join(root, 'manifest.json'));
   invariant(manifest.schemaVersion === 1, 'Invalid evidence schemaVersion');
+  invariant(manifest.correctiveCycle === undefined || manifest.correctiveCycle === '07', 'Unsupported corrective-cycle marker');
+  const cycle07 = manifest.correctiveCycle === '07';
+  const characterCases = cycle07 ? CYCLE_07_CHARACTER_CASES : LEGACY_CHARACTER_CASES;
   invariant(BUILD_ID.test(String(manifest.buildId ?? '')), 'Evidence requires an exact clean Build ID');
   invariant(manifest.clean === true, 'Evidence build must be clean');
   invariant(/^[a-f0-9]{40}$/.test(String(manifest.commitSha ?? '')), 'Invalid evidence commitSha');
@@ -198,7 +238,8 @@ export async function validateAnimationEvidence(evidenceRoot, expected = {}) {
   const motion = await json(join(root, 'pass-2-browser/motion/manifest.json'));
   invariant(motion.buildId === manifest.buildId && motion.sourceFingerprint === manifest.sourceFingerprint, 'Stale motion manifest');
   const scenarios = new Map((motion.scenarios ?? []).map((entry) => [entry.id, entry]));
-  for (const id of [...FLAME_CASES, ...TRANSITION_CASES, ...CHARACTER_CASES]) {
+  const motionFrames = new Map();
+  for (const id of [...FLAME_CASES, ...TRANSITION_CASES, ...characterCases]) {
     const scenario = /** @type {any} */ (scenarios.get(id));
     invariant(scenario, `Missing motion scenario: ${id}`);
     invariant(scenario.buildId === manifest.buildId && scenario.sourceFingerprint === manifest.sourceFingerprint, `${id}: stale identity`);
@@ -219,6 +260,8 @@ export async function validateAnimationEvidence(evidenceRoot, expected = {}) {
       invariant(typeof frame.state.clip === 'string' && Number.isInteger(frame.state.frameIndex), `${id}: missing clip/frame diagnostic`);
       const path = inside(root, frame.path);
       invariant(frame.path.startsWith('pass-2-browser/motion/'), `${id}: frame outside motion directory`);
+      invariant(!motionFrames.has(frame.path), `${id}: sampled frame path is reused by another scenario`);
+      motionFrames.set(frame.path, { scenarioId: id, captureMs: frame.captureMs });
       const bytes = await readFile(path);
       invariant(digest(bytes) === frame.sha256, `${id}: sampled frame hash mismatch`);
       const info = pngInfo(bytes, `${id}/${frame.path}`);
@@ -238,8 +281,21 @@ export async function validateAnimationEvidence(evidenceRoot, expected = {}) {
     if (id === 'flame-tap-continuity') invariant(scenario.metrics?.loopResetCount === 0 && scenario.metrics?.flickerCount === 0, `${id}: tap reset/flicker detected`);
     if (id === 'flame-loop-seam') invariant(scenario.metrics?.visibleSeamCount === 0, `${id}: visible loop seam detected`);
     if (id === 'servant-long-inhale-exhale-fire-reaction') invariant(scenario.metrics?.phaseContract === 'prepare>inhale-ramp>inhale-hold>exhale-start>exhale-ramp>exhale-peak>exhale-fade>exhale-end>recovery>idle' && scenario.metrics?.maxStrengthError <= 0.05 && scenario.metrics?.peakFrameDelta <= 1, `${id}: long exhale/fire synchronization failed`);
+    if (id === 'servant-long-inhale-exhale-steam-reaction') {
+      invariant(scenario.metrics?.phaseContract === 'prepare>inhale-ramp>inhale-hold>steam-start>steam-ramp>steam-peak>steam-fade>steam-end>recovery>idle', `${id}: Cycle 07 steam phase contract failed`);
+      invariant(scenario.metrics?.emissionKind === 'steam' && scenario.metrics?.origin === 'mouth' && scenario.metrics?.snowflakeEvents === 0, `${id}: Cycle 07 forbids snow semantics and requires mouth steam`);
+      invariant(scenario.metrics?.maxSourceDistanceLogicalPx <= 8 && scenario.metrics?.maxScaleDriftPercent <= 2 && scenario.metrics?.rootDriftLogicalPx <= 2, `${id}: Cycle 07 mouth origin/scale stability failed`);
+      invariant(scenario.metrics?.pauseFrozen === true && scenario.metrics?.cleanupCount === 0 && scenario.metrics?.reducedMotionSemanticParity === true, `${id}: Cycle 07 Servant lifecycle parity failed`);
+    }
     if (id === 'demoness-disapproval-head-shake') invariant(scenario.metrics?.orderedSequence === 'look>pause>negative-head-movement>return' && scenario.metrics?.minIntervalMs >= 5_000 && scenario.metrics?.maxIntervalMs <= 9_000 && scenario.metrics?.coreMutations === 0 && scenario.metrics?.castRestarts === 0, `${id}: disapproval gesture failed`);
     if (id === 'demoness-full-cold-cast') invariant(scenario.metrics?.phaseContract === 'cast-look>arms-rise>cast-gather>cold-ramp>cold-hold>cold-release>recovery>idle' && scenario.metrics?.maxStrengthError <= 0.05 && scenario.metrics?.eventToReactionMs <= 50, `${id}: cold cast/fire response failed`);
+    if (id === 'demoness-full-steam-cast') {
+      invariant(scenario.metrics?.phaseContract === 'cast-look>arms-rise>cast-gather>steam-ramp>steam-hold>steam-release>recovery>idle', `${id}: Cycle 07 steam cast contract failed`);
+      invariant(scenario.metrics?.emissionKind === 'steam' && [...(scenario.metrics?.origins ?? [])].sort().join(',') === 'left-hand,right-hand' && scenario.metrics?.iceShardEvents === 0, `${id}: Cycle 07 forbids ice semantics and requires two-hand steam`);
+      invariant(scenario.metrics?.maxSourceDistanceLogicalPx?.leftHand <= 12 && scenario.metrics?.maxSourceDistanceLogicalPx?.rightHand <= 12, `${id}: Cycle 07 hand origin gate failed`);
+      invariant(scenario.metrics?.blurDefects === 0 && scenario.metrics?.morphDefects === 0 && scenario.metrics?.maxDprAdjustedUpscale <= 1.25, `${id}: Cycle 07 Demoness sharpness gate failed`);
+      invariant(scenario.metrics?.pauseFrozen === true && scenario.metrics?.cleanupCount === 0 && scenario.metrics?.reducedMotionSemanticParity === true, `${id}: Cycle 07 Demoness lifecycle parity failed`);
+    }
     if (id === 'demoness-silhouette-reveal') invariant(scenario.metrics?.orderedSequence === 'silhouette>reveal' && scenario.metrics?.fragmentEvents === 0 && scenario.metrics?.teleportEvents === 0, `${id}: reveal continuity failed`);
     if (id === 'inferno-stage-6-to-7-payoff') invariant(scenario.metrics?.durationMs === 1_500 && scenario.metrics?.highFlameExpansion && scenario.metrics?.emberBurst && scenario.metrics?.runeWave && scenario.metrics?.lightingPulse && scenario.metrics?.stagedHostReveal && scenario.metrics?.hudReadable && scenario.metrics?.popCount === 0, `${id}: Stage 6→7 payoff failed`);
     if (id === 'inferno-sustained-30s') invariant(prior - scenario.frames[0].captureMs >= 30_000 && scenario.metrics?.addressableRegions >= 5 && scenario.metrics?.minMovingRegionsPerFiveSeconds >= 2 && scenario.metrics?.lockstep === false && scenario.metrics?.wholePlateOnly === false && scenario.metrics?.seamCount === 0 && scenario.metrics?.freezeWindows === 0, `${id}: sustained Inferno motion failed`);
@@ -250,6 +306,11 @@ export async function validateAnimationEvidence(evidenceRoot, expected = {}) {
   invariant(geometry.demoness?.connectedComponents === 1 && geometry.demoness?.fragmentEvents === 0 && geometry.demoness?.teleportEvents === 0, 'Demoness connected-figure gate failed');
   invariant(geometry.demoness?.heightVsServant >= 1.25 && geometry.demoness?.flameOverlapPixels === 0, 'Demoness scale/flame-clearance gate failed');
   invariant(geometry.infernoHost?.addressableRegions >= 5 && geometry.infernoHost?.minMovingRegionsPerFiveSeconds >= 2 && geometry.infernoHost?.wholePlateOnly === false, 'Inferno host independent-motion gate failed');
+  if (cycle07) {
+    invariant(geometry.servant?.maxScaleDriftPercent <= 2 && geometry.servant?.steamOrigin === 'mouth' && geometry.servant?.maxSteamSourceDistanceLogicalPx <= 8 && geometry.servant?.snowflakeEvents === 0, 'Cycle 07 Servant scale/mouth-steam geometry gate failed');
+    invariant(geometry.demoness?.steamOrigins?.sort().join(',') === 'left-hand,right-hand' && geometry.demoness?.maxSteamSourceDistanceLogicalPx?.leftHand <= 12 && geometry.demoness?.maxSteamSourceDistanceLogicalPx?.rightHand <= 12 && geometry.demoness?.iceShardEvents === 0, 'Cycle 07 Demoness hand-steam geometry gate failed');
+    invariant(geometry.demoness?.blurDefects === 0 && geometry.demoness?.morphDefects === 0 && geometry.demoness?.maxDprAdjustedUpscale <= 1.25, 'Cycle 07 Demoness sharpness geometry gate failed');
+  }
 
   const debuffs = await json(join(root, 'pass-2-browser/metrics/debuff-parity.json'));
   invariant(debuffs.servantOnly === 'PASS' && debuffs.demonessOnly === 'PASS' && debuffs.bothActive === 'PASS', 'Three debuff display states are required');
@@ -275,7 +336,7 @@ export async function validateAnimationEvidence(evidenceRoot, expected = {}) {
   const optionalBoost = await json(join(root, 'pass-2-browser/balance/optional-boost-paired.json'));
   invariant(optionalBoost.buildId === manifest.buildId && optionalBoost.status === 'PASS' && optionalBoost.contentAccessChanged === false && optionalBoost.advantage === true, 'Optional boost paired evidence failed');
 
-  const independentReviewer = await assertSignedReview(join(root, 'pass-3-independent/independent-review.md'), 'independent QA reviewer');
+  const independentReviewer = await assertSignedReview(join(root, 'pass-3-independent/independent-review.md'), 'independent QA reviewer', { cycle07, motionFrames });
   const signoff = await json(join(root, 'pass-3-independent/signoff.json'));
   invariant(signoff.buildId === manifest.buildId && signoff.decision === 'PASS' && signoff.openCritical === 0 && signoff.openHigh === 0, 'Final signoff gate failed');
   invariant(signoff.passOwners?.implementation && signoff.passOwners?.independent === independentReviewer && signoff.passOwners?.regression && new Set(Object.values(signoff.passOwners)).size === 3, 'Exactly three independently owned passes are required');

@@ -178,52 +178,52 @@
       "metadataSha256": "dd19cf6e2e5cf536a8ab3ff9e71892d73ae5be3ded0dcd3c7aec1eea04e90bf6"
     },
     {
-      "id": "CH-ASH-SERVANT-IDLE-C06", "path": "assets/characters/ash-servant/ash-servant-idle-v4.webp", "metadata": "assets/characters/ash-servant/ash-servant-idle-v4.json",
-      "kind": "character-clip-atlas", "stages": [3,4,5,6,7], "width": 1024, "height": 640, "bytes": 327048, "decodedBytes": 2621440,
+      "id": "CH-ASH-SERVANT-IDLE-C07", "path": "assets/characters/ash-servant/ash-servant-idle-v5.webp", "metadata": "assets/characters/ash-servant/ash-servant-idle-v5.json",
+      "kind": "character-clip-atlas", "stages": [3,4,5,6,7], "width": 1024, "height": 640, "bytes": 212864, "decodedBytes": 2621440,
       "transparent": true, "critical": false, "preload": "stage 2 progress >= 0.6; inhale warmed during idle", "release": "after requested clip commit", "residencyGroup": "ash-servant-clips",
-      "animation": "idle and appearance use all 8 unique authored frames at 6/10 fps", "sha256": "ba59875599554f652f1e2bbedfb514ab34835a031488a4b1230ec5d27099b98a", "metadataSha256": "9c83dbe27f8a6b5ee20b46b37e9fd4329a7e17e8551a54d14b2df05f7eae1884"
+      "animation": "stable-scale idle and appearance use all 8 unique authored frames at 6/10 fps", "sha256": "e048ec7fc099a8ae8afe9cb1522c6b7e11e04748a04ec7d9f525422ffd897a23", "metadataSha256": "200db3e6832405d61fb6d366513c9d30196953608382fe41c27216158e438dc4"
     },
     {
-      "id": "CH-ASH-SERVANT-INHALE-C06", "path": "assets/characters/ash-servant/ash-servant-inhale-v4.webp", "metadata": "assets/characters/ash-servant/ash-servant-inhale-v4.json",
-      "kind": "character-clip-atlas", "stages": [3,4,5,6,7], "width": 1024, "height": 640, "bytes": 308706, "decodedBytes": 2621440,
+      "id": "CH-ASH-SERVANT-INHALE-C07", "path": "assets/characters/ash-servant/ash-servant-inhale-v5.webp", "metadata": "assets/characters/ash-servant/ash-servant-inhale-v5.json",
+      "kind": "character-clip-atlas", "stages": [3,4,5,6,7], "width": 1024, "height": 640, "bytes": 241580, "decodedBytes": 2621440,
       "transparent": true, "critical": false, "preload": "during servant idle", "release": "after blow commit", "residencyGroup": "ash-servant-clips",
-      "animation": "inhale 8 unique authored frames at 10 fps", "sha256": "e6f0097519cf33cd8c6f16df4d34b30cb5c4d9bcf437ea52e0ca383ac37ccef1", "metadataSha256": "3147deab6d24e0bf0a1d9af85666c306cde1aa5da70bf34b2055c3e454945502"
+      "animation": "inhale 8 stable-scale authored frames at 10 fps with per-frame mouth sockets", "sha256": "6fb70c2d5849a2c57143c55be1795825fc6e331e5c085cda519300a0d2c37ab4", "metadataSha256": "64fb4238d86598836dfc02c407dd643e7284e0d451e22d04c6241d7361fe2615"
     },
     {
-      "id": "CH-ASH-SERVANT-BLOW-C06", "path": "assets/characters/ash-servant/ash-servant-blow-v4.webp", "metadata": "assets/characters/ash-servant/ash-servant-blow-v4.json",
-      "kind": "character-clip-atlas", "stages": [3,4,5,6,7], "width": 1024, "height": 640, "bytes": 238448, "decodedBytes": 2621440,
+      "id": "CH-ASH-SERVANT-BLOW-C07", "path": "assets/characters/ash-servant/ash-servant-blow-v5.webp", "metadata": "assets/characters/ash-servant/ash-servant-blow-v5.json",
+      "kind": "character-clip-atlas", "stages": [3,4,5,6,7], "width": 1024, "height": 640, "bytes": 197358, "decodedBytes": 2621440,
       "transparent": true, "critical": false, "preload": "during servant telegraph", "release": "after recovery commit", "residencyGroup": "ash-servant-clips",
-      "animation": "blow 8 unique authored frames at 10 fps", "sha256": "b2e7331d6fcb14e4b45c03c2e4d3423e885a10b3c65098ce8df30461d29a0782", "metadataSha256": "fad66961414a6af789b5033ffe8dd2162445b6538afe87425e8b928fcd452d65"
+      "animation": "blow 8 stable-scale authored frames at 10 fps; mouth-socket steam only", "sha256": "364038763b4f00ba3954f2b1aff3e0a106c6a69bf0f2b31484bccf48a2478270", "metadataSha256": "4b3a0ea024be07b889efd8888e1d9a716d5baa56b67fd1a5f5d24f61c55235db"
     },
     {
-      "id": "CH-ASH-SERVANT-RECOVERY-C06", "path": "assets/characters/ash-servant/ash-servant-recovery-v4.webp", "metadata": "assets/characters/ash-servant/ash-servant-recovery-v4.json",
-      "kind": "character-clip-atlas", "stages": [3,4,5,6,7], "width": 1024, "height": 640, "bytes": 324166, "decodedBytes": 2621440,
+      "id": "CH-ASH-SERVANT-RECOVERY-C07", "path": "assets/characters/ash-servant/ash-servant-recovery-v5.webp", "metadata": "assets/characters/ash-servant/ash-servant-recovery-v5.json",
+      "kind": "character-clip-atlas", "stages": [3,4,5,6,7], "width": 1024, "height": 640, "bytes": 186394, "decodedBytes": 2621440,
       "transparent": true, "critical": false, "preload": "during servant active phase", "release": "after idle commit", "residencyGroup": "ash-servant-clips",
-      "animation": "forward-authored recovery uses all 8 unique frames over 0.8 s", "sha256": "a616bcca0bd65231b29c8bdb74d6c054bc5e1f5ebb62d8c8ab48045a8cd84eb9", "metadataSha256": "ef077f8f4c86afcf7da840cdc38ceb904e7cdc9708169c375a2b51404618d310"
+      "animation": "stable-scale forward recovery uses all 8 unique frames over 0.8 s", "sha256": "dbd1a0a8c98e2afea71142742ca784f947ca4188d2bdf4ecc5476bcd8f28dcc2", "metadataSha256": "a87be7978dad23e67dc067ec2daf3b57e6e3fec819a75efb71a79be079168e2a"
     },
     {
-      "id": "CH-DEMONESS-IDLE-C06", "path": "assets/characters/demoness/demoness-idle-v5.webp", "metadata": "assets/characters/demoness/demoness-idle-v5.json",
-      "kind": "character-clip-atlas", "stages": [4,5,6,7], "width": 1600, "height": 1200, "bytes": 647254, "decodedBytes": 7680000,
+      "id": "CH-DEMONESS-IDLE-C07", "path": "assets/characters/demoness/demoness-idle-v6.webp", "metadata": "assets/characters/demoness/demoness-idle-v6.json",
+      "kind": "character-clip-atlas", "stages": [4,5,6,7], "width": 1648, "height": 1328, "bytes": 495708, "decodedBytes": 8754176,
       "transparent": true, "critical": false, "preload": "stage 3 progress >= 0.6; cast warmed during idle", "release": "after requested clip commit", "residencyGroup": "demoness-clips",
-      "animation": "high-resolution idle and appearance use all 8 unique authored frames at 1.2/8 fps", "sha256": "43fc96e43a41e881ea500cdedff27a6a3e2f35a5ed2dc04e031b19a614fe20bc", "metadataSha256": "2d87dc0f5dfcbc68376846a843cda184d282c5197c351edcb4caa5c2dd8efdb6"
+      "animation": "sharp high-resolution idle and appearance use all 8 unique authored frames at 1.2/8 fps", "sha256": "6c761f41c4144cb345df36686ff0c7445c6e7a57548dec137acf7209d238eeee", "metadataSha256": "e5e325d10b5e262d1fbf25511ed7515894f48e45d4573e22a5b63edea76fb692"
     },
     {
-      "id": "CH-DEMONESS-CAST-C06", "path": "assets/characters/demoness/demoness-cast-v5.webp", "metadata": "assets/characters/demoness/demoness-cast-v5.json",
-      "kind": "character-clip-atlas", "stages": [5,6,7], "width": 1600, "height": 1200, "bytes": 698778, "decodedBytes": 7680000,
+      "id": "CH-DEMONESS-CAST-C07", "path": "assets/characters/demoness/demoness-cast-v6.webp", "metadata": "assets/characters/demoness/demoness-cast-v6.json",
+      "kind": "character-clip-atlas", "stages": [5,6,7], "width": 1648, "height": 1328, "bytes": 443114, "decodedBytes": 8754176,
       "transparent": true, "critical": false, "preload": "during demoness idle", "release": "after hold commit", "residencyGroup": "demoness-clips",
-      "animation": "cast 8 unique authored frames at 8 fps", "sha256": "9db3a4789c9041d98ae6866e6b65bc9a7193ca3ace42a7024f2c9c91cb9a41fb", "metadataSha256": "e2ce8d1035b8baeca366d020156c70b2e1787a1be37b8c840c3364ed54a942f9"
+      "animation": "sharp cast 8 unique authored frames at 8 fps with two per-frame palm sockets", "sha256": "778ea2505b8a640daa15e1684f47e074fb3aec76e72d1632e1df656d1d48c760", "metadataSha256": "6a19c7a63efe62e0a09c7c4a9ade5a33fb7f13d1e6b7c1ff86a7b002ab4319c9"
     },
     {
-      "id": "CH-DEMONESS-HOLD-C06", "path": "assets/characters/demoness/demoness-hold-v5.webp", "metadata": "assets/characters/demoness/demoness-hold-v5.json",
-      "kind": "character-clip-atlas", "stages": [5,6,7], "width": 1600, "height": 1200, "bytes": 804146, "decodedBytes": 7680000,
+      "id": "CH-DEMONESS-HOLD-C07", "path": "assets/characters/demoness/demoness-hold-v6.webp", "metadata": "assets/characters/demoness/demoness-hold-v6.json",
+      "kind": "character-clip-atlas", "stages": [5,6,7], "width": 1648, "height": 1328, "bytes": 553028, "decodedBytes": 8754176,
       "transparent": true, "critical": false, "preload": "during demoness telegraph", "release": "after recovery commit", "residencyGroup": "demoness-clips",
-      "animation": "hold uses all 8 unique authored frames at 6 fps", "sha256": "41a9072680cc3118776925da020ffd5a80a7b4186111bac93b7224cc59076db4", "metadataSha256": "e9bb9c51d1d5aa1865646b1824688ac0239af2ef309f7fb4e2dc33c6f09525da"
+      "animation": "hold uses all 8 sharp authored frames at 6 fps; two-palm steam sockets", "sha256": "ff829c08f8ab304d9ffce4221125271348f40d1ccab01e3b653d7fc17b4f83e0", "metadataSha256": "353030a57ea8c1151e470ef6e8f2d91f4f3599b1a1606a6140725c2034c278b2"
     },
     {
-      "id": "CH-DEMONESS-RECOVERY-C06", "path": "assets/characters/demoness/demoness-recovery-v5.webp", "metadata": "assets/characters/demoness/demoness-recovery-v5.json",
-      "kind": "character-clip-atlas", "stages": [5,6,7], "width": 1600, "height": 1200, "bytes": 691720, "decodedBytes": 7680000,
+      "id": "CH-DEMONESS-RECOVERY-C07", "path": "assets/characters/demoness/demoness-recovery-v6.webp", "metadata": "assets/characters/demoness/demoness-recovery-v6.json",
+      "kind": "character-clip-atlas", "stages": [5,6,7], "width": 1648, "height": 1328, "bytes": 513742, "decodedBytes": 8754176,
       "transparent": true, "critical": false, "preload": "during demoness active phase", "release": "after idle commit", "residencyGroup": "demoness-clips",
-      "animation": "forward-authored recovery uses all 8 unique frames over 1.0 s", "sha256": "78f303bdc7a0395300194568fa6ec502e1ff30df39f4c3d8542a6b67148fd266", "metadataSha256": "20f0b66c7996cb4fce2491144b51a5c19897818ac093b252158170856b2deeb0"
+      "animation": "sharp forward recovery uses all 8 unique frames over 1.0 s", "sha256": "f6a5e48008a42bbb005f9fc9f6ebb2e787cb31b0a990b1d667a78f34416af35e", "metadataSha256": "ef42a601ddd45f660e90c202d1645a861121844fdb1ba2ed3fbc83e86142caf8"
     },
     {
       "id": "CH-INFERNO-HOST-MAIN-C06", "path": "assets/characters/character-inferno-host-main-v4.webp", "metadata": "assets/characters/character-inferno-host-main-v4.json",
@@ -376,7 +376,7 @@
       "appearance:8f@8fps once",
       "idle:8f@1.2fps calm loop; disapproval uses 8 authored poses",
       "cast/gather:8 authored poses",
-      "cold hold/release:8 authored poses with dynamic actual-flame target",
+      "two-palm steam hold/release:8 authored poses with dynamic actual-flame target",
       "recovery:8 authored poses, 1000ms"
     ],
     "inferno-host": [
@@ -389,8 +389,8 @@
     "darkness-and-light-reveal-masks",
     "bounded-embers-and-smoke-motion",
     "tap-and-stage-light-flares",
-    "servant-scarlet-snowflakes",
-    "demoness-conical-ice-and-contact-steam"
+    "servant-mouth-steam-stream",
+    "demoness-two-palm-steam-streams"
   ],
   "provenance": "assets/PROVENANCE.md",
   "reviewOwner": "Main Agent + visual/audio QA reviewers"

@@ -10,8 +10,8 @@ async function bytes(path) { return readFile(new URL(path, root)); }
 function sha(buffer) { return createHash('sha256').update(buffer).digest('hex'); }
 
 for (const spec of [
-  ...['idle', 'inhale', 'blow', 'recovery'].map((clip) => ({ id: `CH-ASH-SERVANT-${clip.toUpperCase()}-C06`, version: 'v4', metadata: `assets/characters/ash-servant/ash-servant-${clip}-v4.json`, dimensions: [1024, 640, 256, 320], gutter: 6, centroid: clip === 'recovery' ? 22 : 16, minimumComponent: 0.999 })),
-  ...['idle', 'cast', 'hold', 'recovery'].map((clip) => ({ id: `CH-DEMONESS-${clip.toUpperCase()}-C06`, version: 'v5', metadata: `assets/characters/demoness/demoness-${clip}-v5.json`, dimensions: [1600, 1200, 400, 600], gutter: 6, centroid: 16, minimumComponent: 0.999 })),
+  ...['idle', 'inhale', 'blow', 'recovery'].map((clip) => ({ id: `CH-ASH-SERVANT-${clip.toUpperCase()}-C07`, version: 'v5', metadata: `assets/characters/ash-servant/ash-servant-${clip}-v5.json`, dimensions: [1024, 640, 256, 320], gutter: 6, centroid: clip === 'recovery' ? 22 : 16, minimumComponent: 0.999 })),
+  ...['idle', 'cast', 'hold', 'recovery'].map((clip) => ({ id: `CH-DEMONESS-${clip.toUpperCase()}-C07`, version: 'v6', metadata: `assets/characters/demoness/demoness-${clip}-v6.json`, dimensions: [1648, 1328, 412, 664], gutter: 6, centroid: 22, minimumComponent: 0.999 })),
 ]) {
   test(`${spec.id} ${spec.version} cells preserve root, gutter, anatomy and metadata hashes`, async () => {
     const [manifestBuffer, metadataBuffer] = await Promise.all([bytes('assets/assets-manifest.json'), bytes(spec.metadata)]);
@@ -24,8 +24,10 @@ for (const spec of [
     for (const [clipName, clip] of Object.entries(metadata.clips)) {
       const roots = clip.frames.map((frame) => frame.rootY);
       const centroids = clip.frames.map((frame) => frame.centroidX);
+      const anatomicalScales = clip.frames.map((frame) => frame.anatomicalScale);
       assert.ok(Math.max(...roots) - Math.min(...roots) <= 2, `${clipName} root drift`);
       assert.ok(Math.max(...centroids) - Math.min(...centroids) <= spec.centroid, `${clipName} centroid travel`);
+      assert.ok(Math.max(...anatomicalScales) - Math.min(...anatomicalScales) <= 0.02, `${clipName} anatomical scale drift`);
       for (const frame of clip.frames) {
         assert.equal(frame.w, spec.dimensions[2]);
         assert.equal(frame.h, spec.dimensions[3]);
@@ -33,6 +35,11 @@ for (const spec of [
         assert.ok(frame.largestComponentRatio >= spec.minimumComponent);
         assert.match(frame.sha256, /^[a-f0-9]{64}$/);
         assert.ok(frame.provenance.length > 20);
+        if (spec.id.startsWith('CH-ASH-SERVANT')) assert.equal(frame.sockets.mouth.length, 2);
+        if (spec.id.startsWith('CH-DEMONESS') && ['cast', 'hold'].includes(clipName)) {
+          assert.equal(frame.sockets.leftHand.length, 2);
+          assert.equal(frame.sockets.rightHand.length, 2);
+        }
       }
       assert.equal(new Set(clip.frames.map((frame) => frame.sha256)).size, clip.frames.length);
     }
@@ -41,8 +48,8 @@ for (const spec of [
 
 test('Servant blow-to-recovery boundary preserves the final forward pose before settling', async () => {
   const [blow, recovery] = await Promise.all([
-    bytes('assets/characters/ash-servant/ash-servant-blow-v4.json').then((value) => JSON.parse(value.toString())),
-    bytes('assets/characters/ash-servant/ash-servant-recovery-v4.json').then((value) => JSON.parse(value.toString())),
+    bytes('assets/characters/ash-servant/ash-servant-blow-v5.json').then((value) => JSON.parse(value.toString())),
+    bytes('assets/characters/ash-servant/ash-servant-recovery-v5.json').then((value) => JSON.parse(value.toString())),
   ]);
   const before = blow.clips.blow.frames.at(-1);
   const after = recovery.clips.recovery.frames[0];

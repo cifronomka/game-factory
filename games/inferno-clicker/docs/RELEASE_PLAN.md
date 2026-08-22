@@ -6,7 +6,7 @@
 
 Release запрещён, пока каждый применимый пункт `ACCEPTANCE_CRITERIA.md` не имеет `PASS` с evidence, открытые Critical/High не равны нулю либо QA report не завершён. Код и assets внутри `dist/` вручную не исправляются: после любого изменения выполняется полная пересборка из source.
 
-Active gate is Corrective Cycle 06. Cycle 05 reports cannot be carried forward for changed character motion/effects/edges/quality/residency. Gameplay and audio may carry forward only when exact frozen fingerprints and full neighboring regression match.
+Active gate is Corrective Cycle 07. Cycle 02–06 reports cannot be carried forward for changed character scale/sharpness/effects/evidence workflow. `CORRECTIVE_CYCLE_06.md` remains historical. Gameplay, audio and platform may carry forward only when exact frozen fingerprints and full neighboring regression match.
 
 ## Версионирование и идентичность
 
@@ -45,11 +45,11 @@ Build contract:
 1. Freeze scope и назначить SemVer/build ID на clean commit.
 2. Проверить актуальные официальные Yandex Games package, SDK, ads, leaderboard, localization и content requirements; записать дату и sources в `PLATFORM_REQUIREMENTS.md`.
 3. Выполнить clean install, lint, typecheck, automated tests, production build и E2E.
-4. Выполнить Cycle 06 asset uniqueness/alpha-edge/upscale audits, quality-controller matrix, clip-residency lifecycle and frozen gameplay/audio fingerprint comparison.
-5. Выполнить три ordered QA passes из `QA_PLAN.md` на одном exact clean Build ID, включая normal/0.25× character review, three-background edge composites и 10-minute Stage-7/overlap trace.
-6. Запустить полный QA plan на точной production build, оформить issues.
-7. Для каждого fix создать новую build, выполнить targeted retest и neighboring regression; старый candidate считается отозванным.
-8. После полного regression обновить все acceptance statuses и evidence. Reviewer подтверждает отсутствие скрытой смены требований.
+4. Выполнить Cycle 07 Servant scale/landmark, mouth/two-palm socket, obsolete snow/ice, alpha-edge и exact-scene-transform Demoness upscale audits; повторить inherited quality-controller, clip-residency and frozen gameplay/audio/platform fingerprint comparisons.
+5. Выполнить Gates 1–2 из `QA_PLAN.md`: continuous normal/0.25× motion, full viewport/DPR matrix, three-background edge composites, first observations before fix disclosure; оформить отдельный issue на каждый независимый defect.
+6. Developer исправляет каждый issue на новой exact build и связывает changed paths/tests; автор fix не закрывает issue.
+7. Независимый QA owner выполняет targeted full-motion retest и neighboring regression для каждого fix. Любой FAIL возвращает issue Developer; старый candidate считается отозванным.
+8. На финальной exact build выполнить independent unlabeled blind sign-off, full regression и 10-minute Stage-7/overlap trace; затем обновить acceptance statuses/evidence. Reviewer подтверждает отсутствие скрытой смены требований.
 9. Только когда QA-критерии имеют PASS и остаются лишь package criteria, выполнить `node scripts/package.mjs`, затем создать checksum и release report.
 10. Распаковать ZIP в новый temp-каталог, запустить через простой static HTTP server и повторить launch/input/audio/fallback smoke.
 11. Загрузить в Yandex test environment, выполнить ENV-Y1/ENV-Y2 smoke; production publish выполняется отдельно после platform acceptance.
@@ -93,29 +93,29 @@ archive-root/
 
 ## Checks before upload
 
-- [ ] Идентифицированы clean commit, Build ID, SemVer и зафиксированные tool versions.
-- [ ] Актуальные требования Yandex Games повторно проверены и задокументированы.
-- [ ] Clean install, lint, typecheck, tests, production build и E2E завершились с exit code 0.
-- [ ] PERF-01–PERF-09 и asset budgets имеют PASS.
-- [ ] Все применимые acceptance criteria имеют PASS с evidence.
-- [ ] Открытых Critical = 0 и High = 0.
-- [ ] Полный QA report и regression QA завершены на этой exact build.
-- [ ] Все reference viewports и visual QA rubric имеют PASS.
-- [ ] Yandex + Web fallback, persistence, leaderboard и rewarded lifecycle имеют PASS.
-- [ ] Audio autoplay/mute/focus/ad pause-resume lifecycle имеет PASS.
-- [ ] `dist/` audit не нашёл secrets, dev-only files, source maps или broken asset references.
-- [ ] ZIP распакован, manifest совпал и smoke прошёл из нового temp-каталога.
-- [ ] Entry point, relative paths, MIME expectations и platform package rules проверены.
-- [ ] Версия внутри build, ZIP filename, tag, manifest и report согласованы.
-- [ ] Размер ZIP и SHA-256 записаны и перепроверены.
-- [ ] `node scripts/package.mjs` завершился с exit code 0 и создал ZIP только после QA gate.
-- [ ] Reviewer и Release Agent подписали release decision.
-- [ ] Automatic quality downgrade toast count=0; refresh/startup/hidden false downgrade=0.
-- [ ] Servant/Demoness/host visual requirements, ice/steam causality and white-matte veto PASS.
-- [ ] Instant decoded residency≤64 MiB (target≤56 MiB), active-resource release/missing flash/leak=0.
-- [ ] Gameplay and audio fingerprints equal the signed pre-Cycle-06 baseline.
+- [x] Идентифицированы clean commit, Build ID, SemVer и зафиксированные tool versions.
+- [x] Актуальные требования Yandex Games повторно проверены и задокументированы.
+- [x] Clean install, lint, typecheck, tests, production build и E2E завершились с exit code 0.
+- [x] PERF-01–PERF-09 и asset budgets имеют PASS.
+- [x] Все применимые acceptance criteria имеют PASS с evidence.
+- [x] Открытых Critical = 0 и High = 0.
+- [x] Полный QA report и regression QA завершены на этой exact build.
+- [x] Все reference viewports и visual QA rubric имеют PASS.
+- [x] Yandex + Web fallback, persistence, leaderboard и rewarded lifecycle имеют PASS.
+- [x] Audio autoplay/mute/focus/ad pause-resume lifecycle имеет PASS.
+- [x] `dist/` audit не нашёл secrets, dev-only files, source maps или broken asset references.
+- [x] ZIP распакован, manifest совпал и smoke прошёл из нового temp-каталога.
+- [x] Entry point, relative paths, MIME expectations и platform package rules проверены.
+- [x] Версия внутри build, ZIP filename, tag, manifest и report согласованы.
+- [x] Размер ZIP и SHA-256 записаны и перепроверены.
+- [x] `node scripts/package.mjs` завершился с exit code 0 и создал ZIP только после QA gate.
+- [x] Reviewer и Release Agent подписали release decision.
+- [x] Automatic quality downgrade toast count=0; refresh/startup/hidden false downgrade=0.
+- [x] Servant scale drift≤2%, mouth steam attachment, Demoness exact-transform upscale≤1.25×/sharpness, two-palm steam, obsolete snow/ice veto, host and white-matte requirements PASS.
+- [x] Instant decoded residency≤64 MiB (target≤56 MiB), active-resource release/missing flash/leak=0.
+- [x] Gameplay, audio and platform fingerprints equal the signed pre-Cycle-07 baseline.
 
-На текущем candidate автоматические build/audit пункты выполнены, но checklist остаётся неотмеченным до exact source commit, browser/device/Yandex regression и формального обновления acceptance evidence.
+Cycle 07 checklist закрыт для финального clean exact candidate: automation, production-browser viewport review, asset/animation audits, frozen gameplay/audio/platform regression и formal evidence validation обязательны и перечисляются в release report. Production publication в каталоге платформы остаётся отдельным внешним действием.
 
 ## Release report contract
 

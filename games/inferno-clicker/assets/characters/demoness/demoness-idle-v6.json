@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "cycle": "07",
+  "atlasWidth": 1648,
+  "atlasHeight": 1328,
+  "frameWidth": 412,
+  "frameHeight": 664,
+  "pivot": [
+    0.5,
+    0.99
+  ],
+  "transparentGutterPixels": 6,
+  "packing": "Cycle 07 clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve",
+  "sourceSheet": "visual-references/cycle-07-sources/demoness-idle-8-source.png",
+  "sourceSheetSha256": "3c573979e0c8109aebb223f5f9590ce6745e69bc30476967dfe2c482be03e950",
+  "atlasSha256": "6c761f41c4144cb345df36686ff0c7445c6e7a57548dec137acf7209d238eeee",
+  "clips": {
+    "idle": {
+      "fps": 1.2,
+      "loop": true,
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 412,
+          "h": 664,
+          "durationMs": 833.33,
+          "sha256": "1bd4a7c7569dc3023f2bae68d2fd15ac0aafc11f5efdbfb218941936c7eea4ed",
+          "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 0; alpha defringe, stable-root fit and quality-90 WebP export only",
+          "anatomicalScale": 1,
+          "alphaBBox": [
+            10,
+            50,
+            401,
+            657
+          ],
+          "rootY": 657,
+          "centroidX": 200.32,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.04016
+        },
+        {
+          "x": 412,
+          "y": 0,
+          "w": 412,
+          "h": 664,
+          "durationMs": 833.33,
+          "sha256": "1df431986490d93768eb7f383dc4957b535ac049ae8e7e6d5978f3fec8071309",
+          "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 1; alpha defringe, stable-root fit and quality-90 WebP export only",
+          "anatomicalScale": 1,
+          "alphaBBox": [
+            10,
+            50,
+            401,
+            657
+          ],
+          "rootY": 657,
+          "centroidX": 198.62,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.04296
+        },
+        {
+          "x": 824,
+          "y": 0,
+          "w": 412,
+          "h": 664,
+          "durationMs": 833.33,
+          "sha256": "83900533321f6ce4b323eeecf0e79e20a19c4805e777349a6e4051d76bbd975c",
+          "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 2; alpha defringe, stable-root fit and quality-90 WebP export only",
+          "anatomicalScale": 1,
+          "alphaBBox": [
+            11,
+            50,
+            401,
+            657
+          ],
+          "rootY": 657,
+          "centroidX": 198.83,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.04572
+        },
+        {
+          "x": 1236,
+          "y": 0,
+          "w": 412,
+          "h": 664,
+          "durationMs": 833.33,
+          "sha256": "cff96fbc328faa73faafbcd0132e52df3992828eed3222aee4c823c992f652f5",
+          "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 3; alpha defringe, stable-root fit and quality-90 WebP export only",
+          "anatomicalScale": 1,
+          "alphaBBox": [
+            11,
+            50,
+            401,
+            657
+          ],
+          "rootY": 657,
+          "centroidX": 197.07,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.04769
+        },
+        {
+          "x": 0,
+          "y": 664,
+          "w": 412,
+          "h": 664,
+          "durationMs": 833.33,
+          "sha256": "4a499e5f849f64b6b0bfb6627ae47b77427b04018f648c98a3a903f71fe9edd7",
+          "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 4; alpha defringe, stable-root fit and quality-90 WebP export only",
+          "anatomicalScale": 1,
+          "alphaBBox": [
+            9,
+            51,
+            403,
+            657
+          ],
+          "rootY": 657,
+          "centroidX": 199.03,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.04715
+        },
+        {
+          "x": 412,
+          "y": 664,
+          "w": 412,
+          "h": 664,
+          "durationMs": 833.33,
+          "sha256": "446dede65fa71a80ace8ef74501ed939a133574b259f48f597e5b809603d27f3",
+          "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 5; alpha defringe, stable-root fit and quality-90 WebP export only",
+          "anatomicalScale": 1,
+          "alphaBBox": [
+            9,
+            51,
+            402,
+            657
+          ],
+          "rootY": 657,
+          "centroidX": 196.64,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.04785
+        },
+        {
+          "x": 824,
+          "y": 664,
+          "w": 412,
+          "h": 664,
+          "durationMs": 833.33,
+          "sha256": "2ade86e6e82ee8aa22a5660ac3dfa502e33babac013f3f8cb3551bba3a7fb979",
+          "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 6; alpha defringe, stable-root fit and quality-90 WebP export only",
+          "anatomicalScale": 1,
+          "alphaBBox": [
+            10,
+            49,
+            401,
+            657
+          ],
+          "rootY": 657,
+          "centroidX": 196.71,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.0488
+        },
+        {
+          "x": 1236,
+          "y": 664,
+          "w": 412,
+          "h": 664,
+          "durationMs": 833.33,
+          "sha256": "a65a14a71801a00d07a7eb745f86f9700dc3c9028abb237ed0fe8677d49718f8",
+          "provenance": "Cycle 07 ImageGen Cycle 07 source demoness-idle-8-source.png; idle authored frame 7; alpha defringe, stable-root fit and quality-90 WebP export only",
+          "anatomicalScale": 1,
+          "alphaBBox": [
+            10,
+            49,
+            401,
+            657
+          ],
+          "rootY": 657,
+          "centroidX": 197.71,
+          "edgeAlphaPixels": 0,
+          "largestComponentRatio": 1,
+          "matteRatio": 0.04628
+        }
+      ]
+    }
+  }
+}

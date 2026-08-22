@@ -13,8 +13,8 @@ not shipped as screens, crops or flattened backplates.
 | FL-MID-CORE / OUTER | flame/atlases/{core,outer}-mid-v2.webp | Two independent transparent 10-frame flame layers | preload at stage 2 progress 0.6; 10 fps |
 | FL-HIGH-CORE / OUTER | flame/atlases/{core,outer}-high-v2.webp | Two independent transparent 12-frame Inferno layers | preload at stage 5 progress 0.6; 11 fps |
 | FX-STAGE-FLARE | flame/transitions/stage-flare-v2.webp | Transparent 8-frame boundary flare | preload at stage 1 progress 0.6; 8 fps once; reverse downward |
-| CH-ASH-SERVANT-*-C06 | characters/ash-servant/ash-servant-{idle,inhale,blow,recovery}-v4.webp | Four disposable clip atlases, each with 8 clean stable-root 256×320 authored cells | idle plus one imminent clip retained; deterministic release after commit |
-| CH-DEMONESS-*-C06 | characters/demoness/demoness-{idle,cast,hold,recovery}-v5.webp | High-resolution Inferno Queen clips, each with 8 clean stable-root 400×600 authored cells | idle plus one imminent clip retained; deterministic release after commit |
+| CH-ASH-SERVANT-*-C07 | characters/ash-servant/ash-servant-{idle,inhale,blow,recovery}-v5.webp | Four disposable 8-cell 256×320 atlases with family-scale framing, stable roots and per-frame mouth sockets | idle plus one imminent clip retained; deterministic release after commit |
+| CH-DEMONESS-*-C07 | characters/demoness/demoness-{idle,cast,hold,recovery}-v6.webp | Sharp 8-cell Inferno Queen clips with 412×664 source cells and per-frame two-palm sockets on cast/hold | idle plus one imminent clip retained; deterministic release after commit |
 | CH-INFERNO-HOST-{MAIN,SENTINEL}-C06 | characters/character-inferno-host-{main,sentinel}-v4.webp | Two separately decoded five-frame actors with independent animation phases | preload at stage 5 progress 0.6; 2 fps after the accepted 1.5 s entry |
 
 The matching JSON files are the production clip metadata and preserve frame
@@ -49,6 +49,12 @@ exports can be traced back without shipping the large PNG masters:
 | Cycle 06 Ash Servant recovery continuity replacement | `exec-80ff85fc-c3ce-4e4c-bbac-793433d3eb19.png` |
 | Cycle 06 stable Inferno sentinel loop | `exec-b056f60f-d8b1-4abb-b5e9-2eeb2a6f3afa.png` |
 | Cycle 06 stable crowned Inferno host loop | `exec-f928b29e-3dc9-4eec-acc8-53b07e739bc6.png` |
+| Cycle 07 Ash Servant blow correction | `exec-957db030-8e96-47ac-85e4-fe8e8d91f8e0.png` |
+| Cycle 07 Ash Servant recovery correction | `exec-25e6889f-a543-477f-88e7-e2bb1f3c69f9.png` |
+| Cycle 07 Demoness idle | `exec-99d50280-2685-4496-b58a-b436222d78e9.png` |
+| Cycle 07 Demoness cast, corrected padded generation | `exec-231f2682-743d-45f5-af7c-6c9ca19365b6.png` |
+| Cycle 07 Demoness hold | `exec-4a74f3d8-9a93-4092-b3dc-9db5c9b44f8c.png` |
+| Cycle 07 Demoness recovery | `exec-84967551-3757-4c78-86c0-75996a467036.png` |
 
 Deterministic post-processing used Sharp only for grid crop/resize, removal of
 the generated white/checker preview background into real alpha, WebP encoding,
@@ -58,9 +64,11 @@ outer layers. It did not invent new silhouettes or copy reference pixels.
 All authored atlas cells use real alpha. Flame core and outer cells share the
 same root pivot [0.5, 0.965], so family crossfades do not jump at the hearth.
 Character atlases have no baked environment or UI. Runtime procedural work is
-limited to compositing, light/reveal masks, bounded particles, glow, scarlet
-snowflakes, conical ice shards and contact steam; it does not synthesize a
-geometric flame or humanoid. Full-pose character dissolve is not used.
+limited to compositing, light/reveal masks, bounded particles, restrained glow
+and deterministic steam streams from the current mouth or both current palms to
+the live flame target. Snowflakes, icicles and ice shards are retired. Runtime
+does not synthesize a geometric flame or humanoid, and full-pose character
+dissolve is not used.
 
 Cycle 06 sources are retained under `visual-references/cycle-06-sources/`. The
 servant prompt requested four forward-authored rows (idle, inhale, exhale and
@@ -72,6 +80,20 @@ shipped on independently phased clocks. Sharp performs only
 checker/near-white alpha extraction, component cleanup, defringe, uniform fit,
 metadata measurement and high-quality WebP encoding via
 `scripts/build-cycle06-character-assets.mjs`.
+
+Cycle 07 selected PNG sources are retained under
+`visual-references/cycle-07-sources/`. The built-in ImageGen prompts used
+identity-preserving precise sprite-sheet edits: one fixed 4×2 grid, constant
+head/torso/limb scale and stable root for the Servant blow/recovery; and sharp
+face/crown/hands/armor/cloth, two visible casting palms, no glow, steam, snow or
+ice, plus a flat removable background for Demoness idle/cast/hold/recovery. The
+accepted Cycle 06 Servant idle/inhale sheet is carried forward in the same
+folder. A rejected black-background Demoness exploration was not copied into the
+project and is not used. `scripts/build-cycle07-character-assets.mjs` applies
+only border-connected neutral-background removal, defringe, one scale per clip,
+stable bottom-root placement, measured sockets and high-quality WebP encoding;
+it does not repaint anatomy. The 412×664 Demoness cells keep the exact runtime
+`sceneTransform × DPR` upscale within the C07 1.25× limit.
 
 Cycle 04 losslessly repacked each complete source-space character cluster into
 `1536×1120` VP8L atlases with 24 `256×280` cells, an 8-pixel transparent gutter,
@@ -94,7 +116,7 @@ and aligns the skirt root. It neither paints new anatomy nor borrows reference
 pixels. The final v4 atlas contains 28 cells with zero edge-alpha pixels and at
 most 0.5 source-pixel root drift.
 
-Cycle 06 character clips are mutually disposable residency groups. The manifest
+Cycle 07 character clips are mutually disposable residency groups. The manifest
 records both physical decoded bytes and the runtime group bound; the audit uses
 the two largest members of each group because the currently rendered and one
 imminent decoded clip may overlap. Superseded resources are released on commit.

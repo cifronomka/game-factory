@@ -37,23 +37,28 @@ test('production audio has no oscillator or per-tap tone generator', async () =>
 });
 
 test('flame and characters use authored frame atlases without static-card deformation fallback', async () => {
-  const [flame, characters] = await Promise.all([
+  const [flame, characters, steam] = await Promise.all([
     source('../../src/presentation/scene/flameRig.js'),
     source('../../src/presentation/scene/characterScene.js'),
+    source('../../src/presentation/scene/steamEmitter.js'),
   ]);
   assert.match(flame, /core-low-v2\.webp/);
   assert.match(flame, /outer-high-v2\.webp/);
   assert.match(flame, /stage-flare-v2\.webp/);
   assert.match(flame, /SpriteAnimator/);
   assert.doesNotMatch(flame, /flame-core-organic|flame-outer-organic|inferno-beam-organic|drawSlice|slice deformation/i);
-  assert.match(characters, /ash-servant-\$\{clip\}-v4\.webp/);
-  assert.match(characters, /demoness-\$\{clip\}-v5\.webp/);
+  assert.match(characters, /ash-servant-\$\{clip\}-v5\.webp/);
+  assert.match(characters, /demoness-\$\{clip\}-v6\.webp/);
   assert.match(characters, /appearance.*idle.*inhale.*blow.*recovery/s);
   assert.match(characters, /appearance.*idle.*cast.*hold.*recovery/s);
-  assert.match(characters, /drawScarletSnowflakes/);
-  assert.match(characters, /drawIceShards/);
+  assert.match(characters, /servantMouthSocket/);
+  assert.match(characters, /demonessHandSockets/);
+  assert.match(characters, /drawSteamStream/);
+  assert.match(steam, /steamParticles/);
+  assert.doesNotMatch(`${characters}\n${steam}`, /snowflake|iceShard|drawColdRibbon|drawDirectedAsh/i);
+  assert.doesNotMatch(steam, /quadraticCurveTo|bezierCurveTo/i);
+  assert.doesNotMatch(characters, /91,218,218|drop-shadow\(0 0 28px rgba\(91/);
   assert.match(characters, /drawImpactFx/);
-  assert.doesNotMatch(characters, /drawColdRibbon|drawDirectedAsh/);
   assert.doesNotMatch(characters, /drawServant|drawDemoness|fallback character/i);
 });
 

@@ -26,10 +26,10 @@ function fakeImage(width, height) {
 
 test('asset URLs remain relative to the copied src/assets dist layout', () => {
   assert.match(INFERNAL_CHAMBER_URL, /\/assets\/backgrounds\/bg-infernal-chamber-production\.webp$/);
-  assert.match(ASH_SERVANT_ATLAS_URL, /\/assets\/characters\/ash-servant\/ash-servant-idle-v4\.webp$/);
-  assert.match(ASH_SERVANT_ATLAS_URLS.recovery, /\/assets\/characters\/ash-servant\/ash-servant-recovery-v4\.webp$/);
-  assert.match(DEMONESS_ATLAS_URL, /\/assets\/characters\/demoness\/demoness-idle-v5\.webp$/);
-  assert.match(DEMONESS_ATLAS_URLS.cast, /\/assets\/characters\/demoness\/demoness-cast-v5\.webp$/);
+  assert.match(ASH_SERVANT_ATLAS_URL, /\/assets\/characters\/ash-servant\/ash-servant-idle-v5\.webp$/);
+  assert.match(ASH_SERVANT_ATLAS_URLS.recovery, /\/assets\/characters\/ash-servant\/ash-servant-recovery-v5\.webp$/);
+  assert.match(DEMONESS_ATLAS_URL, /\/assets\/characters\/demoness\/demoness-idle-v6\.webp$/);
+  assert.match(DEMONESS_ATLAS_URLS.cast, /\/assets\/characters\/demoness\/demoness-cast-v6\.webp$/);
   assert.match(INFERNO_HOST_URL, /\/assets\/characters\/character-inferno-host-main-v4\.webp$/);
   assert.match(INFERNO_HOST_URLS.sentinel, /\/assets\/characters\/character-inferno-host-sentinel-v4\.webp$/);
   assert.match(FLAME_ATLAS_URLS.low.core, /\/assets\/flame\/atlases\/core-low-v2\.webp$/);

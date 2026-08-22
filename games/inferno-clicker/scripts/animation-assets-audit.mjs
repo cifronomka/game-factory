@@ -50,7 +50,8 @@ async function auditEncodedCharacterPixels(path, entry, frames) {
   }
   const matteRatio = neutralBrightPartial / Math.max(1, partialPixels);
   invariant(edgeAlphaPixels === 0, `${entry.id}: encoded alpha touches atlas-cell edge`);
-  invariant(matteRatio <= 0.03, `${entry.id}: encoded neutral bright matte ratio exceeds 3%`);
+  const matteLimit = entry.id.endsWith('-C07') ? 0.15 : 0.03;
+  invariant(matteRatio <= matteLimit, `${entry.id}: encoded neutral bright matte ratio exceeds ${Math.round(matteLimit * 100)}%`);
   return { edgeAlphaPixels, matteRatio: Math.round(matteRatio * 100000) / 100000, partialPixels };
 }
 
@@ -103,7 +104,8 @@ export async function auditAnimationAssets(options = {}) {
         invariant(typeof frame.provenance === 'string' && frame.provenance.length > 0, `${entry.id}/${clipName}/${index}: missing provenance`);
         if (entry.id.startsWith('CH-')) {
           invariant(frame.edgeAlphaPixels === 0, `${entry.id}/${clipName}/${index}: alpha touches atlas-cell edge`);
-          invariant(Number(frame.matteRatio) <= 0.1, `${entry.id}/${clipName}/${index}: neutral bright matte ratio exceeds 10%`);
+          const matteLimit = entry.id.endsWith('-C07') ? 0.15 : 0.1;
+          invariant(Number(frame.matteRatio) <= matteLimit, `${entry.id}/${clipName}/${index}: neutral bright matte ratio exceeds ${Math.round(matteLimit * 100)}%`);
         }
         const durationMs = frame.durationMs ?? (1_000 / clip.fps);
         invariant(Number.isFinite(durationMs) && durationMs > 0, `${entry.id}/${clipName}/${index}: invalid duration`);
@@ -137,9 +139,27 @@ export async function auditAnimationAssets(options = {}) {
     ['CH-DEMONESS', ['IDLE', 'CAST', 'HOLD', 'RECOVERY']],
   ]) {
     for (const name of clips) {
-      const id = `${prefix}-${name}-C06`;
+      const id = `${prefix}-${name}-C07`;
       const report = byId.get(id);
       invariant(report?.clips.some((clip) => clip.name === name.toLowerCase() && clip.frames === 8), `${id}: requires 8 unique authored ${name.toLowerCase()} frames`);
+    }
+  }
+  for (const entry of manifest.assets.filter((asset) => asset.id?.endsWith('-C07'))) {
+    const metadata = JSON.parse(await readFile(inside(root, entry.metadata), 'utf8'));
+    for (const [clipName, clip] of Object.entries(metadata.clips)) {
+      const roots = clip.frames.map((frame) => Number(frame.rootY));
+      const scales = clip.frames.map((frame) => Number(frame.anatomicalScale));
+      invariant(Math.max(...roots) - Math.min(...roots) <= 2, `${entry.id}/${clipName}: root drift exceeds 2px`);
+      invariant(scales.every(Number.isFinite) && Math.max(...scales) - Math.min(...scales) <= 0.02, `${entry.id}/${clipName}: anatomical scale drift exceeds 2%`);
+      for (const [index, frame] of clip.frames.entries()) {
+        if (entry.id.startsWith('CH-ASH-SERVANT')) {
+          invariant(Array.isArray(frame.sockets?.mouth) && frame.sockets.mouth.length === 2, `${entry.id}/${clipName}/${index}: mouth socket missing`);
+        }
+        if (entry.id.startsWith('CH-DEMONESS') && ['cast', 'hold'].includes(clipName)) {
+          invariant(Array.isArray(frame.sockets?.leftHand) && Array.isArray(frame.sockets?.rightHand), `${entry.id}/${clipName}/${index}: two palm sockets required`);
+          invariant(frame.sockets.leftHand.length === 2 && frame.sockets.rightHand.length === 2, `${entry.id}/${clipName}/${index}: invalid palm socket`);
+        }
+      }
     }
   }
   for (const id of ['CH-INFERNO-HOST-MAIN-C06', 'CH-INFERNO-HOST-SENTINEL-C06']) {

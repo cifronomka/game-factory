@@ -27,6 +27,9 @@ async function makeFixture() {
         frames: Array.from({ length: frameCount }, (_, index) => ({
           x: (cell + index) * 10, y: 0, w: 10, h: 10,
           durationMs: 100, sha256: sha(`${id}/${name}/${index}`), provenance: 'fixture-author/export-v1', edgeAlphaPixels: 0, matteRatio: 0,
+          rootY: 9, anatomicalScale: 1,
+          sockets: id.startsWith('CH-ASH-SERVANT') ? { mouth: [0.5, 0.3] }
+            : id.startsWith('CH-DEMONESS') ? { leftHand: [0.3, 0.4], rightHand: [0.7, 0.4] } : undefined,
         })),
       };
       cell += frameCount;
@@ -39,8 +42,8 @@ async function makeFixture() {
   }
 
   for (const family of ['LOW', 'MID', 'HIGH']) for (const layer of ['CORE', 'OUTER']) await add(`FL-${family}-${layer}`, ['loop']);
-  for (const clip of ['IDLE', 'INHALE', 'BLOW', 'RECOVERY']) await add(`CH-ASH-SERVANT-${clip}-C06`, [clip.toLowerCase()], 8);
-  for (const clip of ['IDLE', 'CAST', 'HOLD', 'RECOVERY']) await add(`CH-DEMONESS-${clip}-C06`, [clip.toLowerCase()], 8);
+  for (const clip of ['IDLE', 'INHALE', 'BLOW', 'RECOVERY']) await add(`CH-ASH-SERVANT-${clip}-C07`, [clip.toLowerCase()], 8);
+  for (const clip of ['IDLE', 'CAST', 'HOLD', 'RECOVERY']) await add(`CH-DEMONESS-${clip}-C07`, [clip.toLowerCase()], 8);
   await add('CH-INFERNO-HOST-MAIN-C06', ['ambient'], 5);
   await add('CH-INFERNO-HOST-SENTINEL-C06', ['ambient'], 5);
   const manifest = { schemaVersion: 1, provenance: 'assets/PROVENANCE.md', assets };

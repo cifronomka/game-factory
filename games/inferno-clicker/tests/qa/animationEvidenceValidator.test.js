@@ -22,6 +22,12 @@ const characterCases = [
   'debuff-servant-only', 'debuff-demoness-only', 'debuff-both-active',
   'inferno-stage-6-to-7-payoff', 'inferno-sustained-30s',
 ];
+const cycle07CharacterCases = [
+  'servant-appearance', 'servant-idle', 'servant-long-inhale-exhale-steam-reaction',
+  'demoness-silhouette-reveal', 'demoness-calm-idle', 'demoness-disapproval-head-shake', 'demoness-full-steam-cast',
+  'debuff-servant-only', 'debuff-demoness-only', 'debuff-both-active',
+  'inferno-stage-6-to-7-payoff', 'inferno-sustained-30s',
+];
 
 /** @param {Buffer|string} value */
 function sha(value) { return createHash('sha256').update(value).digest('hex'); }
@@ -47,7 +53,7 @@ function png(width, height) {
   return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw)), chunk('IEND', Buffer.alloc(0))]);
 }
 
-async function makeEvidence() {
+async function makeEvidence({ cycle07 = false, substantiveReview = true, legacyCycle07Effect = false, invalidCycle07Scale = false, invalidCycle07Sharpness = false } = {}) {
   const parent = await mkdtemp(join(tmpdir(), 'inferno-animation-evidence-'));
   const root = join(parent, buildId);
   await mkdir(root, { recursive: true });
@@ -93,7 +99,23 @@ async function makeEvidence() {
   await putJson('pass-2-browser/balance/no-reward-stage7.json', { buildId, rewardUsed: false, productionBrowser: true, profile: 'skilled-mouse', stageReached: 7 });
   await putJson('pass-2-browser/balance/optional-boost-paired.json', { buildId, status: 'PASS', contentAccessChanged: false, advantage: true });
   for (const path of ['pass-3-independent/device-matrix.md', 'pass-3-independent/yandex-console.md', 'pass-3-independent/defects.md', 'pass-3-independent/signoff.md']) await put(path, 'Decision: PASS\n');
-  await put('pass-3-independent/independent-review.md', 'Reviewer-ID: independent-qa\nIndependence: PASS\nDecision: PASS\n');
+  const reviewLines = ['Reviewer-ID: independent-qa', 'Independence: PASS', 'Decision: PASS'];
+  if (cycle07) reviewLines.push('Blind: PASS', 'HUD-Hidden: PASS', 'Debug-Labels-Hidden: PASS', 'Fix-Disclosed-Before-Observations: NO');
+  if (cycle07 && substantiveReview) {
+    const linkedCases = ['servant-long-inhale-exhale-steam-reaction', 'servant-long-inhale-exhale-steam-reaction', 'demoness-full-steam-cast', 'demoness-full-steam-cast'];
+    const observations = [
+      'The servant body retains a stable anatomical scale through exhale and recovery without any visible shrinking or jump.',
+      'The servant emits a continuous steam plume from its visible mouth and nothing appears at either horn during exhale.',
+      'The demoness face crown hands and costume edges remain sharply defined throughout cast hold and recovery poses.',
+      'The demoness emits two steam streams from the visible palms toward the flame without icicles or solid projectiles.',
+    ];
+    for (let index = 0; index < 4; index += 1) {
+      const issueId = `C07-0${index + 1}`;
+      reviewLines.push(`First-Observation: ${issueId} | ${observations[index]}`);
+      reviewLines.push(`Timestamp-Frame-Link: ${issueId} | ${linkedCases[index]} | 1500 | pass-2-browser/motion/${linkedCases[index]}/frame-05.png`);
+    }
+  }
+  await put('pass-3-independent/independent-review.md', `${reviewLines.join('\n')}\n`);
   await putJson('pass-3-independent/signoff.json', { buildId, decision: 'PASS', openCritical: 0, openHigh: 0, passOwners: { implementation: 'implementation-owner', independent: 'independent-qa', regression: 'regression-owner' }, audio: { carriedForward: true, fromBuildId: '0.1.0+abcdefabcdef', priorSignoffSha256: 'e'.repeat(64), sourceFingerprint: audioSourceFingerprint, audioFingerprint: audioAssetFingerprint, lifecycleSmoke: 'PASS' } });
 
   const stillViewports = ['360x640', '390x844', '768x1024', '1366x768'];
@@ -113,7 +135,7 @@ async function makeEvidence() {
 
   const samplePng = png(390, 844);
   const scenarios = [];
-  for (const id of [...flameCases, ...transitionCases, ...characterCases]) {
+  for (const id of [...flameCases, ...transitionCases, ...(cycle07 ? cycle07CharacterCases : characterCases)]) {
     const frames = [];
     for (let index = 0; index < 12; index += 1) {
       const path = `pass-2-browser/motion/${id}/frame-${String(index).padStart(2, '0')}.png`;
@@ -125,19 +147,25 @@ async function makeEvidence() {
       : id === 'flame-tap-continuity' ? { loopResetCount: 0, flickerCount: 0 }
         : id === 'flame-loop-seam' ? { visibleSeamCount: 0 }
           : id === 'servant-long-inhale-exhale-fire-reaction' ? { phaseContract: 'prepare>inhale-ramp>inhale-hold>exhale-start>exhale-ramp>exhale-peak>exhale-fade>exhale-end>recovery>idle', maxStrengthError: 0.05, peakFrameDelta: 1 }
+            : id === 'servant-long-inhale-exhale-steam-reaction' ? { phaseContract: 'prepare>inhale-ramp>inhale-hold>steam-start>steam-ramp>steam-peak>steam-fade>steam-end>recovery>idle', emissionKind: legacyCycle07Effect ? 'snowflakes' : 'steam', origin: 'mouth', snowflakeEvents: 0, maxSourceDistanceLogicalPx: 8, maxScaleDriftPercent: invalidCycle07Scale ? 2.1 : 2, rootDriftLogicalPx: 2, pauseFrozen: true, cleanupCount: 0, reducedMotionSemanticParity: true }
             : id === 'demoness-disapproval-head-shake' ? { orderedSequence: 'look>pause>negative-head-movement>return', minIntervalMs: 5_000, maxIntervalMs: 9_000, coreMutations: 0, castRestarts: 0 }
               : id === 'demoness-full-cold-cast' ? { phaseContract: 'cast-look>arms-rise>cast-gather>cold-ramp>cold-hold>cold-release>recovery>idle', maxStrengthError: 0.05, eventToReactionMs: 50 }
+                : id === 'demoness-full-steam-cast' ? { phaseContract: 'cast-look>arms-rise>cast-gather>steam-ramp>steam-hold>steam-release>recovery>idle', emissionKind: 'steam', origins: ['left-hand', 'right-hand'], iceShardEvents: 0, maxSourceDistanceLogicalPx: { leftHand: 12, rightHand: 12 }, blurDefects: invalidCycle07Sharpness ? 1 : 0, morphDefects: 0, maxDprAdjustedUpscale: 1.25, pauseFrozen: true, cleanupCount: 0, reducedMotionSemanticParity: true }
               : id === 'demoness-silhouette-reveal' ? { orderedSequence: 'silhouette>reveal', fragmentEvents: 0, teleportEvents: 0 }
                 : id === 'inferno-stage-6-to-7-payoff' ? { durationMs: 1_500, highFlameExpansion: true, emberBurst: true, runeWave: true, lightingPulse: true, stagedHostReveal: true, hudReadable: true, popCount: 0 }
                   : id === 'inferno-sustained-30s' ? { addressableRegions: 5, minMovingRegionsPerFiveSeconds: 2, lockstep: false, wholePlateOnly: false, seamCount: 0, freezeWindows: 0 } : {};
     scenarios.push({ id, buildId, sourceFingerprint, viewport: '390x844', dpr: 1, browser: { name: 'Chromium', version: 'fixture' }, frames, metrics });
   }
   await putJson('pass-2-browser/motion/manifest.json', { buildId, sourceFingerprint, scenarios });
-  await putJson('pass-2-browser/metrics/geometry.json', { servant: { rootDriftLogicalPx: 2, edgeAlphaPixels: 0, wrapEvents: 0 }, demoness: { connectedComponents: 1, fragmentEvents: 0, teleportEvents: 0, heightVsServant: 1.25, flameOverlapPixels: 0 }, infernoHost: { addressableRegions: 5, minMovingRegionsPerFiveSeconds: 2, wholePlateOnly: false } });
+  await putJson('pass-2-browser/metrics/geometry.json', {
+    servant: { rootDriftLogicalPx: 2, edgeAlphaPixels: 0, wrapEvents: 0, ...(cycle07 ? { maxScaleDriftPercent: 2, steamOrigin: 'mouth', maxSteamSourceDistanceLogicalPx: 8, snowflakeEvents: 0 } : {}) },
+    demoness: { connectedComponents: 1, fragmentEvents: 0, teleportEvents: 0, heightVsServant: 1.25, flameOverlapPixels: 0, ...(cycle07 ? { steamOrigins: ['left-hand', 'right-hand'], maxSteamSourceDistanceLogicalPx: { leftHand: 12, rightHand: 12 }, iceShardEvents: 0, blurDefects: 0, morphDefects: 0, maxDprAdjustedUpscale: 1.25 } : {}) },
+    infernoHost: { addressableRegions: 5, minMovingRegionsPerFiveSeconds: 2, wholePlateOnly: false },
+  });
   await putJson('pass-2-browser/metrics/debuff-parity.json', { servantOnly: 'PASS', demonessOnly: 'PASS', bothActive: 'PASS', servantFactor: 1.8, demonessFactor: 1.5, combinedFactor: 2.5, combinedRule: 'min(2.50,servantFactor*demonessFactor)', uiCoreMaxDeltaMs: 50, overlapCount: 0, truncationCount: 0 });
   await putJson('pass-2-browser/metrics/inferno-ambient.json', { buildId, status: 'PASS', durationMs: 30_000, addressableRegions: 5 });
 
-  const manifest = { schemaVersion: 1, buildId, commitSha, sourceFingerprint, audioSourceFingerprint, audioAssetFingerprint, clean: true, generatedAt: new Date(1_700_000_100_000).toISOString(), passes: ['pass-1-static', 'pass-2-browser', 'pass-3-independent'], files: inventory };
+  const manifest = { schemaVersion: 1, ...(cycle07 ? { correctiveCycle: '07' } : {}), buildId, commitSha, sourceFingerprint, audioSourceFingerprint, audioAssetFingerprint, clean: true, generatedAt: new Date(1_700_000_100_000).toISOString(), passes: ['pass-1-static', 'pass-2-browser', 'pass-3-independent'], files: inventory };
   await writeFile(join(root, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
   return { root, manifest };
 }
@@ -168,4 +196,30 @@ test('animation evidence hard gate rejects corrupt inventoried bytes', async () 
   const { root } = await makeEvidence();
   await writeFile(join(root, 'pass-1-static/automation.log'), 'tampered\n');
   await assert.rejects(() => validateAnimationEvidence(root), /hash\/size mismatch/);
+});
+
+test('animation evidence hard gate accepts Cycle 07 steam, scale, sharpness, and substantive blind review semantics', async () => {
+  const { root } = await makeEvidence({ cycle07: true });
+  const report = await validateAnimationEvidence(root);
+  assert.equal(report.status, 'PASS');
+});
+
+test('animation evidence hard gate rejects Cycle 07 legacy snow semantics', async () => {
+  const { root } = await makeEvidence({ cycle07: true, legacyCycle07Effect: true });
+  await assert.rejects(() => validateAnimationEvidence(root), /forbids snow semantics/);
+});
+
+test('animation evidence hard gate rejects a content-free Cycle 07 independent review', async () => {
+  const { root } = await makeEvidence({ cycle07: true, substantiveReview: false });
+  await assert.rejects(() => validateAnimationEvidence(root), /review must be blind|blind first observations/);
+});
+
+test('animation evidence hard gate rejects Cycle 07 Servant scale drift above two percent', async () => {
+  const { root } = await makeEvidence({ cycle07: true, invalidCycle07Scale: true });
+  await assert.rejects(() => validateAnimationEvidence(root), /mouth origin\/scale stability failed/);
+});
+
+test('animation evidence hard gate rejects Cycle 07 Demoness blur', async () => {
+  const { root } = await makeEvidence({ cycle07: true, invalidCycle07Sharpness: true });
+  await assert.rejects(() => validateAnimationEvidence(root), /Demoness sharpness gate failed/);
 });

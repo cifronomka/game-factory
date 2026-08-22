@@ -3,6 +3,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { gameRoot } from './lib.mjs';
 
@@ -27,6 +28,47 @@ function deriveCheckerAlpha(data, info) {
     if (neutral < 56 && luminance >= 160) alpha = 0;
     else if (neutral < 46 && luminance >= 110) alpha = Math.round(255 * (160 - luminance) / 50);
     output[index + 3] = clamp(alpha, 0, 255);
+  }
+  return output;
+}
+
+/** Remove only border-connected neutral generation backdrops, retaining light details enclosed by the silhouette. */
+function deriveBorderNeutralAlpha(data, info) {
+  const output = Buffer.from(data);
+  const candidate = new Uint8Array(info.width * info.height);
+  const queued = new Uint8Array(candidate.length);
+  const queue = new Int32Array(candidate.length);
+  for (let pixel = 0; pixel < candidate.length; pixel += 1) {
+    const index = pixel * info.channels;
+    const r = output[index]; const g = output[index + 1]; const b = output[index + 2];
+    const high = Math.max(r, g, b); const low = Math.min(r, g, b);
+    const luminance = r * 0.2126 + g * 0.7152 + b * 0.0722;
+    candidate[pixel] = high - low < 54 && luminance >= 168 ? 1 : 0;
+  }
+  let head = 0; let tail = 0;
+  const enqueue = (pixel) => {
+    if (pixel < 0 || pixel >= candidate.length || queued[pixel] || !candidate[pixel]) return;
+    queued[pixel] = 1; queue[tail++] = pixel;
+  };
+  for (let x = 0; x < info.width; x += 1) {
+    enqueue(x); enqueue((info.height - 1) * info.width + x);
+  }
+  for (let y = 0; y < info.height; y += 1) {
+    enqueue(y * info.width); enqueue(y * info.width + info.width - 1);
+  }
+  while (head < tail) {
+    const pixel = queue[head++];
+    const x = pixel % info.width;
+    if (x > 0) enqueue(pixel - 1);
+    if (x < info.width - 1) enqueue(pixel + 1);
+    enqueue(pixel - info.width); enqueue(pixel + info.width);
+  }
+  for (let pixel = 0; pixel < queued.length; pixel += 1) {
+    if (!queued[pixel]) continue;
+    const index = pixel * info.channels;
+    const r = output[index]; const g = output[index + 1]; const b = output[index + 2];
+    const luminance = r * 0.2126 + g * 0.7152 + b * 0.0722;
+    output[index + 3] = clamp(Math.round((205 - luminance) / 37 * 255), 0, 255);
   }
   return output;
 }
@@ -166,15 +208,17 @@ function frameMetrics(data, width, height) {
   };
 }
 
-async function normalizedSource(path, checker) {
+async function normalizedSource(path, checker, backgroundRemoval) {
   const image = sharp(path).ensureAlpha();
   const { data, info } = await image.raw().toBuffer({ resolveWithObject: true });
   const rgba = info.channels === 4 ? data : Buffer.from(data);
-  const alphaReady = checker ? deriveCheckerAlpha(rgba, info) : rgba;
+  const alphaReady = backgroundRemoval === 'border-neutral'
+    ? deriveBorderNeutralAlpha(rgba, info)
+    : checker ? deriveCheckerAlpha(rgba, info) : rgba;
   return { data: defringe(alphaReady, info.width, info.height), width: info.width, height: info.height };
 }
 
-async function extractCell(source, columns, rows, index, targetWidth, targetHeight, componentMode) {
+async function extractCell(source, columns, rows, index, targetWidth, targetHeight, componentMode, preserveCellFraming = false, framingScale = 1) {
   const column = index % columns; const row = Math.floor(index / columns);
   const left = Math.round(column * source.width / columns);
   const top = Math.round(row * source.height / rows);
@@ -184,6 +228,22 @@ async function extractCell(source, columns, rows, index, targetWidth, targetHeig
   let cell = await sharp(source.data, { raw: { width: source.width, height: source.height, channels: 4 } })
     .extract({ left, top, width, height }).raw().toBuffer();
   cell = retainComponents(cell, width, height, componentMode);
+  if (preserveCellFraming) {
+    const framed = await sharp(cell, { raw: { width, height, channels: 4 } })
+      .resize({ width: targetWidth, height: targetHeight, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: sharp.kernel.lanczos3 })
+      .raw().toBuffer();
+    const framedBounds = alphaBounds(framed, targetWidth, targetHeight);
+    let visible = await sharp(framed, { raw: { width: targetWidth, height: targetHeight, channels: 4 } })
+      .extract(framedBounds).png().toBuffer();
+    const visibleWidth = Math.round(framedBounds.width * framingScale);
+    const visibleHeight = Math.round(framedBounds.height * framingScale);
+    if (visibleWidth > targetWidth || visibleHeight > targetHeight - 6) throw new Error(`Framing scale ${framingScale} clips source frame ${index}`);
+    if (framingScale !== 1) visible = await sharp(visible).resize({ width: visibleWidth, height: visibleHeight, fit: 'fill', kernel: sharp.kernel.lanczos3 }).png().toBuffer();
+    const x = Math.round((targetWidth - visibleWidth) / 2);
+    const y = targetHeight - 6 - visibleHeight;
+    return sharp({ create: { width: targetWidth, height: targetHeight, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+      .composite([{ input: visible, left: x, top: y }]).raw().toBuffer();
+  }
   const bounds = alphaBounds(cell, width, height);
   const trimmed = await sharp(cell, { raw: { width, height, channels: 4 } })
     .extract(bounds)
@@ -197,11 +257,12 @@ async function extractCell(source, columns, rows, index, targetWidth, targetHeig
   return canvas;
 }
 
-async function buildAtlas(spec) {
-  const sourcePath = join(sourceRoot, spec.source);
-  const source = await normalizedSource(sourcePath, spec.checker);
+export async function buildAtlas(spec) {
+  const activeSourceRoot = spec.sourceRoot ? resolve(root, spec.sourceRoot) : sourceRoot;
+  const sourcePath = join(activeSourceRoot, spec.source);
+  const source = await normalizedSource(sourcePath, spec.checker, spec.backgroundRemoval);
   const frames = [];
-  for (const sourceIndex of spec.indices) frames.push(await extractCell(source, spec.sourceColumns, spec.sourceRows, sourceIndex, spec.frameWidth, spec.frameHeight, spec.componentMode));
+  for (const sourceIndex of spec.indices) frames.push(await extractCell(source, spec.sourceColumns, spec.sourceRows, sourceIndex, spec.frameWidth, spec.frameHeight, spec.componentMode, spec.preserveCellFraming, spec.framingScale));
   const atlasWidth = spec.columns * spec.frameWidth;
   const atlasHeight = spec.rows * spec.frameHeight;
   const composites = frames.map((input, index) => ({ input, raw: { width: spec.frameWidth, height: spec.frameHeight, channels: 4 }, left: index % spec.columns * spec.frameWidth, top: Math.floor(index / spec.columns) * spec.frameHeight }));
@@ -211,7 +272,7 @@ async function buildAtlas(spec) {
     .composite(composites)
     .webp(spec.checker
       ? { quality: 100, alphaQuality: 100, smartSubsample: false, effort: 4 }
-      : { quality: 92, alphaQuality: 100, smartSubsample: true, effort: 4 })
+      : { quality: spec.quality ?? 92, alphaQuality: 100, smartSubsample: true, effort: 4 })
     .toFile(outputPath);
   const atlasBytes = await readFile(outputPath);
   const metadataPath = outputPath.replace(/\.webp$/i, '.json');
@@ -224,22 +285,23 @@ async function buildAtlas(spec) {
       h: spec.frameHeight,
       durationMs: Math.round(100000 / spec.fps) / 100,
       sha256: SHA256(frame),
-      provenance: `Cycle 06 ImageGen source ${spec.source}; ${spec.clip} authored frame ${index}; alpha defringe, stable-root fit and ${spec.checker ? 'quality-100' : 'high-quality'} WebP export only`,
-      sockets: spec.sockets?.[index] ?? spec.socket ? { [spec.socket.name]: spec.socket.value } : undefined,
+      provenance: `Cycle ${spec.cycle ?? '06'} ${spec.generatedBy ?? 'ImageGen'} source ${spec.source}; ${spec.clip} authored frame ${index}; alpha defringe, stable-root fit and ${spec.checker ? 'quality-100' : spec.quality ? `quality-${spec.quality}` : 'high-quality'} WebP export only`,
+      sockets: spec.sockets?.[index] ?? (spec.socket ? { [spec.socket.name]: spec.socket.value } : undefined),
+      anatomicalScale: spec.anatomicalScale?.[index] ?? spec.anatomicalScale ?? 1,
       ...metrics,
     };
   });
   const metadata = {
     schemaVersion: 1,
-    cycle: '06',
+    cycle: spec.cycle ?? '06',
     atlasWidth,
     atlasHeight,
     frameWidth: spec.frameWidth,
     frameHeight: spec.frameHeight,
     pivot: spec.pivot,
     transparentGutterPixels: 6,
-    packing: 'Cycle 06 clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve',
-    sourceSheet: `visual-references/cycle-06-sources/${spec.source}`,
+    packing: `Cycle ${spec.cycle ?? '06'} clip-split atlas; authored ImageGen poses; clean alpha; stable bottom root; high-quality WebP; no runtime full-pose dissolve`,
+    sourceSheet: `${relative(root, activeSourceRoot).split(sep).join('/')}/${spec.source}`,
     sourceSheetSha256: SHA256(await readFile(sourcePath)),
     atlasSha256: SHA256(atlasBytes),
     clips: { [spec.clip]: { fps: spec.fps, loop: spec.loop, frames: metadataFrames } },
@@ -282,4 +344,6 @@ const hostSpecs = [
   frameWidth: 304, frameHeight: 256, fps: 2, loop: true, pivot: [0.5, 0.9765625],
 }));
 
-for (const spec of [...servantSpecs, ...demonessSpecs, ...hostSpecs]) await buildAtlas(spec);
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  for (const spec of [...servantSpecs, ...demonessSpecs, ...hostSpecs]) await buildAtlas(spec);
+}
