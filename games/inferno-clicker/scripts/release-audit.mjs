@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { access, readFile, stat } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
 import { gameRoot, walk } from './lib.mjs';
 
 const dist = join(gameRoot, 'dist');
@@ -11,13 +11,14 @@ if (!htmlSource.includes(`<meta name="build-id" content="${manifest.buildId}">`)
 
 const actualFiles = await walk(dist, () => true);
 const listedFiles = new Set(manifest.files.map((entry) => entry.path));
+const releasePath = (path) => path.slice(dist.length + 1).split(sep).join('/');
 const unlistedFiles = actualFiles
-  .map((path) => path.slice(dist.length + 1))
+  .map(releasePath)
   .filter((path) => path !== 'build-manifest.json' && !listedFiles.has(path));
 if (unlistedFiles.length) throw new Error(`Unlisted release files: ${unlistedFiles.join(', ')}`);
 const forbiddenPath = /(?:^|\/)(?:src|tests|docs|visual-references|node_modules|dev)(?:\/|$)|(?:\.map|\.env|\.gitkeep|\.DS_Store)$/i;
 const badPaths = actualFiles
-  .map((path) => path.slice(dist.length + 1))
+  .map(releasePath)
   .filter((path) => forbiddenPath.test(path));
 if (badPaths.length) throw new Error(`Forbidden release paths: ${badPaths.join(', ')}`);
 
@@ -36,12 +37,12 @@ const secretPatterns = [
 ];
 for (const path of textFiles) {
   const source = await readFile(path, 'utf8');
-  if (/\b(?:TO[D]O|FIX[M]E)\b|debugger\s*;|allowDevMocks|DevPlatformService/.test(source)) throw new Error(`Dev marker in release: ${path.slice(dist.length + 1)}`);
-  for (const pattern of secretPatterns) if (pattern.test(source)) throw new Error(`Potential secret in release: ${path.slice(dist.length + 1)}`);
+  if (/\b(?:TO[D]O|FIX[M]E)\b|debugger\s*;|allowDevMocks|DevPlatformService/.test(source)) throw new Error(`Dev marker in release: ${releasePath(path)}`);
+  for (const pattern of secretPatterns) if (pattern.test(source)) throw new Error(`Potential secret in release: ${releasePath(path)}`);
   if (path.endsWith('.js')) {
     for (const match of source.matchAll(/from\s+['"](\.[^'"]+)['"]/g)) {
       const target = resolve(dirname(path), match[1]);
-      await access(target).catch(() => { throw new Error(`Broken import ${match[1]} in ${path.slice(dist.length + 1)}`); });
+      await access(target).catch(() => { throw new Error(`Broken import ${match[1]} in ${releasePath(path)}`); });
     }
   }
 }

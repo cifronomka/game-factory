@@ -14,7 +14,9 @@ const archiveName = `inferno-clicker-${version}.zip`;
 const archive = join(releaseDir, archiveName);
 await rm(archive, { force: true });
 await rm(`${archive}.sha256`, { force: true });
-const zip = spawnSync('/usr/bin/zip', ['-q', '-r', archive, '.'], { cwd: join(gameRoot, 'dist'), encoding: 'utf8' });
+const zip = process.platform === 'win32'
+  ? spawnSync('tar', ['-a', '-c', '-f', archive, '.'], { cwd: join(gameRoot, 'dist'), encoding: 'utf8' })
+  : spawnSync('zip', ['-q', '-r', archive, '.'], { cwd: join(gameRoot, 'dist'), encoding: 'utf8' });
 if (zip.status !== 0) throw new Error(zip.stderr || 'zip failed');
 const bytes = await readFile(archive);
 const digest = createHash('sha256').update(bytes).digest('hex');
