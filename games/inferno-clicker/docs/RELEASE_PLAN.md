@@ -2,7 +2,7 @@
 
 ## Назначение и gate
 
-Документ описывает воспроизводимую production-сборку и упаковку `inferno-clicker` для Yandex Games. Implementation candidate `0.1.0` собирается локально; ZIP и upload остаются закрыты release gate до завершения QA, regression и применимых acceptance checks.
+Документ описывает воспроизводимую production-сборку и упаковку `inferno-clicker` для Yandex Games. Локальный candidate `0.1.0` прошёл release gate и упакован; upload и public publish остаются отдельными внешними действиями и в Cycle 07 не выполнялись.
 
 Release запрещён, пока каждый применимый пункт `ACCEPTANCE_CRITERIA.md` не имеет `PASS` с evidence, открытые Critical/High не равны нулю либо QA report не завершён. Код и assets внутри `dist/` вручную не исправляются: после любого изменения выполняется полная пересборка из source.
 
@@ -18,7 +18,7 @@ Active gate is Corrective Cycle 07. Cycle 02–06 reports cannot be carried forw
 
 ## Toolchain lock и production build
 
-Runtime зафиксирован в `.nvmrc`: Node.js 24. External dependencies и package manager отсутствуют; поэтому lockfile не создаётся, а воспроизводимость задаётся Node major, source commit и hashes build scripts. Release Agent записывает фактическую Node version в report и выполняет из clean checkout:
+Runtime зафиксирован в `.nvmrc`: Node.js 24. Production runtime не имеет внешних зависимостей; воспроизводимое authoring/build environment устанавливается `npm ci` по `package-lock.json`, включая `sharp@0.35.3`. Воспроизводимость задаётся exact Node/npm versions, lockfile hash, source commit и hashes build scripts. Release Agent записывает фактические tool versions в report и выполняет из clean checkout:
 
 ```text
 node scripts/lint.mjs
@@ -122,7 +122,7 @@ Cycle 07 checklist закрыт для финального clean exact candidat
 Сохранить как `games/inferno-clicker/releases/inferno-clicker-<version>-report.md`:
 
 - title, version, Build ID, full commit SHA, tag, build date/timezone и owners;
-- OS, exact Node.js version, `N/A — zero external dependencies` для package-manager/lockfile и executed commands with exit codes;
+- OS, exact Node.js/npm versions, production `zero external dependencies`, authoring dependency и lockfile hash, а также executed commands with exit codes;
 - production `dist/` manifest path/hash и reproducibility comparison result;
 - QA report path, acceptance decision и counts of open issues by severity;
 - list of regression runs и exact tested environments/browser versions;
@@ -140,7 +140,7 @@ Cycle 07 checklist закрыт для финального clean exact candidat
 
 ## Current candidate decision and risks
 
-- Release readiness: `NOT READY — implementation candidate; browser/Yandex environment gates pending`.
+- Release readiness: `READY — exact local candidate packaged and verified; Yandex upload/publication not authorized and not performed`.
 - Art/audio payload may threaten startup and stage-7 memory budgets; mitigation — manifest budgets, staged loading and PERF-01–PERF-09 gate.
 - Yandex APIs/policies may change before integration; mitigation — source/date revalidation immediately before adapter work and again before upload.
 - Reward callback race may duplicate a boost or leave audio paused; mitigation — idempotent lifecycle contract and `QA:R-01…R-07` / `AC:Y-09` / `AC:Y-10` / `AC:A-07` / `AC:A-08` tests.

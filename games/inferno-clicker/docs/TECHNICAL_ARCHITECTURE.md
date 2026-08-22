@@ -14,12 +14,12 @@
 ## Выбранный стек
 
 - **Language:** browser-native ES modules (`.js`) с `// @ts-check`, JSDoc contracts, runtime assertions на внешних границах и zero-dependency production runtime.
-- **Build/dev server:** воспроизводимые Node.js scripts на built-in API; внешний package registry не требуется.
+- **Build/dev server:** воспроизводимые Node.js scripts на built-in API; asset-authoring использует зафиксированный `sharp@0.35.3` через `package-lock.json`.
 - **Rendering:** layered Canvas 2D scene с независимыми render passes, pooled particles и low-resolution light/haze buffers; HTML/CSS overlay только для доступного HUD, меню и рекламной CTA.
 - **Audio:** Web Audio API через небольшой собственный `AudioMixer`; тяжёлая engine-обвязка не нужна.
 - **State:** явный serializable `GameState` и pure reducer/systems; без глобального mutable singleton.
 - **Tests:** built-in `node:test` для core/contract suites, repository E2E smoke scripts и реальный browser QA через управляемый браузер; визуальные screenshots на эталонных viewport.
-- **Package manager:** N/A — runtime/build имеют ноль внешних зависимостей; минимальная версия Node фиксируется в `.nvmrc`.
+- **Package manager:** npm `11.17.0`; production runtime имеет ноль внешних зависимостей, authoring dependency устанавливается `npm ci`; минимальная версия Node фиксируется в `.nvmrc`.
 
 Выбор минимизирует стартовый bundle и устраняет сетевую зависимость build после того, как package registry оказался недоступен в implementation environment. PixiJS/Vite/TypeScript отклонены для v0.1.0 как невоспроизводимые без registry; архитектурные контракты сохраняются через явные scene passes, JSDoc ports, runtime assertions и tests. Phaser/React остаются избыточными для одной сцены.
 

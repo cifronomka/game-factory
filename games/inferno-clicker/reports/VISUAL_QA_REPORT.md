@@ -1,31 +1,31 @@
-# Visual QA Report — «Зажги», corrective cycle 04
+# Visual QA Report — «Зажги», corrective cycle 07
 
-Дата: 2026-08-20
-Решение: **IMPLEMENTATION SLICE PASS / EXACT TEMPORAL SIGN-OFF PENDING**.
+Дата: 2026-08-22
+Exact build: `0.1.0+a17cdd65fd5a`
+Решение: **PASS**
 
-## Что проверено
+## Human-Eye verdict
 
-- Servant сохраняет прежний образ/anchor, но полный action теперь состоит из prepare, inhale ramp/hold, exhale start/ramp/peak/fade/end и recovery. Один `exhaleStrength` синхронизирует персонажа, ash stream, ember drift и реакцию огня.
-- Demoness выше Servant, сохраняет clear flame lane, двигается медленно и властно. Idle работает на 1.2 fps, presentation-only disapproval запускается раз в 5–9 active seconds, cold cast имеет отдельные look/raise/gather/ramp/hold/release/recovery phases.
-- V3 character atlases имеют lossless alpha, stable root, gutters и coherent whole-body frames. Дефектные v4 ImageGen candidates отклонены.
-- Concurrent debuffs отображаются двумя отдельными карточками с character/effect/factor/time и optional total `×2,50`.
-- Inferno host имеет пять addressable regions с разными периодами/фазами; whole-plate-only drift отсутствует. Stage 6→7 использует bounded 1.5-second reveal/payoff.
+- Ash Servant сохраняет стабильный размер и planted root через prepare, inhale, blow и recovery.
+- Светлый рассеянный пар начинается у открытого рта и входит в отдельно видимое пламя; снежинок, horn-origin FX и ледяных частиц нет.
+- Demoness сохраняет резкие лицо, корону, силуэт, ладони и костюм; blur, morph, прямоугольный matte и sticker halo не обнаружены.
+- Две узкие полупрозрачные струи имеют разные корни у двух видимых ладоней, остаются раздельно прослеживаемыми и сходятся только внутри пламени; сосулек, осколков и единого общего веера нет.
 
-## Автоматическая temporal evidence
+## Матрица
 
-| Проверка | Результат |
-|---|---|
-| Character atlas alpha/root/centroid/fragment geometry | PASS |
-| Exact Servant and Demoness phase maps | PASS |
-| Recovery, active-effect stage-down, pause freeze and re-entry | PASS |
-| Independent host clocks and calm reduced-motion animation | PASS |
-| Flame reaction does not reset authored flame loop | PASS |
-| Concurrent reaction/source preservation | PASS |
-| Local head/crown disapproval gesture without whole-body transform | PASS |
-| Stage 6→7 composed flame/rune/light/host entry contract | PASS |
+Проверены 16 browser sequences / 192 sampled PNG:
 
-## Не переносить как PASS
+- subjects: `ash-servant`, `demoness`;
+- speeds: `normal`, `slow` (0.25×);
+- viewports: `390x844`, `768x1024`, `1366x768`, `800x360`;
+- по 12 кадров на сценарий с полным prepare→active steam→recovery охватом.
 
-Cycle 02/03 stills и contact sheets являются historical material. Формальный visual PASS возможен только для fresh clean exact build после просмотра полного Servant cycle, ≥18 s Demoness idle/disapproval + full cast, three debuff states, Stage 6→7 entry и sustained Inferno. Authoritative artifacts и независимые verdicts должны находиться в `reports/animation-qa/<build-id>/`.
+Edge composites на black/dark-red/neutral backgrounds и encoded partial-alpha audit PASS. Demoness effective DPR-adjusted upscale≤1.25×; Servant root/scale drift≤2%; socket distance gates≤8/12 logical px PASS.
 
-Open visual Critical: 0. Open visual High после implementation review: 0.
+## Независимые проверки
+
+- Targeted retest `qa-targeted-visual-c07`: PASS после отдельного C07-04 fix; все 96 Demoness-кадров просмотрены.
+- Blind review `qa-blind-final2`: PASS; 192/192 кадров, Critical 0, High 0, ambiguous cause→target 0; код, планы и описание исправлений до наблюдений не читались.
+- Superseded candidates `0.1.0+45211cafc774` и `0.1.0+c71aee6a4718` не подписаны и не являются release evidence.
+
+Authoritative inventory: `reports/corrective-cycle-07/0.1.0+a17cdd65fd5a/summary.json`.
