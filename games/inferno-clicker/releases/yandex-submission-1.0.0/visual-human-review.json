@@ -3,12 +3,12 @@
   "kind": "cycle09-visual-human-review",
   "status": "PASS",
   "cycle": "09",
-  "sourceFingerprint": "969236ffa64980a44d787b2cd4affd43b97611626074f5e6374d1abbd4188151",
-  "evidenceGeneratedAt": "2026-08-23T17:17:49.432Z",
+  "sourceFingerprint": "8ddb2e2897e16a18a8c53a7397f5387cc8e42073e91e64e4f8a995c89a9f77d7",
+  "evidenceGeneratedAt": "2026-08-23T18:03:56.565Z",
   "reviewer": {
-    "id": "cycle09_visual_reviewer",
+    "id": "cycle09_visual_perceptual_reviewer",
     "independent": true,
-    "reviewedAt": "2026-08-23T17:23:42.061Z"
+    "reviewedAt": "2026-08-23T18:47:00.4988890Z"
   },
   "files": [
     {
@@ -91,57 +91,147 @@
     },
     {
       "id": "runtime/runtime-seven-stages-forced-low-dpr1.png",
-      "sha256": "6859505177c471b1c5d06885f9c20593c4ddc09f37c4b2b399281b625d8f791b",
+      "sha256": "d7a3590a58db656ab7e30c23cac31de0e048ef7b9f9b1da1ab89e9f0712099e3",
       "verdict": "PASS",
-      "observation": "Seven forced-low DPR 1 scenes are intact; no crop, filter islands, legacy names, or prohibited symbols."
+      "observation": "Seven forced-low DPR 1 scenes are intact; no crop, filter islands, legacy names, or prohibited symbols.",
+      "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",
+      "stagePerceptualHashes": [
+        "00fb18bf0430080808c0080800e000f400e8030800110008020185bc12431a4b",
+        "606b11670237000800ea0a0a40f200fc00fe015c00180084020285bc12431a4b",
+        "605308ef026780080ecc13ce30ff20ff22ff015e02120042012a85bc12431a4b",
+        "0d6f08f702774ccc08cf13ef30ff20ff22ff015f033d10a2080a85ac12431a4b",
+        "435b10f700674c6d08ef11ff30ff20fb22ef015f033f10900009859c12431a4b",
+        "617301e704df41fd007f10ff30ff00ff20ff031f023b10a50088819c12431a4b",
+        "617308f700b548ef01ef11ff21ff01ff2361039f113f1881017c817c1a431a4b"
+      ]
     },
     {
       "id": "runtime/runtime-seven-stages-forced-low-dpr2.png",
-      "sha256": "bfe362da0eb5a7ec83449e680a7709466a81b2b5939b6c31b2b95a2577468c9d",
+      "sha256": "a5c08adb68e29ce2624e03afa2bcf57c60e38f3c66f287a39dc045ab59341ffa",
       "verdict": "PASS",
-      "observation": "Seven forced-low DPR 2 scenes are intact; no crop, filter islands, legacy names, or prohibited symbols."
+      "observation": "Seven forced-low DPR 2 scenes are intact; no crop, filter islands, legacy names, or prohibited symbols.",
+      "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",
+      "stagePerceptualHashes": [
+        "20fb08bf0430880804c80a0800e000f400e8130400110004004480b812431a4b",
+        "706b1167023700080cea0d0a00f100fe00fe015e02980082004840b812431a4b",
+        "605300ef002780084acc13cc30ff20ff22ff015d02920042080580b812431a4b",
+        "0d4f08f702774ccd08cf13ef32ff20ff22ff011f033d10a00005809812431a4b",
+        "435b10f700674c6d08ef11ff30ff20fb22ef015f133f10a0010580b812431a4b",
+        "617b01e704df41fd007f10ff30ff20ff20ff031f013f18a8008c809812431a4b",
+        "617300f700b548ed01ef11ff21ff21ff2361039f013f10a4010c809812431a4b"
+      ]
     },
     {
       "id": "runtime/runtime-seven-stages-forced-low-dpr3.png",
-      "sha256": "91386dd1eb4d20f1ded23a4e15eb339984a4043fc131b1b19b6c57f5799fce96",
+      "sha256": "08344ada04299a525c1143ed8af73d5619865b99f2184ddeeb074f3de0cdb597",
       "verdict": "PASS",
-      "observation": "Seven forced-low DPR 3 scenes are intact; no crop, filter islands, legacy names, or prohibited symbols."
+      "observation": "Seven forced-low DPR 3 scenes are intact; no crop, filter islands, legacy names, or prohibited symbols.",
+      "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",
+      "stagePerceptualHashes": [
+        "217b08bf0431880804c8080808e400f400e4230400900000020244b81b471b4b",
+        "70eb10e70437000808ca090a00e500fc00fe215e00180081000244b81b471b4b",
+        "425b00ff006f80084acc13ea30ff20ff32ff417d02b90020000244b81b471b4b",
+        "296f10f712674ccc08cf12ef32ff20ff22ff013f013d10a0000444b81b471b4b",
+        "415b10f702674c6d08ef11ff30ff20fb22ef015f013b10a8000244b81b471b4b",
+        "417b11e700df41fd007f10ff30ff30ff20ef031f013f10a6011244b81b471b4b",
+        "616310d700f540ed01ef11ff21ff01ff2361039f013f10a2010c44b81b471b4b"
+      ]
     },
     {
       "id": "runtime/runtime-seven-stages-normal-dpr1.png",
-      "sha256": "36e146d434b0a0d7bfbeba8ac76a45800afc9e2cc33739b2999bcc3b9a44da28",
+      "sha256": "bd35b0179957d2cfaef710a1f97af46960cf263ef0c389c7e10f2e6c812ef701",
       "verdict": "PASS",
-      "observation": "Seven normal DPR 1 scenes are intact; flame highlights are connected with no crop, residue, legacy names, or symbols."
+      "observation": "Seven normal DPR 1 scenes are intact; flame highlights are connected with no crop, residue, legacy names, or symbols.",
+      "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",
+      "stagePerceptualHashes": [
+        "00fb18bf0430080808c0080800e000f400e8030800110008020185bc12431a4b",
+        "606b11670237000800ea0a0a40f200fc00fe015c00180084020285bc12431a4b",
+        "605308ef026780080ecc13ce30ff20ff22ff015e02120042012a85bc12431a4b",
+        "0d6f08f702774ccc08cf13ef30ff20ff22ff015f033d10a2080a85ac12431a4b",
+        "435b10f700674c6d08ef11ff30ff20fb22ef015f033f10900009859c12431a4b",
+        "617301e704df41fd007f10ff30ff00ff20ff031f023b10a50088819c12431a4b",
+        "617308f700b548ef01ef11ff21ff01ff2361039f113f1881017c817c1a431a4b"
+      ]
     },
     {
       "id": "runtime/runtime-seven-stages-normal-dpr2.png",
-      "sha256": "41f6c2b8b06fa39803b4f5b9d4b25ab20ba1c9fb3651a82d5414a7d3420067ef",
+      "sha256": "29a39208f0f6b7469288ef5ff023ce86d0ebd441b2a80f6d159714df9c96cc4a",
       "verdict": "PASS",
-      "observation": "Seven normal DPR 2 scenes are intact; flame highlights are connected with no crop, residue, legacy names, or symbols."
+      "observation": "Seven normal DPR 2 scenes are intact; flame highlights are connected with no crop, residue, legacy names, or symbols.",
+      "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",
+      "stagePerceptualHashes": [
+        "20fb08bf0430880804c80a0800e000f400e8130400110004004480b812431a4b",
+        "706b1167023700080cea0d0a00f100fe00fe015e02980082004840b812431a4b",
+        "605300ef002780084acc13cc30ff20ff22ff015d02920042080580b812431a4b",
+        "0d4f08f702774ccd08cf13ef32ff20ff22ff011f033d10a00005809812431a4b",
+        "435b10f700674c6d08ef11ff30ff20fb22ef015f133f10a0010580b812431a4b",
+        "617b01e704df41fd007f10ff30ff20ff20ff031f013f18a8008c809812431a4b",
+        "617300f700b548ed01ef11ff21ff21ff2361039f013f10a4010c809812431a4b"
+      ]
     },
     {
       "id": "runtime/runtime-seven-stages-normal-dpr3.png",
-      "sha256": "dc8f64d9aa228cd6a3e2dc59d70f4b0f8a10178e437fff2811909ae39dda3ff8",
+      "sha256": "7aff2786f79379a4018a027b4d2deeb5503f6727c3c95eaa1f069f5933a972b9",
       "verdict": "PASS",
-      "observation": "Seven normal DPR 3 scenes are intact; flame highlights are connected with no crop, residue, legacy names, or symbols."
+      "observation": "Seven normal DPR 3 scenes are intact; flame highlights are connected with no crop, residue, legacy names, or symbols.",
+      "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",
+      "stagePerceptualHashes": [
+        "217b08bf0431880804c8080808e400f400e4230400900000020244b81b471b4b",
+        "70eb10e70437000808ca090a00e500fc00fe215e00180081000244b81b471b4b",
+        "425b00ff006f80084acc13ea30ff20ff32ff417d02b90020000244b81b471b4b",
+        "296f10f712674ccc08cf12ef32ff20ff22ff013f013d10a0000444b81b471b4b",
+        "415b10f702674c6d08ef11ff30ff20fb22ef015f013b10a8000244b81b471b4b",
+        "417b11e700df41fd007f10ff30ff30ff20ef031f013f10a6011244b81b471b4b",
+        "616310d700f540ed01ef11ff21ff01ff2361039f013f10a2010c44b81b471b4b"
+      ]
     },
     {
       "id": "runtime/runtime-seven-stages-reduced-dpr1.png",
-      "sha256": "1921a64b760934502d8c03f12bbd12b6e441e1f2aca52a5f96ca0ef910f9ce45",
+      "sha256": "4e547027da89f9a43c06d11eda7709551ba754998de91ce47d05b97116b666cc",
       "verdict": "PASS",
-      "observation": "Seven reduced DPR 1 scenes are intact; no crop, matte, detached artifacts, legacy names, or prohibited symbols."
+      "observation": "Seven reduced DPR 1 scenes are intact; no crop, matte, detached artifacts, legacy names, or prohibited symbols.",
+      "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",
+      "stagePerceptualHashes": [
+        "00fb18bf0430080808c0080800e000f400e8030800110008020240a41a471b4b",
+        "606b11670237000800ea0a0a40f200fc00fe015c00980084020240a41a471b4b",
+        "605308ef026780080ecc13ce30ff20ff22ff015d02920042012a40ac1a471b4b",
+        "0d6f08f702774ccc08cf13ef30ff20ff22ff015f033d10a2080a40ac1a471b4b",
+        "435b10f700674c6d08ef11ff30ff20fb22ef015f033f1090000980ac1a471b4b",
+        "617301e704df41fd007f10ff30ff00ff20ff031f033b10a5010c40ac1a471b4b",
+        "617308f700b548ef01ef11ff21ff01ff2361039f113f1881017c417c1a431b4b"
+      ]
     },
     {
       "id": "runtime/runtime-seven-stages-reduced-dpr2.png",
-      "sha256": "407c44ea94c2b6cd3eaad2cf49df11a6785070248a25015b9398c64956ffb134",
+      "sha256": "ac9853b0f69d035ad40133c175c8f1b33ce3cdfad9ab44a0ba59bb4f2d53ef21",
       "verdict": "PASS",
-      "observation": "Seven reduced DPR 2 scenes are intact; no crop, matte, detached artifacts, legacy names, or prohibited symbols."
+      "observation": "Seven reduced DPR 2 scenes are intact; no crop, matte, detached artifacts, legacy names, or prohibited symbols.",
+      "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",
+      "stagePerceptualHashes": [
+        "20fb08bf0430880804c80a0800e000f400e8130400110004014840a81a471b4b",
+        "706b1167023700080cea0d0a00f100fe00fe215e02980082004840a81a471b4b",
+        "605300ef002780084acc13cc30ff20ff22ff415d02920042080540a81a471b4b",
+        "0d4f08f702774ccd08cf13ef32ff20ff22ff015f033d10a0000580a81a471b4b",
+        "435b10f700674c6d08ef11ff30ff20fb22ef015f033b1090010580a81a471b4b",
+        "617b01e704df41fd007f10ff30ff20ff20ff011f013f18a4008c40a81a471b4b",
+        "617300f700b548ed01ef11ff21ff21ff2361239f013f10a4010c40a81a471b4b"
+      ]
     },
     {
       "id": "runtime/runtime-seven-stages-reduced-dpr3.png",
-      "sha256": "6f67356c5c2956c637048303959f0f0bb74b3bfa5a978a3b48beeb39d6f1df97",
+      "sha256": "ea198ab1486ec9dbe79bfe6aa441b029af418ca9f1f85463625dcdfeb1e3e683",
       "verdict": "PASS",
-      "observation": "Seven reduced DPR 3 scenes are intact; no crop, matte, detached artifacts, legacy names, or prohibited symbols."
+      "observation": "Seven reduced DPR 3 scenes are intact; no crop, matte, detached artifacts, legacy names, or prohibited symbols.",
+      "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",
+      "stagePerceptualHashes": [
+        "217b08bf0431880804c8080808e400f400e4230400900000000244b91b471b4b",
+        "70eb10e70437000808ca090a00e500fe00fe014e02180081000244b91b471b4b",
+        "425b00ff006f80084acc13ea30ff20ff22ff417d02b90020000244b91b471b4b",
+        "296f10f712674ccc08cf12ef32ff20ff22ff013f013d10a0000444b91b471b4b",
+        "415b10f702674c6d08ef11ff30ff20fb22ef015f013b10a8010444b91b471b4b",
+        "417b11e700df41fd007f10ff30ff30ff20ef031f013f10a6010a44b91b471b4b",
+        "616310d700f540ed01ef11ff21ff01ff2369039f013f10a2010c44a91b471b4b"
+      ]
     }
   ],
   "coverage": {

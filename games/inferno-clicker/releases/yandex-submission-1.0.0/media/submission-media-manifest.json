@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "version": "1.0.0",
-  "generatedAt": "2026-08-23T17:16:29.392Z",
+  "generatedAt": "2026-08-23T17:59:33.285Z",
   "captureBuild": {
     "manifest": "dist-e2e/build-manifest.json",
-    "buildId": "1.0.0+384e1215b015",
-    "commitSha": "384e1215b015d82856191bdf61179105f27af061",
-    "sourceFingerprint": "969236ffa64980a44d787b2cd4affd43b97611626074f5e6374d1abbd4188151",
+    "buildId": "1.0.0+2477a2634e9a",
+    "commitSha": "2477a2634e9aea8a6cc666f33d63457126077cba",
+    "sourceFingerprint": "8ddb2e2897e16a18a8c53a7397f5387cc8e42073e91e64e4f8a995c89a9f77d7",
     "target": "yandex",
     "testDriver": true,
-    "manifestSha256": "d85e4c2119e70d5997bb51e70da9b83d161f22b52643d03bd0095701c8534c35"
+    "manifestSha256": "c83f3ef44cceca098f8cf4cf277606ea0a76b47e3456b0324666f1343b63f197"
   },
   "gameplayShareRequiredMinimum": 0.7,
   "gameplayShareMinimum": 1,
@@ -21,13 +21,7 @@
     "requestFailures": 0,
     "httpErrors": 0
   },
-  "expectedResidencyAborts": [
-    {
-      "path": "/assets/characters/ash-servant/ash-servant-blow-v7.webp",
-      "errorText": "net::ERR_ABORTED",
-      "reason": "test-driver clip transition released the non-current decoded atlas"
-    }
-  ],
+  "expectedResidencyAborts": [],
   "captureAssertions": [
     {
       "filename": "desktop-01-1920x1080.png",
@@ -131,64 +125,64 @@
       "filename": "desktop-01-1920x1080.png",
       "width": 1920,
       "height": 1080,
-      "bytes": 714547,
-      "sha256": "daa6bb9b7a335deb75d730957fafa8c2ac5dbef6e136fc3cf949dcdcb03c71e7",
+      "bytes": 714589,
+      "sha256": "2634bb03939b0c97d01486f9424f69d368b296f06501ed6f5c37fb95f4ba11f2",
       "source": "exact release gameplay"
     },
     {
       "filename": "desktop-02-1920x1080.png",
       "width": 1920,
       "height": 1080,
-      "bytes": 1487282,
-      "sha256": "034dcf701bc8cdab9a2f8c238f1ca8a1a9377fcaecbd4735a4b9b1ea81caf371",
+      "bytes": 1491316,
+      "sha256": "ad535bd5558c3410004b5fe1cc0169f17535e090a60912c2aa3f814ac866f2a7",
       "source": "exact release gameplay"
     },
     {
       "filename": "desktop-03-1920x1080.png",
       "width": 1920,
       "height": 1080,
-      "bytes": 2017655,
-      "sha256": "3d519b4a82053a704c30a7ae12609259962513154e3ed727b4830ce990bef67b",
+      "bytes": 2016998,
+      "sha256": "5ce1cc719ca8a155fa94498dee00c25ecda10a24463ddf2f09a835f645a17bda",
       "source": "exact release gameplay"
     },
     {
       "filename": "desktop-04-1920x1080.png",
       "width": 1920,
       "height": 1080,
-      "bytes": 2126534,
-      "sha256": "34d1c2f25b8e7f765adf2f77b48c41fe4cd5434a480966db1bcfce27c7f1251c",
+      "bytes": 2113561,
+      "sha256": "98986fb07dcf254eb626e5c893e8dbbd6eb9a2deebd9cd522db136d0be88b197",
       "source": "exact release gameplay"
     },
     {
       "filename": "mobile-01-1080x1920.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 503799,
-      "sha256": "9581199ebe7766dc7852a2bdd9249efe0a8dbce98785f1b7daf7426ec991c7c8",
+      "bytes": 503169,
+      "sha256": "6a33447d9f17a9ddac158af1e291c282f6eda042ec0db036d49fbbd89509ac3b",
       "source": "exact release gameplay"
     },
     {
       "filename": "mobile-02-1080x1920.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 1297741,
-      "sha256": "727ccddbd1e8e4e96a895183b75eabd62eba6825b603fefcbcc88f17f139a3ad",
+      "bytes": 1317076,
+      "sha256": "6de30e7c4fcd14129e13f20b591b7511e00e6af2736c764bb01eca50e230cb48",
       "source": "exact release gameplay"
     },
     {
       "filename": "mobile-03-1080x1920.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 1432719,
-      "sha256": "8d275eb5d782dbda3f1b3344b7da9d41b1d233916f1d31ab2a1e2a205633226a",
+      "bytes": 1440719,
+      "sha256": "8e4d4f05d589ad1c33f30e22b2d04b3c2a91ac4fd20cc6458b206f8691e69bfd",
       "source": "exact release gameplay"
     },
     {
       "filename": "mobile-04-1080x1920.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 1804267,
-      "sha256": "b09c8190f84a034d2b0e6554fe6b506306bca4b7dd812d90f556c5f8f7fd1395",
+      "bytes": 1820491,
+      "sha256": "871c628628e0a4f67252981b77cac3fa20dbc06b390ea96889b23a488803d16b",
       "source": "exact release gameplay"
     }
   ]

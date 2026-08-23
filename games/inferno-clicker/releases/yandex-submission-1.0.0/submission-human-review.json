@@ -3,12 +3,12 @@
   "kind": "submission-human-review",
   "status": "PASS",
   "cycle": "09",
-  "sourceFingerprint": "969236ffa64980a44d787b2cd4affd43b97611626074f5e6374d1abbd4188151",
-  "mediaManifestSha256": "cf9c6550ad65ae514981ac69e42eb4deadf5229dcc80ca92fac977b2984aa4da",
+  "sourceFingerprint": "8ddb2e2897e16a18a8c53a7397f5387cc8e42073e91e64e4f8a995c89a9f77d7",
+  "mediaManifestSha256": "bce0099bb0be1f8ea2419318d5f9b4aca393bf779006738c225b3612f2e518f3",
   "reviewer": {
     "id": "submission_media_reviewer",
     "independent": true,
-    "reviewedAt": "2026-08-23T17:21:48.871Z"
+    "reviewedAt": "2026-08-23T18:09:25.384Z"
   },
   "files": [
     {
@@ -25,7 +25,7 @@
     },
     {
       "filename": "desktop-01-1920x1080.png",
-      "sha256": "daa6bb9b7a335deb75d730957fafa8c2ac5dbef6e136fc3cf949dcdcb03c71e7",
+      "sha256": "2634bb03939b0c97d01486f9424f69d368b296f06501ed6f5c37fb95f4ba11f2",
       "verdict": "PASS",
       "realGameplay": true,
       "gameplayShareAtLeast70": true,
@@ -35,7 +35,7 @@
     },
     {
       "filename": "desktop-02-1920x1080.png",
-      "sha256": "034dcf701bc8cdab9a2f8c238f1ca8a1a9377fcaecbd4735a4b9b1ea81caf371",
+      "sha256": "ad535bd5558c3410004b5fe1cc0169f17535e090a60912c2aa3f814ac866f2a7",
       "verdict": "PASS",
       "realGameplay": true,
       "gameplayShareAtLeast70": true,
@@ -45,7 +45,7 @@
     },
     {
       "filename": "desktop-03-1920x1080.png",
-      "sha256": "3d519b4a82053a704c30a7ae12609259962513154e3ed727b4830ce990bef67b",
+      "sha256": "5ce1cc719ca8a155fa94498dee00c25ecda10a24463ddf2f09a835f645a17bda",
       "verdict": "PASS",
       "realGameplay": true,
       "gameplayShareAtLeast70": true,
@@ -55,7 +55,7 @@
     },
     {
       "filename": "desktop-04-1920x1080.png",
-      "sha256": "34d1c2f25b8e7f765adf2f77b48c41fe4cd5434a480966db1bcfce27c7f1251c",
+      "sha256": "98986fb07dcf254eb626e5c893e8dbbd6eb9a2deebd9cd522db136d0be88b197",
       "verdict": "PASS",
       "realGameplay": true,
       "gameplayShareAtLeast70": true,
@@ -65,7 +65,7 @@
     },
     {
       "filename": "mobile-01-1080x1920.png",
-      "sha256": "9581199ebe7766dc7852a2bdd9249efe0a8dbce98785f1b7daf7426ec991c7c8",
+      "sha256": "6a33447d9f17a9ddac158af1e291c282f6eda042ec0db036d49fbbd89509ac3b",
       "verdict": "PASS",
       "realGameplay": true,
       "gameplayShareAtLeast70": true,
@@ -75,7 +75,7 @@
     },
     {
       "filename": "mobile-02-1080x1920.png",
-      "sha256": "727ccddbd1e8e4e96a895183b75eabd62eba6825b603fefcbcc88f17f139a3ad",
+      "sha256": "6de30e7c4fcd14129e13f20b591b7511e00e6af2736c764bb01eca50e230cb48",
       "verdict": "PASS",
       "realGameplay": true,
       "gameplayShareAtLeast70": true,
@@ -85,7 +85,7 @@
     },
     {
       "filename": "mobile-03-1080x1920.png",
-      "sha256": "8d275eb5d782dbda3f1b3344b7da9d41b1d233916f1d31ab2a1e2a205633226a",
+      "sha256": "8e4d4f05d589ad1c33f30e22b2d04b3c2a91ac4fd20cc6458b206f8691e69bfd",
       "verdict": "PASS",
       "realGameplay": true,
       "gameplayShareAtLeast70": true,
@@ -95,7 +95,7 @@
     },
     {
       "filename": "mobile-04-1080x1920.png",
-      "sha256": "b09c8190f84a034d2b0e6554fe6b506306bca4b7dd812d90f556c5f8f7fd1395",
+      "sha256": "871c628628e0a4f67252981b77cac3fa20dbc06b390ea96889b23a488803d16b",
       "verdict": "PASS",
       "realGameplay": true,
       "gameplayShareAtLeast70": true,
