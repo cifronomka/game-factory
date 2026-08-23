@@ -57,13 +57,10 @@ invariant(!/__INFERNO_E2E__|reachStage\(|advanceActive\(|settleRewardOffer\(/u.t
 invariant(!/bg-infernal-chamber-production|ash-servant-[^"']*-v6\.webp|demoness-[^"']*-v7\.webp/iu.test(game), 'Production bundle references retired visual assets.');
 invariant(!/outer-(?:low|mid|high)-v[23]\.(?:webp|png)/u.test(game), 'Production bundle references a superseded outer flame v2/v3.');
 for (const family of ['low', 'mid', 'high']) invariant(game.includes(`outer-${family}-v4`), `Production bundle is missing outer-${family}-v4.`);
-for (const requiredVisibleName of ['Хранительница угасания', 'Ember Warden', 'Огненное кольцо', 'Fire Ring']) {
-  invariant(game.includes(requiredVisibleName), `Required localized visible name is missing: ${requiredVisibleName}.`);
-}
-invariant(!/Демонесса угасания|Fading Demoness|Круг Инферно|Inferno Circle/iu.test(game), 'Production text retains a prohibited legacy visible name.');
 
 const forbiddenSyntax = new Set(['ArrowFunctionExpression', 'ClassDeclaration', 'ClassExpression', 'AwaitExpression', 'OptionalCallExpression', 'OptionalMemberExpression', 'RestElement', 'SpreadElement', 'ForOfStatement', 'BigIntLiteral']);
 let unsupportedSyntaxCount = 0;
+const productionStringFragments = [];
 const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/giu)].map((match) => match[1]);
 invariant(inlineScripts.length === 1, `Expected one inline compatibility loader, found ${inlineScripts.length}.`);
 for (const [sourceName, source] of [['game.js', game], ...inlineScripts.map((script, index) => [`index.html:inline-${index + 1}`, script])]) {
@@ -79,6 +76,8 @@ for (const [sourceName, source] of [['game.js', game], ...inlineScripts.map((scr
       || (node.type === 'VariableDeclaration' && node.kind !== 'var')
       || ((node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression' || node.type === 'ObjectMethod') && node.async)
       || (node.type === 'LogicalExpression' && node.operator === '??')) unsupportedSyntaxCount += 1;
+    if (node.type === 'StringLiteral' || node.type === 'DirectiveLiteral') productionStringFragments.push(node.value);
+    if (node.type === 'TemplateElement') productionStringFragments.push(node.value?.cooked ?? node.value?.raw ?? '');
     for (const value of Object.values(node)) {
       if (Array.isArray(value)) for (const item of value) syntaxStack.push(item);
       else if (value && typeof value === 'object') syntaxStack.push(value);
@@ -86,6 +85,12 @@ for (const [sourceName, source] of [['game.js', game], ...inlineScripts.map((scr
   }
 }
 invariant(unsupportedSyntaxCount === 0, `Production bundle retains ${unsupportedSyntaxCount} unsupported syntax nodes.`);
+const productionTextCorpus = productionStringFragments.join('\n');
+for (const requiredVisibleName of ['Хранительница угасания', 'Ember Warden', 'Огненное кольцо', 'Fire Ring']) {
+  invariant(productionTextCorpus.includes(requiredVisibleName), `Required localized visible name is missing: ${requiredVisibleName}.`);
+}
+invariant(!/Демонесса угасания|Fading Demoness|Круг Инферно|Inferno Circle/iu.test(productionTextCorpus),
+  'Production text retains a prohibited legacy visible name.');
 
 const yandexAssets = JSON.parse(await readFile(join(gameRoot, 'assets/assets-manifest-yandex-1.0.0.json'), 'utf8'));
 invariant(yandexAssets.maximumDecodedResidencyBytes <= 64 * 1024 * 1024, 'Decoded asset residency exceeds 64 MiB.');

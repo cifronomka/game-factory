@@ -172,7 +172,7 @@ const canonicalBlockerMappings = blockerMappings.map((item) => {
     && new Set(item.criteria).size === item.criteria.length,
   `Malformed stop-report blocker mapping: ${JSON.stringify(item)}`);
   return { blocker: item.blocker, criteria: [...item.criteria].sort() };
-}).sort((left, right) => left.blocker.localeCompare(right.blocker));
+}).sort((left, right) => (left.blocker < right.blocker ? -1 : left.blocker > right.blocker ? 1 : 0));
 invariant(JSON.stringify(canonicalBlockerMappings) === JSON.stringify(expectedBlockerMappings),
 'Stop-report blocker mappings differ from the static exact category policy.');
 const issueLedgerBytes = await readFile(join(gameRoot, 'docs/CYCLE09_ISSUES.md'));

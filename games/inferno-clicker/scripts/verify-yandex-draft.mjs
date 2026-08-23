@@ -909,7 +909,7 @@ function expectedBlockerMappings(blockers) {
   ].sort();
   const policies = [
     ...['Yandex Browser', 'Mozilla Firefox', 'Opera', 'Apple Safari'].map((name) => ({
-      pattern: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')} executed Cycle 09 run evidence$`, 'u'),
+      pattern: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')} executed Cycle 09 production run evidence$`, 'u'),
       criteria: browserCriteria,
     })),
     { pattern: /^Android physical device or real-device cloud exact-build run$/u, criteria: deviceCriteria },
@@ -944,7 +944,9 @@ function validateBlockers(blockers, rows, stopMappings, gateStatus) {
     invariant(row.reason === [...byCriterion.get(row.id)].sort().join('; '),
       `${row.id} blocker reason differs from the exact mapped blockers.`);
   }
-  invariant(sameValue([...(stopMappings ?? [])].sort((a, b) => a.blocker.localeCompare(b.blocker)), mappings),
+  invariant(sameValue([...(stopMappings ?? [])].sort((a, b) => (
+    a.blocker < b.blocker ? -1 : a.blocker > b.blocker ? 1 : 0
+  )), mappings),
     'Stop-report blocker mappings differ from the static blocker policy.');
   if (gateStatus === 'PASS') invariant(blockers.length === 0 && blockedRows.length === 0, 'PASS gate retains external blockers.');
   else invariant(blockers.length > 0 && blockedRows.length > 0, 'PASS_WITH_EXTERNAL_BLOCKERS lacks mapped blockers.');

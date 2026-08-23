@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "kind": "submission-human-review",
+  "status": "PASS",
+  "cycle": "09",
+  "sourceFingerprint": "840236a54bc05e830fb674367e3bc9c9d3233516c590297df06b0e86f7c30c6b",
+  "mediaManifestSha256": "cd4cddc37f97882f16f104c27759e719fba196e42873c97e433b42f5f3c248c9",
+  "reviewer": {
+    "id": "submission_media_reviewer",
+    "independent": true,
+    "reviewedAt": "2026-08-23T16:27:05.478Z"
+  },
+  "files": [
+    {
+      "filename": "icon-512.png",
+      "sha256": "38ea20080d30c2821524196a9b36884ee8a11f2fe2e4cc6ac5a9205f536fd52d",
+      "verdict": "PASS",
+      "observation": "Standalone text-free flame-and-embers emblem on dark cracked ground; it is not a gameplay screenshot and contains no religious or esoteric symbol, crop defect, or white/matte artifact."
+    },
+    {
+      "filename": "cover-800x470.png",
+      "sha256": "3450033d4bf7d859a3c66a5e3a284eff3c2a3a2e4b084a8b0c68e7eccb25b79f",
+      "verdict": "PASS",
+      "observation": "Standalone text-free authored fire composition with no gameplay UI; the subject is cleanly framed and contains no religious or esoteric symbol, crop defect, or white/matte artifact."
+    },
+    {
+      "filename": "desktop-01-1920x1080.png",
+      "sha256": "89898054d92fe58ff8a7f30b9900ef565bde983f8d3da104f0dbaba38411d1ce",
+      "verdict": "PASS",
+      "realGameplay": true,
+      "gameplayShareAtLeast70": true,
+      "noSystemOrDebugOverlay": true,
+      "cropAndReadability": true,
+      "observation": "Real 16:9 ready-state gameplay fills the frame; the current Russian Stage 1 HUD, tap target, progress bar, and controls are readable, while the dark field is part of the game composition. No system/debug UI, prohibited symbol, legacy label, clipping, distortion, or white/matte artifact is visible."
+    },
+    {
+      "filename": "desktop-02-1920x1080.png",
+      "sha256": "b163d9e78e67070ecf41a42d0ee56f2e9bde21188c67f8676efde0bc32a6ac3e",
+      "verdict": "PASS",
+      "realGameplay": true,
+      "gameplayShareAtLeast70": true,
+      "noSystemOrDebugOverlay": true,
+      "cropAndReadability": true,
+      "observation": "Real 16:9 Stage 3 gameplay shows the Ash Servant telegraph, live fire state, localized Russian HUD, warning, and controls at readable scale. The crop is complete with no system/debug overlay, prohibited symbol, legacy name, distortion, or white/matte artifact."
+    },
+    {
+      "filename": "desktop-03-1920x1080.png",
+      "sha256": "85e7f52a3a799b173d84a0ba4275a14664cf8a6fa99c29a9cf59433667a2aef0",
+      "verdict": "PASS",
+      "realGameplay": true,
+      "gameplayShareAtLeast70": true,
+      "noSystemOrDebugOverlay": true,
+      "cropAndReadability": true,
+      "observation": "Real 16:9 Stage 5 gameplay clearly presents the active fire, Ash Servant, Ember Warden, localized Russian HUD, warning, and controls. Gameplay dominates the image and remains legible without system/debug UI, prohibited symbols, legacy names, crop loss, or matte artifacts."
+    },
+    {
+      "filename": "desktop-04-1920x1080.png",
+      "sha256": "c025cf8dee99b25d7512a179cb2cb68895dbcf01f9bb46d7468e1cfaf8762ca6",
+      "verdict": "PASS",
+      "realGameplay": true,
+      "gameplayShareAtLeast70": true,
+      "noSystemOrDebugOverlay": true,
+      "cropAndReadability": true,
+      "observation": "Real 16:9 Inferno gameplay is fully framed with readable Russian HUD and controls. The optional rewarded CTA explicitly says to watch an ad and states the x2 heat-power benefit for 60 seconds; it does not obscure gameplay or appear mandatory. No system/debug overlay, prohibited symbol, legacy name, distortion, or white/matte artifact is visible."
+    },
+    {
+      "filename": "mobile-01-1080x1920.png",
+      "sha256": "d6f8378e760f733a3572c991f22cd6ebb048448cefa8056fc7dca63c9f189446",
+      "verdict": "PASS",
+      "realGameplay": true,
+      "gameplayShareAtLeast70": true,
+      "noSystemOrDebugOverlay": true,
+      "cropAndReadability": true,
+      "observation": "Real 9:16 ready-state gameplay fills the portrait frame; the current Russian Stage 1 HUD, tap target, and all controls are readable and comfortably inset. No browser/system/debug UI, prohibited symbol, legacy label, crop loss, distortion, or white/matte artifact is present."
+    },
+    {
+      "filename": "mobile-02-1080x1920.png",
+      "sha256": "76e2316844673c8fa4354b782d9cfe3901ae71e14a56a1218c575f355d1c3ad7",
+      "verdict": "PASS",
+      "realGameplay": true,
+      "gameplayShareAtLeast70": true,
+      "noSystemOrDebugOverlay": true,
+      "cropAndReadability": true,
+      "observation": "Real 9:16 Stage 3 gameplay shows the Ash Servant telegraph with a readable localized Russian HUD, warning, progress bar, and complete controls. The crop is clean with no system/debug overlay, prohibited symbol, legacy name, distortion, or white/matte artifact."
+    },
+    {
+      "filename": "mobile-03-1080x1920.png",
+      "sha256": "fcf960684f283c33f84ac1c7d79544906ae4a5d8314e9d14e1c1ea826efa707f",
+      "verdict": "PASS",
+      "realGameplay": true,
+      "gameplayShareAtLeast70": true,
+      "noSystemOrDebugOverlay": true,
+      "cropAndReadability": true,
+      "observation": "Real 9:16 Stage 3 gameplay remains dominant and readable. The rewarded offer is a distinct optional button that explicitly says to watch an ad and states the x2 heat-power benefit for 60 seconds; it neither blocks the game nor mimics a compulsory control. No system/debug UI, prohibited symbol, legacy name, clipping, or matte artifact is visible."
+    },
+    {
+      "filename": "mobile-04-1080x1920.png",
+      "sha256": "86fdb7d840c51f3faebc4ac96e2592cd5299a33eb002b7298906fcfe8e7f3595",
+      "verdict": "PASS",
+      "realGameplay": true,
+      "gameplayShareAtLeast70": true,
+      "noSystemOrDebugOverlay": true,
+      "cropAndReadability": true,
+      "observation": "Real 9:16 Inferno gameplay is clearly framed with the current Russian Stage 7 HUD, warning, attack card, characters, and complete controls all readable. No system/debug overlay, prohibited symbol, legacy label, crop loss, distortion, or white/matte artifact is visible."
+    }
+  ]
+}
