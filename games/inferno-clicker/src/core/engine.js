@@ -20,7 +20,6 @@ import {
   MAX_SCORE,
   MAX_TAPS_PER_FIXED_STEP,
   REWARDED_DURATION_MS,
-  REWARDED_ELIGIBLE_RUN_MS,
   REWARDED_SESSION_COOLDOWN_MS,
   SERVANT_DECAY_FACTOR,
   SERVANT_EFFECT_MS,
@@ -101,9 +100,9 @@ export function createInitialState(records = createDefaultRecords(), runId = 1, 
     pauseReasons: [],
     failGraceMsLeft: null,
     reachedStageTwo: false,
-    rewardedUsedThisRun: false,
     rewardSheetOpen: false,
     activeRewardRequestId: null,
+    activeRewardGranted: false,
     sessionRewardCooldownMs: Math.max(0, sessionRewardCooldownMs),
     boostUsed: false,
     abandoned: false,
@@ -462,6 +461,7 @@ function finishRun(state, events, abandoned) {
   state.abandoned = abandoned;
   state.rewardSheetOpen = false;
   state.activeRewardRequestId = null;
+  state.activeRewardGranted = false;
   state.boost = null;
   state.queuedBoost = false;
   emit(events, state, 'phaseChanged', { from, to: 'RESULTS' });
@@ -516,10 +516,8 @@ export function reduceFixedStep(source, commands) {
 /** @param {GameState} state */
 export function canOfferRewarded(state) {
   return state.phase === 'PLAYING'
-    && state.runHighestStage >= 4
-    && state.activeRunTimeMs >= REWARDED_ELIGIBLE_RUN_MS
+    && state.runHighestStage >= 3
     && state.sessionRewardCooldownMs <= 0
-    && !state.rewardedUsedThisRun
     && !state.boost
     && state.encounters.length === 0
     && !state.activeRewardRequestId;
@@ -626,21 +624,29 @@ export class GameEngine {
     this.#state.rewardSheetOpen = false;
     this.#state.pauseReasons = this.#state.pauseReasons.filter((reason) => reason !== 'menu');
     this.#state.activeRewardRequestId = requestId;
+    this.#state.activeRewardGranted = false;
     this.pause('ad');
     emit(this.#events, this.#state, 'rewardRequested', { requestId });
+    return true;
+  }
+
+  /** @param {string} requestId */
+  grantRewarded(requestId) {
+    if (this.#state.activeRewardRequestId !== requestId || this.#state.activeRewardGranted) return false;
+    this.#state.activeRewardGranted = true;
+    this.#state.boostUsed = true;
+    this.#state.queuedBoost = true;
+    this.#state.sessionRewardCooldownMs = REWARDED_SESSION_COOLDOWN_MS;
+    emit(this.#events, this.#state, 'rewardEarned', { requestId });
     return true;
   }
 
   /** @param {string} requestId @param {RewardedOutcome} outcome */
   resolveRewarded(requestId, outcome) {
     if (this.#state.activeRewardRequestId !== requestId) return false;
+    if (outcome === 'rewarded') this.grantRewarded(requestId);
     this.#state.activeRewardRequestId = null;
-    if (outcome === 'rewarded' && !this.#state.rewardedUsedThisRun) {
-      this.#state.rewardedUsedThisRun = true;
-      this.#state.boostUsed = true;
-      this.#state.queuedBoost = true;
-      this.#state.sessionRewardCooldownMs = REWARDED_SESSION_COOLDOWN_MS;
-    }
+    this.#state.activeRewardGranted = false;
     emit(this.#events, this.#state, 'rewardResolved', { requestId, outcome });
     this.resume('ad');
     return true;

@@ -90,8 +90,7 @@ test('heat window is independent and stacks with rewarded heat, not direct ad sc
     { kind: 'servant', phase: 'effect', msLeft: 1_000 },
     { kind: 'heat-window', phase: 'effect', msLeft: 1_500 },
   ];
-  state.boost = { msLeft: 20_000 };
-  state.rewardedUsedThisRun = true;
+  state.boost = { msLeft: 60_000 };
   state.grantedStageBonuses = [2, 3, 4, 5, 6];
   const engine = new GameEngine(state);
   engine.queueTap(0);

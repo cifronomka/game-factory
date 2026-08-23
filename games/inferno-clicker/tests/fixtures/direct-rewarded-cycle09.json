@@ -1,0 +1,20 @@
+{
+  "name": "canonicalDirectRewardedC09",
+  "version": 1,
+  "firstTapMs": 0,
+  "intervalByRunHighestStageMs": [500, 500, 250, 250, 200, 140, 140],
+  "stopMs": 240000,
+  "rewardAtMs": [65000, 155000],
+  "expected": {
+    "stageReachedAtMs": { "2": 9000, "3": 43500, "4": 64500, "5": 75750, "6": 83950, "7": 90950 },
+    "acceptedTaps": 1372,
+    "score": 276349,
+    "heat": 998.38,
+    "currentInfernoHoldMs": 148910,
+    "runHighestStage": 7,
+    "rewardResolvedAtMs": [65000, 160250],
+    "boostStartedAtMs": [65000, 160250],
+    "boostEndedAtMs": [125000, 220250],
+    "sessionRewardCooldownMs": 10250
+  }
+}

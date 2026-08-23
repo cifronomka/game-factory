@@ -2,6 +2,7 @@
 
 import { attachBrowserLifecycle } from '../shared/browserLifecycle.js';
 import { PauseController } from '../shared/PauseController.js';
+import { REWARDED_PLACEMENT, mapPlatformLocale } from '../types/platform.js';
 import { createDefaultSave, MAX_SCORE, parseInfernoSave } from '../types/save.js';
 import { fail, ok } from '../types/result.js';
 
@@ -25,7 +26,7 @@ export class WebPlatformService {
    * @param {StorageLike|null} [options.storage]
    * @param {string} [options.storageKey]
    * @param {()=>number} [options.now]
-   * @param {'test'|'unavailable'} [options.rewardedProvider] Explicit review/test provider by default; set to `unavailable` to disable rewards.
+   * @param {import('../types/platform.js').PlatformLocale} [options.locale]
    * @param {(diagnostic:PlatformDiagnostic)=>void} [options.onDiagnostic]
    * @param {(active:boolean)=>void} [options.onGameplayActiveChange]
    * @param {import('../shared/browserLifecycle.js').VisibilitySource|null} [options.documentTarget]
@@ -35,10 +36,10 @@ export class WebPlatformService {
     this.storage = options.storage === undefined ? defaultStorage() : options.storage;
     this.storageKey = options.storageKey ?? DEFAULT_STORAGE_KEY;
     this.now = options.now ?? Date.now;
-    this.rewardedProvider = options.rewardedProvider ?? 'test';
-    if (this.rewardedProvider !== 'test' && this.rewardedProvider !== 'unavailable') {
-      throw new TypeError('Web rewardedProvider must be "test" or "unavailable".');
-    }
+    const browserLanguage = typeof globalThis.navigator === 'undefined'
+      ? undefined
+      : globalThis.navigator.language;
+    this.locale = options.locale ?? mapPlatformLocale(browserLanguage);
     this.onDiagnostic = options.onDiagnostic ?? (() => {});
     this.pauseController = new PauseController(options.onGameplayActiveChange);
     this.lifecycleOptions = {
@@ -48,16 +49,20 @@ export class WebPlatformService {
     /** @type {null|(()=>void)} */
     this.detachLifecycle = null;
     this.requestCounter = 0;
-    /** @type {Promise<import('../types/platform.js').RewardedResult>|null} */
-    this.pendingTestReward = null;
+    /** @type {Promise<import('../types/result.js').Result<void>>} */
+    this.scoreWriteTail = Promise.resolve(ok(undefined));
     /** @type {import('../types/platform.js').PlatformCapabilities} */
     this.capabilities = Object.freeze({
       platform: 'web',
+      locale: this.locale,
+      authorized: false,
       localSave: this.storage !== null,
       cloudSave: false,
       leaderboard: 'local-only',
-      rewardedProvider: this.rewardedProvider,
-      rewardedAds: this.rewardedProvider === 'test',
+      leaderboardRead: false,
+      leaderboardWrite: false,
+      rewardedProvider: 'unavailable',
+      rewardedAds: false,
       interstitialAds: false,
       gameplayLifecycle: true,
     });
@@ -110,11 +115,22 @@ export class WebPlatformService {
     }
   }
 
+  async flushData() {
+    return ok(undefined);
+  }
+
   /** @param {number} score */
-  async submitScore(score) {
+  submitScore(score) {
     if (!Number.isInteger(score) || score < 0 || score > MAX_SCORE) {
-      return fail('invalid-data', `Best Score must be an integer from 0 to ${MAX_SCORE}.`);
+      return Promise.resolve(fail('invalid-data', `Best Score must be an integer from 0 to ${MAX_SCORE}.`));
     }
+    const operation = this.scoreWriteTail.then(() => this.#writeBestScore(score));
+    this.scoreWriteTail = operation;
+    return operation;
+  }
+
+  /** @param {number} score */
+  async #writeBestScore(score) {
     const loaded = await this.loadData();
     if (!loaded.ok) return loaded;
     const save = loaded.value ?? createDefaultSave(this.now());
@@ -129,35 +145,20 @@ export class WebPlatformService {
     return ok([{
       rank: 1,
       score: loaded.value.bestScore,
-      displayName: 'Local Best',
+      displayName: '',
       isCurrentPlayer: true,
       source: 'local',
     }]);
   }
 
-  /** @param {'inferno-seal'} placement Internal legacy-compatible id for the optional timed boost. */
+  /** @param {typeof REWARDED_PLACEMENT} placement */
   showRewardedAd(placement) {
-    if (this.rewardedProvider === 'unavailable' || placement !== 'inferno-seal') {
-      return Promise.resolve({
-        status: /** @type {'unavailable'} */ ('unavailable'),
-        requestId: this.#requestId('rewarded'),
-        error: { code: /** @type {'unavailable'} */ ('unavailable'), message: 'Rewarded provider is unavailable in Web fallback.', retryable: false },
-      });
-    }
-
-    // The review provider has no ad UI. Concurrent duplicate calls share one
-    // asynchronous request/result so one user action cannot create two rewards.
-    if (this.pendingTestReward) return this.pendingTestReward;
-    const requestId = this.#requestId('test-rewarded');
-    const request = Promise.resolve().then(() => ({
-      status: /** @type {'rewarded'} */ ('rewarded'),
-      requestId,
-      wasShown: false,
-    })).finally(() => {
-      if (this.pendingTestReward === request) this.pendingTestReward = null;
+    const suffix = placement === REWARDED_PLACEMENT ? '' : ' Invalid placement.';
+    return Promise.resolve({
+      status: /** @type {'unavailable'} */ ('unavailable'),
+      requestId: this.#requestId('rewarded'),
+      error: { code: /** @type {'unavailable'} */ ('unavailable'), message: `Rewarded provider is unavailable in Web fallback.${suffix}`, retryable: false },
     });
-    this.pendingTestReward = request;
-    return request;
   }
 
   /** @param {string} _placement */
@@ -179,6 +180,10 @@ export class WebPlatformService {
   resumeGame(reason = 'menu') {
     this.pauseController.requestResume(reason);
     return ok(undefined);
+  }
+
+  startGameplay() {
+    this.pauseController.startGameplay();
   }
 
   /** @param {string} reason */

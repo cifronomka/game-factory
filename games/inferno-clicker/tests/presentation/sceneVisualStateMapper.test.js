@@ -38,7 +38,7 @@ test('reveals light continuously within a stage without changing gameplay state'
 
 test('keeps architecture, characters and flame in the fixed compositing order', () => {
   assert.deepEqual(SCENE_LAYER_ORDER, [
-    'far-chamber', 'midground-architecture', 'ritual-plane', 'characters',
+    'far-chamber', 'midground-architecture', 'hearth-floor', 'characters',
     'flame-rig', 'lighting-fx', 'foreground',
   ]);
 });

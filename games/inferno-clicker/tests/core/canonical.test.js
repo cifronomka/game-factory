@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { replayCanonicalDirect, replayTapRateScenario } from '../fixtures/canonical-direct.js';
+import { replayCanonicalDirect, replayCanonicalRewardedCycle09, replayTapRateScenario } from '../fixtures/canonical-direct.js';
 
 /** @type {import('../fixtures/canonical-direct.js').DirectTraceConfig} */
 const noReward = JSON.parse(readFileSync(new URL('../fixtures/direct-no-reward-canonical.json', import.meta.url), 'utf8'));
@@ -11,6 +11,8 @@ const noReward = JSON.parse(readFileSync(new URL('../fixtures/direct-no-reward-c
 const boosted = JSON.parse(readFileSync(new URL('../fixtures/direct-boosted-canonical.json', import.meta.url), 'utf8'));
 /** @type {{name:string,version:number,scenarios:import('../fixtures/canonical-direct.js').TapRateScenario[]}} */
 const rateMatrix = JSON.parse(readFileSync(new URL('../fixtures/tap-rate-matrix.json', import.meta.url), 'utf8'));
+/** @type {import('../fixtures/canonical-direct.js').Cycle09RewardedTraceConfig} */
+const cycle09Rewarded = JSON.parse(readFileSync(new URL('../fixtures/direct-rewarded-cycle09.json', import.meta.url), 'utf8'));
 
 /** @param {ReturnType<typeof replayCanonicalDirect>} run @param {import('../fixtures/canonical-direct.js').ExpectedTrace} expected */
 function assertCanonical(run, expected) {
@@ -68,4 +70,27 @@ test('tap-rate matrix has exact slow/normal/fast/very-fast/boosted parity at 60/
       assert.ok(Math.abs(run.maxHeat - (runs[0]?.maxHeat ?? 0)) <= 0.5, scenario.name);
     }
   }
+});
+
+test('Cycle 09 rewarded balance fixture has two 60-second grants at the 90-active-second cadence with exact 60/30/15 FPS parity', () => {
+  assert.equal(cycle09Rewarded.name, 'canonicalDirectRewardedC09');
+  assert.equal(cycle09Rewarded.version, 1);
+  assert.deepEqual(cycle09Rewarded.rewardAtMs, [65_000, 155_000]);
+  const runs = /** @type {const} */ ([60, 30, 15]).map((fps) => replayCanonicalRewardedCycle09(cycle09Rewarded, fps));
+  for (const run of runs) {
+    assert.deepEqual(run.stageReachedAtMs, cycle09Rewarded.expected.stageReachedAtMs);
+    assert.equal(run.acceptedTaps, cycle09Rewarded.expected.acceptedTaps);
+    assert.equal(run.state.score, cycle09Rewarded.expected.score);
+    assert.ok(Math.abs(run.state.heat - cycle09Rewarded.expected.heat) <= 0.01);
+    assert.ok(Math.abs(run.state.currentInfernoHoldMs - cycle09Rewarded.expected.currentInfernoHoldMs) <= 0.01);
+    assert.equal(run.state.runHighestStage, cycle09Rewarded.expected.runHighestStage);
+    assert.deepEqual(run.rewardResolvedAtMs, cycle09Rewarded.expected.rewardResolvedAtMs);
+    assert.deepEqual(run.boostStartedAtMs, cycle09Rewarded.expected.boostStartedAtMs);
+    assert.deepEqual(run.boostEndedAtMs, cycle09Rewarded.expected.boostEndedAtMs);
+    assert.equal(run.state.sessionRewardCooldownMs, cycle09Rewarded.expected.sessionRewardCooldownMs);
+  }
+  assert.equal(runs[0].rewardResolvedAtMs[1] >= 155_000, true, 'the second grant is never earlier than 90 active seconds');
+  assert.equal(runs[0].rewardResolvedAtMs[1], 160_250, 'an active encounter delays the placard until the next safe state');
+  assert.deepEqual(runs[1], runs[0]);
+  assert.deepEqual(runs[2], runs[0]);
 });

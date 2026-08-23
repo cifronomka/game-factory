@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "family": "low",
+  "frameWidth": 256,
+  "frameHeight": 512,
+  "fps": 10,
+  "loop": true,
+  "pivot": [
+    0.5,
+    0.965
+  ],
+  "frames": [
+    {
+      "x": 0,
+      "y": 0,
+      "w": 256,
+      "h": 512,
+      "durationMs": 100,
+      "sha256": "a7aaac24c7db02f13954669803ed0f206a400d5e4c96925d4b370f39dc574006",
+      "provenance": "deterministically cleaned low outer atlas frame 0; decoded RGBA crop from outer-low-v3.webp"
+    },
+    {
+      "x": 256,
+      "y": 0,
+      "w": 256,
+      "h": 512,
+      "durationMs": 100,
+      "sha256": "95a06643671d5878fd47eddd249fafa95ed25cf5582a124025ed950da68f3447",
+      "provenance": "deterministically cleaned low outer atlas frame 1; decoded RGBA crop from outer-low-v3.webp"
+    },
+    {
+      "x": 512,
+      "y": 0,
+      "w": 256,
+      "h": 512,
+      "durationMs": 100,
+      "sha256": "53025279b77d87a54d8392d713e14f4de99e11810e6413d41475af1598193a42",
+      "provenance": "deterministically cleaned low outer atlas frame 2; decoded RGBA crop from outer-low-v3.webp"
+    },
+    {
+      "x": 768,
+      "y": 0,
+      "w": 256,
+      "h": 512,
+      "durationMs": 100,
+      "sha256": "561fa0e21999ee435925c46e7b3a2f8e447c2fc3d8df40b059fb8b4b73adb608",
+      "provenance": "deterministically cleaned low outer atlas frame 3; decoded RGBA crop from outer-low-v3.webp"
+    },
+    {
+      "x": 0,
+      "y": 512,
+      "w": 256,
+      "h": 512,
+      "durationMs": 100,
+      "sha256": "81d76beec869e0af4844b748ae7d5f901c456e39a630a3e00ff151211e6b8603",
+      "provenance": "deterministically cleaned low outer atlas frame 4; decoded RGBA crop from outer-low-v3.webp"
+    },
+    {
+      "x": 256,
+      "y": 512,
+      "w": 256,
+      "h": 512,
+      "durationMs": 100,
+      "sha256": "cc6d4e43cfdfac7061a13cab08e9752dcbcab65aa0179a6f7be37333e69987b3",
+      "provenance": "deterministically cleaned low outer atlas frame 5; decoded RGBA crop from outer-low-v3.webp"
+    },
+    {
+      "x": 512,
+      "y": 512,
+      "w": 256,
+      "h": 512,
+      "durationMs": 100,
+      "sha256": "785103aea5e686ce8cd6e32bdefd80fe5eb62fcf493155ecfa45b87f7c234e46",
+      "provenance": "deterministically cleaned low outer atlas frame 6; decoded RGBA crop from outer-low-v3.webp"
+    },
+    {
+      "x": 768,
+      "y": 512,
+      "w": 256,
+      "h": 512,
+      "durationMs": 100,
+      "sha256": "0b2556be79acca2b9663509f61efc763223a202c06f73f23998b941fa771e300",
+      "provenance": "deterministically cleaned low outer atlas frame 7; decoded RGBA crop from outer-low-v3.webp"
+    }
+  ],
+  "layer": "outer",
+  "phaseOffsetFrames": 2,
+  "version": "v3",
+  "sourceAtlas": "assets/flame/atlases/outer-low-v2.webp",
+  "sourceAtlasSha256": "ebe2a039f57f5f40b6f8f4b817f8420085ade9c3d128e91e254389e0bb0da87a",
+  "alphaCleanup": {
+    "algorithm": "C09 deterministic alpha-floor + per-frame largest 8-connected component + nearest warm edge RGB transfer",
+    "alphaFloorInclusive": 15,
+    "nearestWarmSearchRadius": 6,
+    "pngWebpDecodedRgbaParity": true,
+    "activePixelCount": 212967,
+    "removedLowAlphaPixelCount": 322,
+    "removedDetachedAlphaPixelCount": 210,
+    "recoloredNeutralEdgePixelCount": 3887,
+    "removedUnrecoverableEdgePixelCount": 0,
+    "detachedAlphaPixelCount": 0,
+    "neutralEdgePixelCount": 0,
+    "coolEdgePixelCount": 0,
+    "frames": [
+      {
+        "index": 0,
+        "source": {
+          "activePixelCount": 25535,
+          "componentCount": 2,
+          "detachedAlphaPixelCount": 45,
+          "neutralEdgePixelCount": 512,
+          "coolEdgePixelCount": 45
+        },
+        "activePixelCount": 25457,
+        "componentCount": 1,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "removedLowAlphaPixelCount": 34,
+        "removedDetachedAlphaPixelCount": 44,
+        "recoloredNeutralEdgePixelCount": 506,
+        "removedUnrecoverableEdgePixelCount": 0,
+        "sourceComponentCount": 2,
+        "decodedRgbaSha256": "a7aaac24c7db02f13954669803ed0f206a400d5e4c96925d4b370f39dc574006"
+      },
+      {
+        "index": 1,
+        "source": {
+          "activePixelCount": 28721,
+          "componentCount": 3,
+          "detachedAlphaPixelCount": 147,
+          "neutralEdgePixelCount": 621,
+          "coolEdgePixelCount": 76
+        },
+        "activePixelCount": 28521,
+        "componentCount": 1,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "removedLowAlphaPixelCount": 53,
+        "removedDetachedAlphaPixelCount": 147,
+        "recoloredNeutralEdgePixelCount": 607,
+        "removedUnrecoverableEdgePixelCount": 0,
+        "sourceComponentCount": 3,
+        "decodedRgbaSha256": "95a06643671d5878fd47eddd249fafa95ed25cf5582a124025ed950da68f3447"
+      },
+      {
+        "index": 2,
+        "source": {
+          "activePixelCount": 31242,
+          "componentCount": 2,
+          "detachedAlphaPixelCount": 3,
+          "neutralEdgePixelCount": 502,
+          "coolEdgePixelCount": 47
+        },
+        "activePixelCount": 31193,
+        "componentCount": 1,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "removedLowAlphaPixelCount": 46,
+        "removedDetachedAlphaPixelCount": 3,
+        "recoloredNeutralEdgePixelCount": 506,
+        "removedUnrecoverableEdgePixelCount": 0,
+        "sourceComponentCount": 2,
+        "decodedRgbaSha256": "53025279b77d87a54d8392d713e14f4de99e11810e6413d41475af1598193a42"
+      },
+      {
+        "index": 3,
+        "source": {
+          "activePixelCount": 25963,
+          "componentCount": 1,
+          "detachedAlphaPixelCount": 0,
+          "neutralEdgePixelCount": 482,
+          "coolEdgePixelCount": 40
+        },
+        "activePixelCount": 25923,
+        "componentCount": 1,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "removedLowAlphaPixelCount": 40,
+        "removedDetachedAlphaPixelCount": 0,
+        "recoloredNeutralEdgePixelCount": 485,
+        "removedUnrecoverableEdgePixelCount": 0,
+        "sourceComponentCount": 1,
+        "decodedRgbaSha256": "561fa0e21999ee435925c46e7b3a2f8e447c2fc3d8df40b059fb8b4b73adb608"
+      },
+      {
+        "index": 4,
+        "source": {
+          "activePixelCount": 26813,
+          "componentCount": 1,
+          "detachedAlphaPixelCount": 0,
+          "neutralEdgePixelCount": 446,
+          "coolEdgePixelCount": 39
+        },
+        "activePixelCount": 26772,
+        "componentCount": 1,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "removedLowAlphaPixelCount": 41,
+        "removedDetachedAlphaPixelCount": 0,
+        "recoloredNeutralEdgePixelCount": 446,
+        "removedUnrecoverableEdgePixelCount": 0,
+        "sourceComponentCount": 1,
+        "decodedRgbaSha256": "81d76beec869e0af4844b748ae7d5f901c456e39a630a3e00ff151211e6b8603"
+      },
+      {
+        "index": 5,
+        "source": {
+          "activePixelCount": 27862,
+          "componentCount": 1,
+          "detachedAlphaPixelCount": 0,
+          "neutralEdgePixelCount": 591,
+          "coolEdgePixelCount": 55
+        },
+        "activePixelCount": 27820,
+        "componentCount": 1,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "removedLowAlphaPixelCount": 42,
+        "removedDetachedAlphaPixelCount": 0,
+        "recoloredNeutralEdgePixelCount": 593,
+        "removedUnrecoverableEdgePixelCount": 0,
+        "sourceComponentCount": 1,
+        "decodedRgbaSha256": "cc6d4e43cfdfac7061a13cab08e9752dcbcab65aa0179a6f7be37333e69987b3"
+      },
+      {
+        "index": 6,
+        "source": {
+          "activePixelCount": 20227,
+          "componentCount": 1,
+          "detachedAlphaPixelCount": 0,
+          "neutralEdgePixelCount": 339,
+          "coolEdgePixelCount": 22
+        },
+        "activePixelCount": 20194,
+        "componentCount": 1,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "removedLowAlphaPixelCount": 33,
+        "removedDetachedAlphaPixelCount": 0,
+        "recoloredNeutralEdgePixelCount": 339,
+        "removedUnrecoverableEdgePixelCount": 0,
+        "sourceComponentCount": 1,
+        "decodedRgbaSha256": "785103aea5e686ce8cd6e32bdefd80fe5eb62fcf493155ecfa45b87f7c234e46"
+      },
+      {
+        "index": 7,
+        "source": {
+          "activePixelCount": 27136,
+          "componentCount": 2,
+          "detachedAlphaPixelCount": 17,
+          "neutralEdgePixelCount": 406,
+          "coolEdgePixelCount": 27
+        },
+        "activePixelCount": 27087,
+        "componentCount": 1,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "removedLowAlphaPixelCount": 33,
+        "removedDetachedAlphaPixelCount": 16,
+        "recoloredNeutralEdgePixelCount": 405,
+        "removedUnrecoverableEdgePixelCount": 0,
+        "sourceComponentCount": 2,
+        "decodedRgbaSha256": "0b2556be79acca2b9663509f61efc763223a202c06f73f23998b941fa771e300"
+      }
+    ]
+  }
+}

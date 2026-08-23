@@ -5,14 +5,16 @@
 /**
  * @typedef {object} YandexPlayer
  * @property {() => boolean} isAuthorized
+ * @property {() => string} [getUniqueID]
  * @property {(keys?:string[]) => Promise<Record<string, unknown>>} getData
  * @property {(data:Record<string, unknown>, flush?:boolean) => Promise<void>} setData
  */
 /**
  * @typedef {object} YandexSdk
+ * @property {{app?:{id?:string}, i18n?:{lang?:string}, payload?:string, referrer?:Record<string,unknown>}} [environment]
  * @property {{LoadingAPI?:{ready:()=>void|Promise<void>}, GameplayAPI?:{start:()=>void, stop:()=>void}}} [features]
  * @property {{showRewardedVideo:(options:{callbacks:{onOpen?:()=>void,onRewarded?:()=>void,onClose?:(wasShown:boolean)=>void,onError?:(error:unknown)=>void}})=>void}} [adv]
- * @property {{setScore:(name:string,score:number,extraData?:string)=>Promise<void>,getEntries:(name:string,options:{includeUser?:boolean,quantityAround?:number,quantityTop?:number})=>Promise<{entries:YandexLeaderboardEntry[]}>}} [leaderboards]
+ * @property {{setScore:(name:string,score:number,extraData?:string)=>Promise<void>,getEntries:(name:string,options:{includeUser?:boolean,quantityAround?:number,quantityTop?:number})=>Promise<{entries:YandexLeaderboardEntry[],userRank?:number}>}} [leaderboards]
  * @property {() => Promise<YandexPlayer>} [getPlayer]
  * @property {(method:string) => Promise<boolean>} [isAvailableMethod]
  * @property {(event:'game_api_pause'|'game_api_resume', callback:()=>void)=>void} [on]

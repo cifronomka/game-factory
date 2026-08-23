@@ -47,8 +47,14 @@ export function makeSave(overrides = {}) {
 /**
  * @param {object} [options]
  * @param {boolean} [options.authorized]
+ * @param {string} [options.language]
+ * @param {string} [options.playerId]
  * @param {Record<string,unknown>} [options.cloudData]
+ * @param {(data:Record<string,unknown>,flush:boolean)=>Promise<void>} [options.setData]
  * @param {(name:string,score:number)=>Promise<void>} [options.setScore]
+ * @param {()=>Promise<void>|void} [options.loadingReady]
+ * @param {Record<string,boolean>} [options.methodAvailability]
+ * @param {(name:string,options:Record<string,unknown>)=>Promise<{entries:Array<{rank:number,score:number,player?:{publicName?:string,uniqueID?:string}}>,userRank?:number}>} [options.getEntries]
  * @param {(callbacks:Record<string,Function>)=>void} [options.rewarded]
  */
 export function createYandexMock(options = {}) {
@@ -62,25 +68,37 @@ export function createYandexMock(options = {}) {
     setData: 0,
     setScore: /** @type {number[]} */ ([]),
     getEntries: 0,
+    rewardedVideo: 0,
+    getEntriesOptions: /** @type {Record<string,unknown>[]} */ ([]),
+    availableMethods: /** @type {string[]} */ ([]),
+    setDataPayloads: /** @type {Record<string,unknown>[]} */ ([]),
+    setDataFlush: /** @type {boolean[]} */ ([]),
   };
   let cloudData = { ...(options.cloudData ?? {}) };
-  let gameplayActive = false;
-  let platformResumePending = false;
   const player = {
     isAuthorized: () => options.authorized ?? true,
+    getUniqueID: () => options.playerId ?? 'current-player',
     async getData() { return { ...cloudData }; },
-    async setData(data) { calls.setData += 1; cloudData = { ...cloudData, ...data }; },
+    async setData(data, flush = false) {
+      calls.setData += 1;
+      calls.setDataPayloads.push(data);
+      calls.setDataFlush.push(flush);
+      if (options.setData) await options.setData(data, flush);
+      cloudData = { ...cloudData, ...data };
+    },
   };
   const sdk = {
+    environment: { i18n: { lang: options.language ?? 'ru' } },
     features: {
-      LoadingAPI: { ready: () => { calls.ready += 1; } },
+      LoadingAPI: { ready: () => { calls.ready += 1; return options.loadingReady?.(); } },
       GameplayAPI: {
-        start: () => { calls.start += 1; gameplayActive = true; },
-        stop: () => { calls.stop += 1; gameplayActive = false; },
+        start: () => { calls.start += 1; },
+        stop: () => { calls.stop += 1; },
       },
     },
     adv: {
       showRewardedVideo: ({ callbacks }) => {
+        calls.rewardedVideo += 1;
         if (options.rewarded) options.rewarded(callbacks);
         else callbacks.onClose?.(false);
       },
@@ -90,13 +108,18 @@ export function createYandexMock(options = {}) {
         calls.setScore.push(score);
         if (options.setScore) await options.setScore(name, score);
       },
-      async getEntries() {
+      async getEntries(name, requestOptions) {
         calls.getEntries += 1;
+        calls.getEntriesOptions.push(requestOptions);
+        if (options.getEntries) return options.getEntries(name, requestOptions);
         return { entries: [{ rank: 1, score: 321, player: { publicName: 'Игрок' } }] };
       },
     },
     async getPlayer() { calls.getPlayer += 1; return player; },
-    async isAvailableMethod() { return true; },
+    async isAvailableMethod(method) {
+      calls.availableMethods.push(method);
+      return options.methodAvailability?.[method] ?? true;
+    },
     on(event, callback) {
       const listeners = events.get(event) ?? new Set();
       listeners.add(callback);
@@ -108,15 +131,6 @@ export function createYandexMock(options = {}) {
     sdk,
     calls,
     emit(event) {
-      if (event === 'game_api_pause' && gameplayActive) {
-        calls.stop += 1;
-        gameplayActive = false;
-        platformResumePending = true;
-      } else if (event === 'game_api_resume' && platformResumePending) {
-        calls.start += 1;
-        gameplayActive = true;
-        platformResumePending = false;
-      }
       for (const callback of events.get(event) ?? []) callback();
     },
     getCloudData() { return cloudData; },

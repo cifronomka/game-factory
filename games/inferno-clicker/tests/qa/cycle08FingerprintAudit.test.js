@@ -14,6 +14,7 @@ const REQUIRED_FROZEN_PRESENTATION_PATHS = Object.freeze([
   'src/presentation/types.js',
   'src/styles.css',
 ]);
+const CYCLE08_ROLLBACK_COMMIT = 'c7a9ea4f3b85f4d17cf65549d6fead1d67e2dd8b';
 
 test('Cycle 08 shell fingerprint covers frozen presentation runtime without character placement', () => {
   const shell = cycle08FingerprintGroups.shell;
@@ -26,10 +27,11 @@ test('Cycle 08 shell fingerprint covers frozen presentation runtime without char
   assert.ok(!shell.includes('src/presentation/scene/characterScene.js'), 'Cycle 08 intentionally permits character placement changes');
 });
 
-test('Cycle 08 frozen fingerprint audit passes for the legitimate current candidate', async () => {
-  const report = await auditCycle08Fingerprints();
+test('Cycle 08 frozen fingerprint audit still passes for the immutable 0.1.1 rollback commit', async () => {
+  const report = await auditCycle08Fingerprints({ candidateCommit: CYCLE08_ROLLBACK_COMMIT });
   assert.equal(report.status, 'PASS');
   assert.equal(report.groups.shell.status, 'PASS');
   assert.equal(report.groups.shell.baselineSha256, report.groups.shell.candidateSha256);
+  assert.equal(report.candidateCommit, CYCLE08_ROLLBACK_COMMIT);
   assert.ok(report.groups.shell.files >= REQUIRED_FROZEN_PRESENTATION_PATHS.length);
 });

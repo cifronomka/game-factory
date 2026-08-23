@@ -7,4 +7,4 @@ export { InfernoScene } from './scene/infernoScene.js';
 export { FlameRig } from './scene/flameRig.js';
 export { SCENE_LAYER_ORDER } from './scene/layerOrder.js';
 export { OptionalBitmap } from './scene/optionalBitmap.js';
-export { SceneVisualStateMapper, STAGE_NAMES } from './sceneVisualStateMapper.js';
+export { SceneVisualStateMapper } from './sceneVisualStateMapper.js';

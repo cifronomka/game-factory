@@ -6,6 +6,7 @@ test-results/
 reports/
 dist/*
 !dist/.gitkeep
+dist-e2e/
 releases/*.zip
 releases/*.sha256
 *.log

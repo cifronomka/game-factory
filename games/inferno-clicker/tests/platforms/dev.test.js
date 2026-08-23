@@ -27,13 +27,14 @@ test('explicit non-production mock can emulate rewarded without an SDK', async (
   assert.equal(initialized.ok, true);
   if (initialized.ok) {
     assert.equal(initialized.value.platform, 'development');
+    assert.equal(initialized.value.authorized, false);
     assert.equal(initialized.value.rewardedProvider, 'test');
     assert.equal(initialized.value.rewardedAds, true);
   }
   let settled = false;
-  const first = service.showRewardedAd('inferno-seal');
+  const first = service.showRewardedAd('heat-power-2x-60s');
   first.then(() => { settled = true; });
-  const duplicate = service.showRewardedAd('inferno-seal');
+  const duplicate = service.showRewardedAd('heat-power-2x-60s');
   assert.equal(settled, false);
   assert.strictEqual(duplicate, first);
   const result = await first;

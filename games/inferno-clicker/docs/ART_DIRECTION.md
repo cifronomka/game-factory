@@ -1,12 +1,20 @@
 # Art Direction — «Зажги»
 
-## Corrective Cycle 08 — active direction
+## Yandex Release Cycle 09 — active direction
+
+Cycle 09 наследует C08 персонажей, authored motion, alpha и scale, но переоткрывает каждый runtime frame и seven-stage composite из-за оставшихся white/neutral spots и Yandex content review. Новые bitmap не нужны для rewarded UI; CTA/goals создаются DOM/CSS. Любая ретушь выпускается новым versioned asset ID, старые bytes не перезаписываются.
+
+Из видимой сцены удаляются руны, пентаграммы, ritual/religious marks и узнаваемая эзотерическая символика; остаётся нейтральная dark-fantasy fire chamber. Видимое имя Demoness — `Хранительница угасания / Ember Warden`, stage 6 — `Огненное кольцо / Fire Ring`. Internal filenames могут сохранить legacy ID только как невидимую техническую совместимость.
+
+Обязательный C09 visual audit: все 64 production character frames и полный runtime stages 1–7 на black, neutral-gray и dark-red, DPR 1/2/3, normal/reduced/forced-low. White matte, low-chroma fringe, opaque/internal-gap island, detached alpha, sticker edge, crop и filter-amplified spot count=`0`; legitimate skin/eyes/metal/highlights сохраняются. Все результаты начинаются `NOT RUN` и проходят QA→fix→independent retest→neighboring regression.
+
+## Corrective Cycle 08 — inherited baseline
 
 Cycle 08 наследует принятую C07 identity/composition огня, Ash Servant, Demoness, steam semantics и Inferno entry. Он переопределяет C07 только для очистки alpha у Ash Servant и Demoness, фактической чёткости/масштаба Demoness и нового evidence. `CORRECTIVE_CYCLE_07.md` и его PASS остаются историей, но не доказывают C08. Gameplay, audio, platform, flame/environment, позы и тайминги не меняются.
 
 У обоих персонажей обязателен genuine alpha: по внешнему силуэту и во всех внутренних просветах, включая сгибы локтей и промежутки между руками и корпусом, visible white matte/fringe/opaque islands/sticker edge=`0`. Approved alpha каждого кадра побитно сохраняется после WebP encode/decode; у Servant detached partial-alpha contour tiles=`0`. Сохраняются настоящие светлые детали кожи, глаз, металла и бликов; грубое удаление всех белых пикселей запрещено. Плавность по-прежнему строится на уникальных authored in-betweens: full-body мерцание, morph-crossfade, reverse-as-recovery и перестановка одинаковых кадров не считаются анимацией.
 
-Concept art из `visual-references/` задаёт mood, palette, fixed hearth/camera и путь darkness → Inferno. Его нельзя использовать как fullscreen screen или копировать пиксели в production. Persistent world, characters, flame layers, particles, runes, glow, smoke, overlays, HUD и transition FX остаются раздельными.
+Concept art из `visual-references/` задаёт mood, palette, fixed hearth/camera и путь darkness → Inferno. Его нельзя использовать как fullscreen screen или копировать пиксели в production. Persistent world, characters, flame layers, particles, neutral fire markings, glow, smoke, overlays, HUD и transition FX остаются раздельными.
 
 ## Visual language
 
@@ -20,12 +28,12 @@ Concept art из `visual-references/` задаёт mood, palette, fixed hearth/c
 
 | Stage | Main reveal | Flame treatment |
 |---:|---|---|
-| 1 | Почти чёрный chamber, едва заметный ritual anchor | low family, маленький authored loop |
-| 2 | Рунный круг и трещины начинают читаться | low family + stage flare |
+| 1 | Почти чёрный chamber, едва заметный hearth anchor без символа | low family, маленький authored loop |
+| 2 | Нейтральное огненное кольцо и трещины начинают читаться | low family + stage flare |
 | 3 | Появляется Ash Servant | low→mid crossfade, appearance→idle |
-| 4 | Gate/chains/scarlet accents, Demoness silhouette | mid family + stage flare |
-| 5 | Demoness раскрывается и действует | mid family, appearance/idle/cast/hold |
-| 6 | Ritual circle, pylons и distant host | mid→high crossfade |
+| 4 | Gate/chains/scarlet accents, Ember Warden silhouette | mid family + stage flare |
+| 5 | Ember Warden раскрывается и действует | mid family, appearance/idle/cast/hold |
+| 6 | Fire Ring, neutral pylons и distant host | mid→high crossfade |
 | 7 | White-gold climax, watchers/winged host | high family with reinforced high-core pass |
 
 Снижение stage использует тот же authored stage-flare atlas в обратном порядке с cool tint и root-locked target. Это осознанный V2 candidate contract: отдельный collapse atlas не заявляется. Каждый boundary дополнительно меняет environment reveal и glow за 0.8–1.5 s.

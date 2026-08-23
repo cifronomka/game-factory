@@ -48,12 +48,48 @@ export class InfernoScene {
     this.pointerReleaseHandler = (/** @type {PointerEvent} */ event) => this.activePointers.delete(event.pointerId);
     /** @type {Set<number>} */
     this.activePointers = new Set();
+    /** @type {Set<number>} */
+    this.activeFallbackTouches = new Set();
+    this.lastTouchAt = Number.NEGATIVE_INFINITY;
+    this.touchHandler = (/** @type {TouchEvent} */ event) => {
+      if (this.state?.paused || event.changedTouches.length === 0) return;
+      event.preventDefault();
+      this.lastTouchAt = performance.now();
+      for (let index = 0; index < event.changedTouches.length; index += 1) {
+        const touch = event.changedTouches[index];
+        if (!touch || this.activeFallbackTouches.has(touch.identifier)) continue;
+        this.activeFallbackTouches.add(touch.identifier);
+        this.handleClientPoint(touch.clientX, touch.clientY);
+      }
+    };
+    this.touchReleaseHandler = (/** @type {TouchEvent} */ event) => {
+      if (event.changedTouches.length > 0) this.lastTouchAt = performance.now();
+      for (let index = 0; index < event.changedTouches.length; index += 1) {
+        const touch = event.changedTouches[index];
+        if (touch) this.activeFallbackTouches.delete(touch.identifier);
+      }
+    };
+    this.mouseHandler = (/** @type {MouseEvent} */ event) => {
+      if (this.state?.paused || event.button !== 0 || this.activeFallbackTouches.size > 0
+        || performance.now() - this.lastTouchAt < 800) return;
+      event.preventDefault();
+      this.handleClientPoint(event.clientX, event.clientY);
+    };
     this.contextMenuHandler = (/** @type {Event} */ event) => event.preventDefault();
-    canvas.addEventListener('pointerdown', this.pointerHandler);
-    canvas.addEventListener('pointerup', this.pointerReleaseHandler);
-    canvas.addEventListener('pointercancel', this.pointerReleaseHandler);
-    canvas.addEventListener('lostpointercapture', this.pointerReleaseHandler);
+    this.usesPointerEvents = typeof globalThis.PointerEvent === 'function';
+    if (this.usesPointerEvents) {
+      canvas.addEventListener('pointerdown', this.pointerHandler);
+      canvas.addEventListener('pointerup', this.pointerReleaseHandler);
+      canvas.addEventListener('pointercancel', this.pointerReleaseHandler);
+      canvas.addEventListener('lostpointercapture', this.pointerReleaseHandler);
+    } else {
+      canvas.addEventListener('touchstart', this.touchHandler, { passive: false });
+      canvas.addEventListener('touchend', this.touchReleaseHandler);
+      canvas.addEventListener('touchcancel', this.touchReleaseHandler);
+      canvas.addEventListener('mousedown', this.mouseHandler);
+    }
     canvas.addEventListener('contextmenu', this.contextMenuHandler);
+    canvas.addEventListener('dragstart', this.contextMenuHandler);
     this.resize();
   }
 
@@ -93,10 +129,15 @@ export class InfernoScene {
     if ((pointerType === 'touch' || pointerType === 'pen') && this.activePointers.has(event.pointerId)) return;
     if (pointerType === 'touch' || pointerType === 'pen') this.activePointers.add(event.pointerId);
     event.preventDefault();
+    this.handleClientPoint(event.clientX, event.clientY);
+  }
+
+  /** @param {number} clientX @param {number} clientY */
+  handleClientPoint(clientX, clientY) {
     const rect = this.canvas.getBoundingClientRect();
     const transform = sceneTransform(rect.width, rect.height);
-    const x = (event.clientX - rect.left - transform.left) / transform.scale;
-    const y = (event.clientY - rect.top - transform.top) / transform.scale;
+    const x = (clientX - rect.left - transform.left) / transform.scale;
+    const y = (clientY - rect.top - transform.top) / transform.scale;
     if (isGameplayPoint(x, y)) {
       this.onGameplayTap({ x, y, timestampMs: performance.now() });
     }
@@ -126,6 +167,7 @@ export class InfernoScene {
     this.characters.update(delta);
     this.flame.setCharacterReaction(this.characters.getFlameReaction());
     this.flame.update(delta);
+    if (this.state?.stage >= 6 && this.flame.isHighFamilySettled()) this.characters.prepareHostAssets();
     this.render();
     this.onPerformanceSample({
       atMs: now,
@@ -143,8 +185,7 @@ export class InfernoScene {
     const ratioY = this.canvas.height / (this.canvas.clientHeight || 1);
     context.setTransform(ratioX, 0, 0, ratioY, 0, 0);
     context.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
-    context.fillStyle = '#050407';
-    context.fillRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
+    this.environment.drawSideFill(context, this.canvas.clientWidth, this.canvas.clientHeight);
     const transform = sceneTransform(this.canvas.clientWidth, this.canvas.clientHeight);
     const flameStats = this.flame.getStats();
     this.characters.setFlameTarget(flameStats.targetAnchor);
@@ -160,7 +201,7 @@ export class InfernoScene {
     for (const layer of SCENE_LAYER_ORDER) {
       if (layer === 'far-chamber') this.environment.drawFar(context, state);
       else if (layer === 'midground-architecture') this.environment.drawMidground(context, state);
-      else if (layer === 'ritual-plane') this.environment.drawRitual(context, state, this.elapsed, entry);
+      else if (layer === 'hearth-floor') this.environment.drawHearthFloor(context, state, this.elapsed, entry);
       else if (layer === 'characters') this.characters.draw(context, state, this.elapsed);
       else if (layer === 'flame-rig') this.flame.drawFlame(context, this.elapsed);
       else if (layer === 'lighting-fx') {
@@ -186,12 +227,21 @@ export class InfernoScene {
   destroy() {
     this.running = false;
     cancelAnimationFrame(this.frameId);
-    this.canvas.removeEventListener('pointerdown', this.pointerHandler);
-    this.canvas.removeEventListener('pointerup', this.pointerReleaseHandler);
-    this.canvas.removeEventListener('pointercancel', this.pointerReleaseHandler);
-    this.canvas.removeEventListener('lostpointercapture', this.pointerReleaseHandler);
+    if (this.usesPointerEvents) {
+      this.canvas.removeEventListener('pointerdown', this.pointerHandler);
+      this.canvas.removeEventListener('pointerup', this.pointerReleaseHandler);
+      this.canvas.removeEventListener('pointercancel', this.pointerReleaseHandler);
+      this.canvas.removeEventListener('lostpointercapture', this.pointerReleaseHandler);
+    } else {
+      this.canvas.removeEventListener('touchstart', this.touchHandler);
+      this.canvas.removeEventListener('touchend', this.touchReleaseHandler);
+      this.canvas.removeEventListener('touchcancel', this.touchReleaseHandler);
+      this.canvas.removeEventListener('mousedown', this.mouseHandler);
+    }
     this.canvas.removeEventListener('contextmenu', this.contextMenuHandler);
+    this.canvas.removeEventListener('dragstart', this.contextMenuHandler);
     this.activePointers.clear();
+    this.activeFallbackTouches.clear();
     this.flame.destroy();
   }
 }

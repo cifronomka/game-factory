@@ -2,7 +2,7 @@
 
 ## Статус и границы
 
-Документ задаёт порядок реализации `inferno-clicker`. Active Corrective Cycle 07 сохраняет завершённые M1–M4/M7–M10, применимые C06 improvements и замороженные V5 gameplay/audio/platform contracts. Он переоткрывает presentation milestones M5/M6, asset residency M13 и QA/release gates M11–M15. `CORRECTIVE_CYCLE_07.md` имеет precedence над конфликтующими Cycle 05/Cycle 06 presentation решениями; `CORRECTIVE_CYCLE_06.md` остаётся историческим.
+Документ задаёт порядок реализации `inferno-clicker`. Active scope — Yandex Release Cycle 09 / 1.0.0 из `YANDEX_RELEASE_CYCLE_09.md`; он переоткрывает reward, goals, RU+EN, SDK/data, compatibility/layout, content/visual, QA и release. M1–M15 ниже являются исторической implementation baseline и не закрывают новые C09 gates.
 
 Источник продуктовых правил — `GAME_DESIGN.md`, технических границ — `TECHNICAL_ARCHITECTURE.md`, production registry — `ASSET_PLAN.md`, stop condition — `ACCEPTANCE_CRITERIA.md`. Изменение механики сначала обновляет design + acceptance, изменение platform contract — platform + architecture + tests.
 
@@ -15,7 +15,20 @@
 - Один файл одновременно имеет одного владельца; параллельные роли передают изменения через документы/asset registry и не редактируют один файл совместно.
 - После любого QA defect выполняется `QA issue → Developer fix → independent targeted retest → neighboring regression`; milestone не закрывается автором исправления, а retest owner не совпадает с fix owner.
 
-## Milestones
+## Active Cycle 09 milestones
+
+| ID | Deliverable | Gate |
+|---|---|---|
+| C09-M1 | Зафиксировать 1.0.0 contracts и baseline identity; historical artifacts immutable; все новые AC=`NOT RUN` | Cross-doc audit без конфликтов/placeholders |
+| C09-M2 | Stage-3 DOM offer, exact 60-s boost/90-active-s session cooldown/repeat; goals/nextGoal; no test provider | Unit/state/browser reward + goals matrix, new balance rebaseline |
+| C09-M3 | Explicit Yandex target, `/sdk.js` before app, locale/capabilities, ready/lifecycle, cloud queue/flush, guarded `best-score` | Mock SDK E2E success/failure/RU/EN/guest/reward/cloud/leaderboard |
+| C09-M4 | Compatibility bundle/fallbacks, responsive Any orientation/safe areas/input guards; visible content scrub; frame/scene cleanup | Browser/device/zoom matrix + content/alpha/visual audit |
+| C09-M5 | Ordered QA→fix→independent retest→neighboring regression; four ≥12-min sessions; submission assets/metadata | All C09 AC except final package/draft PASS; Critical=0/High=0 |
+| C09-M6 | Reproducible Yandex build/package, fresh-unpack smoke, exact ZIP draft/debug verification and report | Same SHA throughout; every C09 AC PASS; sign-offs complete |
+
+Dependency order: `C09-M1 → C09-M2`; после stable contracts `C09-M3` и `C09-M4` могут идти параллельно с разными file owners; затем `C09-M5 → C09-M6`. Draft upload не начинается до local QA gate; moderation/publication не входят в C09-M6.
+
+## Historical implementation baseline
 
 | ID | Milestone | Scope / deliverable | Зависимости | Gate / evidence |
 |---|---|---|---|---|
@@ -27,7 +40,7 @@
 | M6-C07 | Character runtime and steam FX | Remove active snowflake and ice/shard/contact renderers; sample actual current-frame mouth and two palm sockets through the real scene transform; drive bounded steam from mouth and both hands to live flame; preserve inherited host/quality behavior and low/reduced semantics | M5-C07 | Normal/slow motion tests, source/target geometry, static old-semantic veto, both-palm presence, exact transform, bounded pools/pause/cleanup and frozen core timing PASS |
 | M7 | Audio | Authored fire ambience plus restrained air-fanning/attack ambience, unlock/mute, bounded sources, shared pause/provider lifecycle; no oscillator, cadence layer or mandatory per-tap sound | M1, corrected M3 event contract; audio exports ready; can integrate parallel to M5–M6 | Audio A-cases: no autoplay error, fire/fanning clarity, no tap-rate rhythm, loop/click/loudness and pause/resume evidence; gameplay fully readable muted |
 | M8 | Yandex integration | `PlatformService` Yandex adapter, official loader/init, LoadingAPI ready, GameplayAPI lifecycle, web fallback; official docs revalidated on implementation date | M1 stable adapter contract; M3 pause model | Adapter contract suite + ENV-Y1/Y2 init/lifecycle smoke; static scan proves zero Yandex imports/globals in core |
-| M9 | Optional boost provider | Explicit stage-4 PLAYING opener → pause/boost sheet → provider confirmation; terminal success queues only ×2 heat tapPower for 20 active seconds; Web/dev `Получить ×2 (тест)` uses same idempotent contract without fake-ad | corrected M3, M7, M8 | Test/Yandex success, cancel/error/unavailable/duplicate/late/background matrix; no-reward-to-Inferno trace PASS; no test provider in parallel with Yandex |
+| M9-HIST | Superseded optional boost baseline | Historical stage-4/20-second Web-test design, retained only to explain the pre-Cycle-09 code history; it is not a 1.0.0 requirement and no such provider/text ships | corrected M3, M7, M8 | Superseded by C09-M2: stage 3, onRewarded-only 60 s, 90-active-s session cooldown, repeats, production test provider absent |
 | M10 | Leaderboard / persistence | `InfernoSaveV1`, local/cloud merge/migration/recovery, settings/daily ritual records-only save, Best Score submit/get and unauthenticated fallback | M2–M3, M8 | Persistence fixtures and leaderboard contract tests; reload never restores active run; lower/duplicate score never reduces best |
 | M11 | Browser QA | Full functional matrix on target touch/mouse browsers/viewports, direct stage 4→5 crossing, optional boost, lifecycle, storage failures, offline/Web fallback and later Yandex test environment; create issue log | corrected M3–M10 feature-complete build | QA report for exact Build ID; Critical/High issues routed to owners; no criterion promoted without evidence |
 | M12 | Visual QA | Seven stages + event/boost/reduced-motion continuous motion; binary rubric, contrast/crop/safe-area, reference decomposition, content-safety and asset integrity review | M6-C07, M11 stable build | Every applicable Visual criterion PASS on reference viewport/DPR matrix with continuous clips, timestamp-linked frames and rubric sign-off; still-only evidence=0 |
@@ -55,4 +68,4 @@ M1 → M2 → M3 ───────────────┬→ M4 → M5-C
 
 Corrective order: freeze gameplay/audio/platform fingerprints → record C07 issues independently → produce/version stable-scale Servant and sharp Demoness clips/metadata → integrate actual mouth/two-palm sockets through the shared scene transform → replace snow/ice with bounded steam → preserve inherited host and silent-quality behavior → partition/preload/release corrected resources → implementation automation/motion capture → Developer fix → independent targeted retest → neighboring regression → independent unlabeled 1×/0.25× motion sign-off → full regression → release gate. Cycle 02–06 screenshots/reports do not close Cycle 07.
 
-Числовая база не перебалансирована молча: `baseTapPower=3`, heat cap `1000`, thresholds `80/220/380/560/730/900`, stage decays `0,5/2/4/6,5/9/13/18`, multipliers и event schedules сохраняются. Optional eligibility `runHighestStage≥4` + `45 000 ms`, boost `×2` на `20 000 ms`, V5 checkpoint `180 000 ms`; authoritative outputs находятся в `GAME_DESIGN.md`, `BALANCE_REPORT.md` и fixtures. Production Yandex rewarded требует test console перед release.
+Числовая база не перебалансируется молча: `baseTapPower=3`, heat cap `1000`, thresholds `80/220/380/560/730/900`, stage decays `0,5/2/4/6,5/9/13/18`, multipliers и event schedules сохраняются. Cycle 09 optional eligibility=`runHighestStage≥3`, boost=`60 000 ms`, cooldown=`90 000 ms` active session time, repeats allowed; новый rewarded fixture требует rebaseline, а no-reward V5 остаётся regression baseline. Production Yandex rewarded/cloud/leaderboard требуют exact-ZIP draft verification.

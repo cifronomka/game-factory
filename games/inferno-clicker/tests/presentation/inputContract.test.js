@@ -12,6 +12,11 @@ test('gameplay canvas accepts distinct touch contacts and restricts mouse to pri
   assert.match(source, /activePointers\.add\(event\.pointerId\)/);
   assert.match(source, /pointerup/);
   assert.match(source, /pointercancel/);
+  assert.match(source, /event\.changedTouches/);
+  assert.match(source, /activeFallbackTouches\.has\(touch\.identifier\)/);
+  assert.match(source, /activeFallbackTouches\.add\(touch\.identifier\)/);
+  assert.match(source, /touchend/);
+  assert.match(source, /touchcancel/);
   assert.match(source, /event\.button !== 0/);
   assert.match(source, /event\.preventDefault\(\)/);
   assert.match(source, /contextmenu/);

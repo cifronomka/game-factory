@@ -6,14 +6,14 @@
 
 ## Статус и владелец
 
-- Этап: Corrective Cycle 08. C07 stable-scale Ash Servant, mouth/two-palm steam, authored motion and timings remain the accepted baseline. Active work is limited to Servant/Demoness exterior and internal-gap alpha cleanup, native sharp Demoness redraw, Demoness draw-box change `420×700 → 504×840`, frame metadata and C08 evidence. Direct-tap V5/concurrent-hazard gameplay, platform contract, persistence, flame/environment, Inferno host and audio are frozen. `CORRECTIVE_CYCLE_07.md` remains historical and cannot close C08 rows.
+- Этап: Yandex Release Cycle 09 / 1.0.0. Проверенный C08 art/motion baseline наследуется, но rewarded, localization, adapter selection, cloud rate limiting, goals, browser compatibility, visible content и release evidence переоткрыты. `YANDEX_RELEASE_CYCLE_09.md` имеет приоритет над конфликтующими прежними решениями.
 - Владелец: Game Architect.
 - Primary runtime: браузер внутри Yandex Games.
 - Architecture rule: ни один модуль `src/core/` не импортирует Yandex SDK, VK Bridge, Android API, DOM или renderer.
 
 ## Выбранный стек
 
-- **Language:** browser-native ES modules (`.js`) с `// @ts-check`, JSDoc contracts, runtime assertions на внешних границах и zero-dependency production runtime.
+- **Language:** authoring modules `.js` с `// @ts-check` и JSDoc contracts; Yandex production собирается в compatibility bundle без runtime-зависимости от native ESM. Runtime assertions остаются на внешних границах.
 - **Build/dev server:** воспроизводимые Node.js scripts на built-in API; asset-authoring использует зафиксированный `sharp@0.35.3` через `package-lock.json`.
 - **Rendering:** layered Canvas 2D scene с независимыми render passes, pooled particles и low-resolution light/haze buffers; HTML/CSS overlay только для доступного HUD, меню и рекламной CTA.
 - **Audio:** Web Audio API через небольшой собственный `AudioMixer`; тяжёлая engine-обвязка не нужна.
@@ -37,8 +37,9 @@ src/
     scene/              # Canvas 2D layer passes, stage visual state mapper, responsive camera
       flame/            # independent multi-layer flame rig and emitters
       characters/       # servant, demoness and observer presentation state machines
-      environment/      # chamber, ritual plane, gates, runes, chains and reveal masks
-    ui/                 # DOM HUD, dialogs, accessibility labels
+      environment/      # chamber, fire-ring plane, gates, chains and reveal masks; no religious/esoteric marks
+    ui/                 # DOM HUD, goals, dialogs, localized accessibility labels
+    i18n/               # RU/EN dictionaries and SDK-locale mapping outside core
     input/              # pointer normalization and anti-duplicate gate
     audio/              # Web Audio mixer and adaptive layers
   assets/               # manifest, preload groups, validation
@@ -53,17 +54,19 @@ src/
 
 Dependency direction: `app → presentation/platform adapters → core`; `core` depends only on JSDoc value contracts and injected monotonic clock. Gameplay RNG в MVP отсутствует; session seed принадлежит только presentation/audio variations. Platform callbacks dispatch commands, never mutate game state directly.
 
+`PresentationViewModel` Cycle 09 получает `rewardOffer`, `goals` и `nextGoal`; legacy `rewardedProvider` удаляется. Stage/effect fields передают stable IDs, а i18n layer выбирает RU/EN text. `goals` — восемь объектов `{id, current, target, complete}` в фиксированном порядке из `GAME_DESIGN.md`; `nextGoal` — первый incomplete или `null`.
+
 ## Boot sequence
 
 1. Render a lightweight branded loading shell without starting audio/gameplay.
-2. На Yandex host условно загрузить `/sdk.js`, затем select adapter; Generic Web не запрашивает SDK; time-box platform `init()` to 5 s.
+2. Для target `yandex` без hostname-эвристики загрузить `/sdk.js` до application entry, вызвать `YaGames.init()` once, подписать SDK pause/resume и получить locale; time-box remote init to 5 s.
 3. Load local settings and persistent records; cloud merge may complete afterward.
 4. Load critical stage-1/2 flame atlas families, HUD, environment and initial wood-fire audio metadata.
-5. Construct core and presentation, attach pause/resume listeners.
-6. Mark platform ready only when no loading overlay remains and tap/click is accepted.
+5. Construct core and RU/EN presentation; browser pause coordinator уже создан до SDK/gameplay.
+6. Вызвать `LoadingAPI.ready()` once только когда no loading overlay remains, HUD видим и tap/click accepted.
 7. Unlock audio on the first trusted pointer gesture and start gameplay.
 
-Adapter init failure falls back to `web` capabilities without blocking the game. До Yandex integration Generic Web/dev явно сообщает capability `rewardedProvider='test'`; UI показывает только маркированную тестовую CTA, а не симулирует рекламу.
+Adapter init failure не меняет build target: Yandex service остаётся local-only с unavailable rewarded/remote leaderboard и не блокирует game core. Production bundle не содержит test provider или бесплатный rewarded success.
 
 ## Game state
 
@@ -96,7 +99,7 @@ type GameState = {
 };
 ```
 
-Все thresholds и coefficients находятся в versioned immutable config. Core работает fixed simulation step `50 ms`; renderer интерполирует визуал. После frame gap входной frame delta ограничивается `100 ms`, а pause/background gap не догоняется. Во время `PAUSED` и `AD_BREAK` simulation clock и rewarded timer не идут, поэтому background tab и provider flow не сжигают heat. Каждый accepted tap применяет heat до единственного cap `1000`; provider state не участвует в stage crossing. Terminal confirmed reward только ставит queued 20-s boost.
+Все thresholds и coefficients находятся в versioned immutable config. Core работает fixed simulation step `50 ms`; renderer интерполирует визуал. После frame gap входной frame delta ограничивается `100 ms`, а pause/background gap не догоняется. Во время `PAUSED` и `AD_BREAK` simulation clock, boost и session cooldown не идут. Каждый accepted tap применяет heat до cap `1000`; provider state не участвует в stage crossing. Первый `onRewarded` request ID ставит queued 60-s boost; application-level cooldown хранит `90 000 ms` active session time и не persisted.
 
 Gameplay schedules в MVP детерминированы активным временем и versioned config; core PRNG для progression/encounters не используется. Только несмысловые visual/audio variations получают отдельный injected session seed и не меняют state/score. Серверного authoritative anti-cheat в MVP нет; leaderboard submission проходит sanity checks и rate limit adapter, а риск client-side manipulation фиксируется как известное ограничение.
 
@@ -162,7 +165,7 @@ Core публикует typed domain events `tapAccepted`, `tapRejected`, `stage
 
 ## Input
 
-`PointerEvent` — единый источник tap/click. Input layer принимает left mouse и каждый новый touch/pen contact внутри hit area, предотвращает browser scroll/zoom и дедуплицирует synthetic click после touch. Один физический `pointerdown` создаёт ровно одну команду `Tap`.
+`PointerEvent` — основной источник tap/click; compatibility path использует взаимоисключающие touch/mouse listeners, если Pointer Events недоступны. Input layer принимает left mouse и каждый новый touch/pen contact внутри hit area, предотвращает browser scroll/zoom, context menu, drag/select и дедуплицирует synthetic click после touch. Один физический контакт создаёт ровно одну команду `Tap`.
 
 - Центральная зона пламени занимает не менее `96 × 96 CSS px`; основной gameplay также принимает tap по безопасной центральной области сцены.
 - UI controls имеют минимум `48 × 48 CSS px` и не пробрасывают tap в core.
@@ -171,10 +174,10 @@ Core публикует typed domain events `tapAccepted`, `tapRejected`, `stage
 
 ## Persistence
 
-Persisted schema `InfernoSaveV1` содержит `schemaVersion`, `bestScore`, all-time `highestStageReached`, `longestInfernoHoldMs`, stage-only `maxMultiplier` (`1..5`), `runsPlayed`, tutorial flags, audio/reduced-motion settings, daily-ritual date/status и `updatedAt`. Старое значение maxMultiplier выше 5 при load clamp'ится до 5. Текущий `runHighestStage`, heat, score, timers, encounters и boost не сохраняются и не восстанавливаются после reload/relaunch: новый run начинается в `READY` с `heat=30`.
+Persisted schema `InfernoSaveV1` содержит `schemaVersion`, `bestScore`, all-time `highestStageReached`, `longestInfernoHoldMs`, stage-only `maxMultiplier` (`1..5`), `runsPlayed`, tutorial flags, audio/reduced-motion settings, legacy daily-goal date/status и `updatedAt`. Goals вычисляются из record fields и не требуют migration. Текущий `runHighestStage`, heat, score, timers, encounters, boost и cooldown не сохраняются: новый run начинается в `READY` с `heat=30`.
 
-- Local: `localStorage` через web adapter; `SaveCoordinator` coalesces изменения на 500 ms, сериализует write, flushes при pause/visibility/pagehide и не позволяет позднему promise перезаписать новый максимум.
-- Yandex: local-first, затем `Player.getData()/setData()` при доступном player; merge по максимуму для рекордов и по `updatedAt` для настроек.
+- Local: `localStorage` записывается без ожидания cloud; `SaveCoordinator` детерминированно coalesces изменения, flushes при result/pause/visibility/pagehide и не позволяет позднему promise перезаписать новый максимум.
+- Yandex: local-first, затем `Player.getData()/setData()` при доступном player; merge по максимуму для рекордов и по `updatedAt` для настроек. Latest-wins cloud queue пишет не чаще одного раза за 5 секунд, объединяет pending maxima и поддерживает explicit `flushData()`.
 - Corrupt/unknown save не приводит к crash: quarantine diagnostic, defaults, событие `save_recovered`.
 - Failed cloud write повторяется максимум два раза с exponential backoff только в текущей сессии; local record остаётся источником восстановления.
 
@@ -185,10 +188,11 @@ interface PlatformService {
   init(): Promise<PlatformCapabilities>;
   markReady(): Promise<Result<void>>;
   saveData(data: PersistedData): Promise<Result<void>>;
+  flushData(): Promise<Result<void>>;
   loadData(): Promise<Result<PersistedData | null>>;
   submitScore(score: number): Promise<Result<void>>;
   getLeaderboard(): Promise<Result<LeaderboardEntry[]>>;
-  showRewardedAd(placement: 'inferno-seal'): Promise<RewardedResult>;
+  showRewardedAd(placement: 'heat-power-2x-60s'): Promise<RewardedResult>;
   showInterstitial(placement: string): Promise<AdResult>;
   pauseGame(reason?: string): Result<void>;
   resumeGame(reason?: string): Result<void>;
@@ -198,11 +202,12 @@ interface PlatformService {
 }
 ```
 
-`PlatformCapabilities.rewardedProvider` имеет значение `'test' | 'yandex' | 'unavailable'`. `RewardedResult` различает `rewarded`, `closed`, `unavailable`, `error`; reward выдаётся только для `rewarded` и максимум один раз на request id. Generic Web/dev test provider возвращает тот же асинхронный terminal result без ad copy и взаимоисключается с Yandex; Yandex release не может содержать активный test provider. Adapter преобразует platform pause/resume в idempotent reason-set: игра возобновляется, только когда закрыты все причины (`ad`, `visibility`, `platform`, `menu`, `game-ended`). Yandex technical leaderboard name зафиксирован как `best-score`. SDK events `game_api_pause/resume` не дублируют Gameplay API markup; повторный `stop()` нужен только если после platform resume остаётся local pause reason.
+`PlatformCapabilities` содержит `locale: 'ru'|'en'`, `authorized` и отдельные booleans `rewarded`, `leaderboardRead`, `leaderboardWrite`, `cloudRead`, `cloudWrite`; provider identity не передаётся в view model. `RewardedResult` различает `rewarded`, `closed`, `unavailable`, `error`; первый `rewarded` request ID выдаёт максимум одну награду. Adapter преобразует platform/browser pause/resume в idempotent reason-set: игра возобновляется, только когда закрыты все причины (`ad`, `visibility`, `platform`, `menu`, `game-ended`). Technical leaderboard name — `best-score`; read/write предваряет `isAvailableMethod`. Guest/auth-required не запускает login без отдельного user action.
 
 ## Asset loading
 
 - Generated asset manifest содержит path, hash, bytes, dimensions/duration, clip summary, license/provenance и preload group; exact frame rectangles/fps/loop/pivot находятся в соседних atlas JSON.
+- Loader выбирает WebP либо PNG fallback один раз по capability и не загружает оба формата одного asset; network path имеет `fetch` и XHR fallback. Decode/upload error даёт bounded retry или approved procedural/local fallback без бесконечного refetch.
 - C08 character records additionally contain raw native source dimensions, per-frame `sourceToAtlasUpscale≤1.0`, approved/decoded alpha SHA-256 with `encodedAlphaExact=true`, `cellSize`, logical `drawSize`, visible `alphaBbox`, exterior/internal-gap alpha metrics, partial-alpha decontamination metrics and the accepted C07 baseline hash. Runtime URLs are Ash Servant v6 and Demoness v7; superseded C07 bytes remain traceable through hashes/Git history but are excluded from production assets.
 - Critical group: HUD, low flame core/outer atlases, stage 1–2 background и wood/charcoal bed metadata; mid/high flame, character/action and transition groups грузятся ahead-of-need при достижении 60% текущего stage.
 - Ошибка optional asset включает procedural/neutral fallback; ошибка critical asset показывает retry, но не оставляет чёрный экран.
@@ -229,24 +234,24 @@ interface PlatformService {
 Воспроизводимые команды implementation/release:
 
 ```text
-node scripts/lint.mjs
-node scripts/typecheck.mjs
-node scripts/test.mjs
-node scripts/build.mjs
-node scripts/e2e-smoke.mjs
-node scripts/package.mjs
+npm run lint
+npm run typecheck
+npm test
+npm run build:yandex
+npm run test:yandex
+npm run package:yandex
 ```
 
-`node scripts/build.mjs` создаёт `dist/`; `node scripts/package.mjs` валидирует manifest и создаёт ZIP по `RELEASE_PLAN.md`. Runtime задаётся `.nvmrc` на Node 24 LTS. External dependency lockfile не нужен, поскольку production/build dependency graph пуст; toolchain фиксируется Node major и хешами scripts. Build не обращается к сети и не встраивает secrets. Runtime assets загружаются только из archive root; внешняя сеть допустима лишь внутри platform adapters для SDK/ads/cloud/leaderboard, а её отсутствие сохраняет playable Web fallback.
+`build:yandex` создаёт compatibility bundle и `dist/`; `package:yandex` валидирует Yandex target, manifest и ZIP по `RELEASE_PLAN.md`. Pipeline сначала собирает единый IIFE через esbuild, затем пропускает его через Babel `@babel/preset-env` с явными minimum targets Chrome 49 / Firefox 52 / Safari 9 / Edge 15. Отдельный AST-аудит fail-closed запрещает оставшиеся `class`, arrow/async functions, optional chaining, object spread/rest, `for…of`, `const` и `let`; CSS-аудит требует fallback перед `inset`, `min/max/clamp`, safe-area и 8-digit color declarations. Runtime задаётся `.nvmrc` на Node 24 LTS. Authoring/transpilation dependencies фиксируются lockfile и не попадают в runtime. Build не обращается к сети и не встраивает secrets. Runtime assets загружаются из archive root; `/sdk.js` — единственный platform loader path, а SDK/ads/cloud/leaderboard network failures сохраняют local-only gameplay.
 
 ## Testing strategy
 
-- Unit/property tests: heat clamp, decay integration, every-valid-tap throughput, scoring, thresholds, encounters, boost timer, pause clock, corrupted save migration.
-- Deterministic simulations: paired direct V5 traces, constant-rate controls and irregular human-profile hypotheses on 60/30/15 FPS give the same core state within `≤0.01 heat`, `≤1 score` and `≤10 ms` hold tolerance. Human plausibility is then checked through the production browser input path rather than inferred from headless math alone.
-- Adapter contract suite: web и Yandex mock проходят одинаковые success/closed/unavailable/error cases.
-- E2E: boot, touch emulation, mouse, seven stages, restart, persistence, rewarded lifecycle, offline/no-SDK fallback.
-- Visual regression: stages 1–7 на `360×640`, `390×844`, `768×1024`, `1366×768` с rubric из `QA_PLAN.md`.
-- Performance run: Stage-7 entry plus sustained maximum FX for 10 minutes, asynchronous host active, mobile emulation and desktop, quality auto-degrade verified.
+- Unit/property tests: heat clamp, decay integration, every-valid-tap throughput, scoring, thresholds, encounters, 60-s boost/90-s active cooldown/repeat, goals/nextGoal, pause clock, cloud queue/merge и corrupt save recovery.
+- Deterministic simulations: no-reward V5 и новый rewarded C09 trace на 60/30/15 FPS дают одинаковый core state within `≤0.01 heat`, `≤1 score`, `≤10 ms` hold. Human plausibility проверяется production browser input path.
+- Adapter contract suite: mocked Yandex покрывает SDK success/failure, RU/EN, ready once, gameplay lifecycle, guest/authorized, cloud rate limit/flush, leaderboard availability и rewarded success/closed/error/timeout/duplicate/late.
+- Browser E2E: production target без hostname dependency/test provider; touch/mouse fallback, seven stages, goals, restart, persistence, no-SDK local-only и lifecycle.
+- Visual regression: seven-stage runtime и 64 character frames на black/gray/red, DPR 1/2/3, official desktop matrix, mobile portrait/landscape, zoom/rotation/safe areas.
+- Performance: четыре session traces `≥12 минут` desktop/mobile × rewarded/no-reward; median FPS, long frames, heap, input p95 и decoded residency фиксируются по `QA_PLAN.md`.
 
 ## Architecture decisions и риски
 

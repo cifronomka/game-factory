@@ -14,7 +14,7 @@ test('runtime observes scene work cost and silently applies presentation quality
   assert.match(mainSource, /paused: paused \|\| !performanceMonitoringReady/);
   assert.doesNotMatch(mainSource, /Эффекты снижены для плавной игры/);
 
-  assert.match(mainSource, /Не удалось синхронизировать рекорд/);
-  assert.match(mainSource, /ИНФЕРНО — удерживай пламя!/);
-  assert.match(mainSource, /Включён упрощённый процедурный фон/);
+  assert.match(mainSource, /toast\.saveError/);
+  assert.match(mainSource, /toast\.inferno/);
+  assert.match(mainSource, /boot\.fallback/);
 });

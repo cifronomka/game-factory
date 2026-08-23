@@ -1,0 +1,648 @@
+{
+  "schemaVersion": 1,
+  "game": "inferno-clicker",
+  "version": "1.0.0",
+  "cycle": "09",
+  "generatedBy": "scripts/sync-yandex-asset-manifest.mjs",
+  "primaryArtBudgetUnchanged": true,
+  "compatibilityFormatsLoadedTogether": false,
+  "maximumDecodedResidencyBytes": 63171968,
+  "maximumDecodedResidencyMiB": 60.25,
+  "residencyModel": {
+    "method": "sum of decoded RGBA bytes for every simultaneously resident runtime component; includes two servant atlases, one Warden atlas, one 512x832 Warden handoff frame, flame transition overlap, flare, background, and both host parts",
+    "frameCacheBytes": 1703936,
+    "scenarios": [
+      {
+        "id": "startup-low",
+        "components": [
+          "BG-FIRE-CHAMBER-Y2",
+          "FLAME-CORE-LOW-V2",
+          "FLAME-OUTER-LOW-V4"
+        ],
+        "extraDecodedBytes": 0,
+        "decodedBytes": 14675328,
+        "decodedMiB": 14
+      },
+      {
+        "id": "low-to-mid-transition-stage-3",
+        "components": [
+          "BG-FIRE-CHAMBER-Y2",
+          "FLAME-CORE-LOW-V2",
+          "FLAME-OUTER-LOW-V4",
+          "FLAME-CORE-MID-V2",
+          "FLAME-OUTER-MID-V4",
+          "FLAME-STAGE-FLARE",
+          "ASH-IDLE-C09",
+          "ASH-INHALE-C09"
+        ],
+        "extraDecodedBytes": 0,
+        "decodedBytes": 40496512,
+        "decodedMiB": 38.62
+      },
+      {
+        "id": "mid-to-high-transition-stage-6",
+        "components": [
+          "BG-FIRE-CHAMBER-Y2",
+          "FLAME-CORE-MID-V2",
+          "FLAME-OUTER-MID-V4",
+          "FLAME-CORE-HIGH-V2",
+          "FLAME-OUTER-HIGH-V4",
+          "FLAME-STAGE-FLARE",
+          "ASH-IDLE-C09",
+          "ASH-INHALE-C09",
+          "EMBER-WARDEN-IDLE-C09"
+        ],
+        "extraDecodedBytes": 1703936,
+        "decodedBytes": 63171968,
+        "decodedMiB": 60.25
+      },
+      {
+        "id": "stage-7-entry-host-and-character-handoff",
+        "components": [
+          "BG-FIRE-CHAMBER-Y2",
+          "FLAME-CORE-HIGH-V2",
+          "FLAME-OUTER-HIGH-V4",
+          "FLAME-STAGE-FLARE",
+          "ASH-IDLE-C09",
+          "ASH-INHALE-C09",
+          "EMBER-WARDEN-IDLE-C09",
+          "HOST-MAIN-COMPAT",
+          "HOST-SENTINEL-COMPAT"
+        ],
+        "extraDecodedBytes": 1703936,
+        "decodedBytes": 50523520,
+        "decodedMiB": 48.18
+      }
+    ]
+  },
+  "assets": [
+    {
+      "id": "BG-FIRE-CHAMBER-Y2",
+      "role": "background",
+      "runtimeResidency": "startup",
+      "preferred": {
+        "path": "assets/backgrounds/bg-fire-chamber-yandex-v3.webp",
+        "bytes": 281516,
+        "sha256": "a39947acea075337e64f84b3a0488006d1f122d9f07db17afb5f5b920d236466"
+      },
+      "fallback": {
+        "path": "assets/backgrounds/bg-fire-chamber-yandex-v3.png",
+        "bytes": 2001066,
+        "sha256": "cae51aa2db13d2c298983a2e201c827fabf78ca1e964138fc10ae4cccbb0fbf8"
+      },
+      "width": 940,
+      "height": 1672,
+      "decodedRgbaBytes": 6286720,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "ASH-IDLE-C09",
+      "role": "character-atlas",
+      "runtimeResidency": "active-plus-imminent",
+      "preferred": {
+        "path": "assets/characters/ash-servant/ash-servant-idle-v7.webp",
+        "bytes": 190716,
+        "sha256": "0d13c360f37a93c196652b0943b28c1c7ed82469b77197fd1808e91d831b0f3a"
+      },
+      "fallback": {
+        "path": "assets/characters/ash-servant/ash-servant-idle-v7.png",
+        "bytes": 847250,
+        "sha256": "1691d405a1a7da4d97f5171dff2b4bf0d315f7909a0f05bd0adc7b527273fb37"
+      },
+      "width": 1024,
+      "height": 640,
+      "decodedRgbaBytes": 2621440,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "ASH-INHALE-C09",
+      "role": "character-atlas",
+      "runtimeResidency": "active-plus-imminent",
+      "preferred": {
+        "path": "assets/characters/ash-servant/ash-servant-inhale-v7.webp",
+        "bytes": 190180,
+        "sha256": "c6b47ab98022e3b26a182222c1e2f19af53cc611dabc215b4a05656bc76487b6"
+      },
+      "fallback": {
+        "path": "assets/characters/ash-servant/ash-servant-inhale-v7.png",
+        "bytes": 844728,
+        "sha256": "3a5fda602af9518ea7701aad1585eb2305b202149ae4eb31fe1e3a930cb2da1d"
+      },
+      "width": 1024,
+      "height": 640,
+      "decodedRgbaBytes": 2621440,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "ASH-BLOW-C09",
+      "role": "character-atlas",
+      "runtimeResidency": "active-plus-imminent",
+      "preferred": {
+        "path": "assets/characters/ash-servant/ash-servant-blow-v7.webp",
+        "bytes": 167398,
+        "sha256": "22eec9f5cdf9cf1780def1225ed8eb083ba29b52d1fd7ba552493ad47a841528"
+      },
+      "fallback": {
+        "path": "assets/characters/ash-servant/ash-servant-blow-v7.png",
+        "bytes": 689975,
+        "sha256": "c8171aa9cd4570d324c8905744b6a23f56974c07121b7879a72ce10d0de597e1"
+      },
+      "width": 1024,
+      "height": 640,
+      "decodedRgbaBytes": 2621440,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "ASH-RECOVERY-C09",
+      "role": "character-atlas",
+      "runtimeResidency": "active-plus-imminent",
+      "preferred": {
+        "path": "assets/characters/ash-servant/ash-servant-recovery-v7.webp",
+        "bytes": 158706,
+        "sha256": "52c0aeafe890b74adbe37690554781910a13d94b43ade89a1d0a388121d7a80a"
+      },
+      "fallback": {
+        "path": "assets/characters/ash-servant/ash-servant-recovery-v7.png",
+        "bytes": 647363,
+        "sha256": "7b5a37ef1e4e4d8a0ebd5eafd6ffd23ca6e5994593a83b293ac4a2338afffa8a"
+      },
+      "width": 1024,
+      "height": 640,
+      "decodedRgbaBytes": 2621440,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "EMBER-WARDEN-IDLE-C09",
+      "role": "character-atlas",
+      "runtimeResidency": "one-active-atlas",
+      "preferred": {
+        "path": "assets/characters/demoness/demoness-idle-v8.webp",
+        "bytes": 867802,
+        "sha256": "f0d3879456d8a69046df04a106904bd2f878992ad766c9c2ae37b4fabd638af7"
+      },
+      "fallback": {
+        "path": "assets/characters/demoness/demoness-idle-v8.png",
+        "bytes": 4016099,
+        "sha256": "62e7d03b6d8b840c43cd1b53ff0774ba793f91f382259bd7bf24a7e3c1f80834"
+      },
+      "width": 2048,
+      "height": 1664,
+      "decodedRgbaBytes": 13631488,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "EMBER-WARDEN-CAST-C09",
+      "role": "character-atlas",
+      "runtimeResidency": "one-active-atlas",
+      "preferred": {
+        "path": "assets/characters/demoness/demoness-cast-v8.webp",
+        "bytes": 878486,
+        "sha256": "b1041285d1446da7f99ab7e02c3213b30bc7c5dbe2191403d1862f5c3a084506"
+      },
+      "fallback": {
+        "path": "assets/characters/demoness/demoness-cast-v8.png",
+        "bytes": 4328481,
+        "sha256": "fff8549232e77eff347531d5663b1e0d5cd6f1631fad23f599dbdfa69fdc53e4"
+      },
+      "width": 2048,
+      "height": 1664,
+      "decodedRgbaBytes": 13631488,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "EMBER-WARDEN-HOLD-C09",
+      "role": "character-atlas",
+      "runtimeResidency": "one-active-atlas",
+      "preferred": {
+        "path": "assets/characters/demoness/demoness-hold-v8.webp",
+        "bytes": 964802,
+        "sha256": "a2268659fc3668d9ee21e3cf565dc99303eb61badc16cdf96aac49ef2c8e270f"
+      },
+      "fallback": {
+        "path": "assets/characters/demoness/demoness-hold-v8.png",
+        "bytes": 4352854,
+        "sha256": "93b6d488449cf7f0b64e29f6879ab167558fd94946fddcb8ee7afd08e3355502"
+      },
+      "width": 2048,
+      "height": 1664,
+      "decodedRgbaBytes": 13631488,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "EMBER-WARDEN-RECOVERY-C09",
+      "role": "character-atlas",
+      "runtimeResidency": "one-active-atlas",
+      "preferred": {
+        "path": "assets/characters/demoness/demoness-recovery-v8.webp",
+        "bytes": 944618,
+        "sha256": "625299a55ba021e1c7c7eb820f4f1cabfe2279c125191bc3524f2791cc2836b7"
+      },
+      "fallback": {
+        "path": "assets/characters/demoness/demoness-recovery-v8.png",
+        "bytes": 4277360,
+        "sha256": "5bd18f6885a8f5be8a1314482a4ea3b97560d58adab47add880648654b60e8b6"
+      },
+      "width": 2048,
+      "height": 1664,
+      "decodedRgbaBytes": 13631488,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "HOST-MAIN-COMPAT",
+      "role": "character-atlas",
+      "runtimeResidency": "stage-7",
+      "preferred": {
+        "path": "assets/characters/character-inferno-host-main-v4.webp",
+        "bytes": 215866,
+        "sha256": "899fd7adf074d4b1e00d97f4dc39577e743aae38da8591158db0d529cc2c396b"
+      },
+      "fallback": {
+        "path": "assets/characters/character-inferno-host-main-v4.png",
+        "bytes": 601716,
+        "sha256": "cd27f5fcf45f2c905f3c586c18a51ddef642efd0adb76ca211095c73f7da4db7"
+      },
+      "width": 912,
+      "height": 512,
+      "decodedRgbaBytes": 1867776,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "HOST-SENTINEL-COMPAT",
+      "role": "character-atlas",
+      "runtimeResidency": "stage-7",
+      "preferred": {
+        "path": "assets/characters/character-inferno-host-sentinel-v4.webp",
+        "bytes": 178484,
+        "sha256": "95b33b965b1af2f976edecd26e9ecb64cbeb2680b401f0778b60c0332a47f844"
+      },
+      "fallback": {
+        "path": "assets/characters/character-inferno-host-sentinel-v4.png",
+        "bytes": 399510,
+        "sha256": "8eaef93911ec2eb181fc7479b470d32671c43869d6a41ae55beb5beacb003913"
+      },
+      "width": 912,
+      "height": 512,
+      "decodedRgbaBytes": 1867776,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "FLAME-CORE-LOW-V2",
+      "role": "flame-atlas",
+      "runtimeResidency": "bounded-family",
+      "preferred": {
+        "path": "assets/flame/atlases/core-low-v2.webp",
+        "bytes": 291384,
+        "sha256": "355a1490ed676236a7359fc6c90d2cbe00e31cb397d2ec808cf4aa7b419a63aa"
+      },
+      "fallback": {
+        "path": "assets/flame/atlases/core-low-v2.png",
+        "bytes": 651490,
+        "sha256": "bd766eab73e6d3f6e76d3dc732a8e87255d07b7a3f3673e1bf5af94ca2ea710b"
+      },
+      "width": 1024,
+      "height": 1024,
+      "decodedRgbaBytes": 4194304,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "FLAME-OUTER-LOW-V4",
+      "role": "flame-atlas",
+      "runtimeResidency": "bounded-family",
+      "preferred": {
+        "path": "assets/flame/atlases/outer-low-v4.webp",
+        "bytes": 456998,
+        "sha256": "59d8a78c348066c902c2a3290aa5ec38bb0fa33718328dd7a62d4e5098b3600a"
+      },
+      "fallback": {
+        "path": "assets/flame/atlases/outer-low-v4.png",
+        "bytes": 612459,
+        "sha256": "5e6d9c33992c01c5ca7ae6bf11bc2f1ebfe26773a7aafc80ba5e4fa03241fd44"
+      },
+      "width": 1024,
+      "height": 1024,
+      "decodedRgbaBytes": 4194304,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "FLAME-CORE-MID-V2",
+      "role": "flame-atlas",
+      "runtimeResidency": "bounded-family",
+      "preferred": {
+        "path": "assets/flame/atlases/core-mid-v2.webp",
+        "bytes": 770040,
+        "sha256": "1ff494f788f0a6b5c8e162136ad2f637796127728752641c1b763c290d1874c6"
+      },
+      "fallback": {
+        "path": "assets/flame/atlases/core-mid-v2.png",
+        "bytes": 1919633,
+        "sha256": "2ae3c05bfb4f4ec1d213e7605e4233500b1459f28f5d74db4eae177c2253a7c3"
+      },
+      "width": 1600,
+      "height": 1280,
+      "decodedRgbaBytes": 8192000,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "FLAME-OUTER-MID-V4",
+      "role": "flame-atlas",
+      "runtimeResidency": "bounded-family",
+      "preferred": {
+        "path": "assets/flame/atlases/outer-mid-v4.webp",
+        "bytes": 1534794,
+        "sha256": "0f7b0f7afeb41b407154405c340af0cbf24e5ae7552ff0a820d048fbd4526218"
+      },
+      "fallback": {
+        "path": "assets/flame/atlases/outer-mid-v4.png",
+        "bytes": 1912974,
+        "sha256": "e34dd3402f1f5103ba7c7a0ddafe5290d96efc973bb0c18cc432e1269f104192"
+      },
+      "width": 1600,
+      "height": 1280,
+      "decodedRgbaBytes": 8192000,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "FLAME-CORE-HIGH-V2",
+      "role": "flame-atlas",
+      "runtimeResidency": "bounded-family",
+      "preferred": {
+        "path": "assets/flame/atlases/core-high-v2.webp",
+        "bytes": 919606,
+        "sha256": "6f6d5d6c7359d83f5a9aaf872fb907b8e81609c0b896c5658f899963efa22821"
+      },
+      "fallback": {
+        "path": "assets/flame/atlases/core-high-v2.png",
+        "bytes": 2569398,
+        "sha256": "53a398cea0013e661a055939ad77b0c7d930860dd4aad418313bb45a45ef7292"
+      },
+      "width": 1536,
+      "height": 1280,
+      "decodedRgbaBytes": 7864320,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "FLAME-OUTER-HIGH-V4",
+      "role": "flame-atlas",
+      "runtimeResidency": "bounded-family",
+      "preferred": {
+        "path": "assets/flame/atlases/outer-high-v4.webp",
+        "bytes": 2112982,
+        "sha256": "b03865f89c9aa733258444fe5050f3833d29b20f1117e21591d232880dd8672d"
+      },
+      "fallback": {
+        "path": "assets/flame/atlases/outer-high-v4.png",
+        "bytes": 2807761,
+        "sha256": "66b7f900e4ac1e7c2553998e30da9f64d20a890a6958ba60e52bbf03d45820fb"
+      },
+      "width": 1536,
+      "height": 1280,
+      "decodedRgbaBytes": 7864320,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    },
+    {
+      "id": "FLAME-STAGE-FLARE",
+      "role": "transition-atlas",
+      "runtimeResidency": "stage-boundary",
+      "preferred": {
+        "path": "assets/flame/transitions/stage-flare-v3.webp",
+        "bytes": 936194,
+        "sha256": "b0891a2ec4143f3e81acf4d9956f0eace1bf6515200a0b5e5ff600cb2b6529a8"
+      },
+      "fallback": {
+        "path": "assets/flame/transitions/stage-flare-v3.png",
+        "bytes": 1301678,
+        "sha256": "f3cdff549b03dddd20ce7ced4ebbee09d09ad9291451b3852fa5da0b16782be5"
+      },
+      "width": 1024,
+      "height": 1024,
+      "decodedRgbaBytes": 4194304,
+      "loadPolicy": "capability-selected; exactly one format requested"
+    }
+  ],
+  "alphaAudit": {
+    "frames": 64,
+    "removedDetachedPartialAlphaPixelCount": 164413,
+    "detachedPartialAlphaPixelCountMax": 0,
+    "entries": [
+      {
+        "id": "ASH-IDLE-C09",
+        "metadata": "assets/characters/ash-servant/ash-servant-idle-v7.json",
+        "metadataSha256": "799addc8711e5860d3c94ff5816947a69505e419f3eb969ce336850a600876b4",
+        "frames": 8,
+        "removedDetachedPartialAlphaPixelCount": 0,
+        "detachedPartialAlphaPixelCountMax": 0,
+        "matteRatioMax": 0,
+        "internalNeutralResidueRatioMax": 0.00051
+      },
+      {
+        "id": "ASH-INHALE-C09",
+        "metadata": "assets/characters/ash-servant/ash-servant-inhale-v7.json",
+        "metadataSha256": "00e2e2a498e51d1716bed1a93c5567414dd7843efb4a0a3706c67bb8f59ba485",
+        "frames": 8,
+        "removedDetachedPartialAlphaPixelCount": 0,
+        "detachedPartialAlphaPixelCountMax": 0,
+        "matteRatioMax": 0,
+        "internalNeutralResidueRatioMax": 0.0009
+      },
+      {
+        "id": "ASH-BLOW-C09",
+        "metadata": "assets/characters/ash-servant/ash-servant-blow-v7.json",
+        "metadataSha256": "2e497cc07441cb22cdbecd5db53c9d4e50b8d5fd9bbb601a1b32bb7f8f259b19",
+        "frames": 8,
+        "removedDetachedPartialAlphaPixelCount": 0,
+        "detachedPartialAlphaPixelCountMax": 0,
+        "matteRatioMax": 0,
+        "internalNeutralResidueRatioMax": 0.00051
+      },
+      {
+        "id": "ASH-RECOVERY-C09",
+        "metadata": "assets/characters/ash-servant/ash-servant-recovery-v7.json",
+        "metadataSha256": "7e56376fd30d118008ef9beb0317a1b0a00848ef1f75e68694b07e3f6076dc99",
+        "frames": 8,
+        "removedDetachedPartialAlphaPixelCount": 0,
+        "detachedPartialAlphaPixelCountMax": 0,
+        "matteRatioMax": 0,
+        "internalNeutralResidueRatioMax": 0.00042
+      },
+      {
+        "id": "EMBER-WARDEN-IDLE-C09",
+        "metadata": "assets/characters/demoness/demoness-idle-v8.json",
+        "metadataSha256": "cf09cfec13b59bc0f9b29c3d78e49b502f81bfe418f1ead290898a0c98ee5b32",
+        "frames": 8,
+        "removedDetachedPartialAlphaPixelCount": 42381,
+        "detachedPartialAlphaPixelCountMax": 0,
+        "matteRatioMax": 0,
+        "internalNeutralResidueRatioMax": 0
+      },
+      {
+        "id": "EMBER-WARDEN-CAST-C09",
+        "metadata": "assets/characters/demoness/demoness-cast-v8.json",
+        "metadataSha256": "0eace83493e036551fa402d3bd49347f7438045cf5c3f51b3da2f88dd6742456",
+        "frames": 8,
+        "removedDetachedPartialAlphaPixelCount": 35030,
+        "detachedPartialAlphaPixelCountMax": 0,
+        "matteRatioMax": 0,
+        "internalNeutralResidueRatioMax": 0
+      },
+      {
+        "id": "EMBER-WARDEN-HOLD-C09",
+        "metadata": "assets/characters/demoness/demoness-hold-v8.json",
+        "metadataSha256": "a406594dd4efdb9c7f6cea9658eb0a43e47156e05636ca684f898332f941270b",
+        "frames": 8,
+        "removedDetachedPartialAlphaPixelCount": 47697,
+        "detachedPartialAlphaPixelCountMax": 0,
+        "matteRatioMax": 0,
+        "internalNeutralResidueRatioMax": 0
+      },
+      {
+        "id": "EMBER-WARDEN-RECOVERY-C09",
+        "metadata": "assets/characters/demoness/demoness-recovery-v8.json",
+        "metadataSha256": "d8ac514b31110a5662fad4701969c30bc05de1a1eb5ddbf2cae107ca507c7c67",
+        "frames": 8,
+        "removedDetachedPartialAlphaPixelCount": 39305,
+        "detachedPartialAlphaPixelCountMax": 0,
+        "matteRatioMax": 0,
+        "internalNeutralResidueRatioMax": 0
+      }
+    ]
+  },
+  "outerFlameAudit": {
+    "frames": 30,
+    "sourceInternalLowChromaMattePixelCount": 71914,
+    "sourceInternalOliveMattePixelCount": 437067,
+    "sourceStickerEdgePixelCount": 182592,
+    "retintedPixelCount": 514476,
+    "suppressedMattePixelCount": 514128,
+    "featheredStickerEdgePixelCount": 126437,
+    "detachedAlphaPixelCount": 0,
+    "internalLowChromaMattePixelCount": 0,
+    "internalOliveMattePixelCount": 0,
+    "neutralEdgePixelCount": 0,
+    "coolEdgePixelCount": 0,
+    "stickerEdgePixelCount": 0,
+    "pngWebpDecodedRgbaParity": true,
+    "entries": [
+      {
+        "family": "low",
+        "metadata": "assets/flame/atlases/outer-low-v4.json",
+        "metadataSha256": "42292bc04b4e8e0cd81077d8bfcaa96c07ce46ee7f570c313b16f61e543262aa",
+        "frames": 8,
+        "sourceInternalLowChromaMattePixelCount": 9655,
+        "sourceInternalOliveMattePixelCount": 58902,
+        "sourceStickerEdgePixelCount": 46716,
+        "retintedPixelCount": 77531,
+        "suppressedMattePixelCount": 77376,
+        "featheredStickerEdgePixelCount": 27969,
+        "detachedAlphaPixelCount": 0,
+        "internalLowChromaMattePixelCount": 0,
+        "internalOliveMattePixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "stickerEdgePixelCount": 0,
+        "pngWebpDecodedRgbaParity": true
+      },
+      {
+        "family": "mid",
+        "metadata": "assets/flame/atlases/outer-mid-v4.json",
+        "metadataSha256": "b8f8e7b28facb1a0afcef4d670037940393b836ee4378590b01fb4a21abd43db",
+        "frames": 10,
+        "sourceInternalLowChromaMattePixelCount": 12209,
+        "sourceInternalOliveMattePixelCount": 155619,
+        "sourceStickerEdgePixelCount": 92482,
+        "retintedPixelCount": 192678,
+        "suppressedMattePixelCount": 192582,
+        "featheredStickerEdgePixelCount": 55222,
+        "detachedAlphaPixelCount": 0,
+        "internalLowChromaMattePixelCount": 0,
+        "internalOliveMattePixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "stickerEdgePixelCount": 0,
+        "pngWebpDecodedRgbaParity": true
+      },
+      {
+        "family": "high",
+        "metadata": "assets/flame/atlases/outer-high-v4.json",
+        "metadataSha256": "ba4242e681d456d164137001c75e0252cc3bcb1249a605da500422668c264c2e",
+        "frames": 12,
+        "sourceInternalLowChromaMattePixelCount": 50050,
+        "sourceInternalOliveMattePixelCount": 222546,
+        "sourceStickerEdgePixelCount": 43394,
+        "retintedPixelCount": 244267,
+        "suppressedMattePixelCount": 244170,
+        "featheredStickerEdgePixelCount": 43246,
+        "detachedAlphaPixelCount": 0,
+        "internalLowChromaMattePixelCount": 0,
+        "internalOliveMattePixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0,
+        "stickerEdgePixelCount": 0,
+        "pngWebpDecodedRgbaParity": true
+      }
+    ]
+  },
+  "stageFlareAudit": {
+    "metadata": "assets/flame/transitions/stage-flare-v3.json",
+    "metadataSha256": "5967aa0c1c94b1f58c11f58f5b8a48bb4afe340d83b9f2b91540b4d75fd02d13",
+    "frames": 8,
+    "alphaFloorInclusive": 15,
+    "sourceDetachedAlphaPixelCount": 3427,
+    "sourceNeutralEdgePixelCount": 400,
+    "sourceCoolEdgePixelCount": 28,
+    "removedLowAlphaPixelCount": 179243,
+    "removedDetachedAlphaPixelCount": 558,
+    "detachedAlphaPixelCount": 0,
+    "neutralEdgePixelCount": 0,
+    "coolEdgePixelCount": 0,
+    "backgroundAudits": [
+      {
+        "id": "black",
+        "color": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "alpha": 1
+        },
+        "boundaryPixelCount": 39478,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0
+      },
+      {
+        "id": "neutral-gray",
+        "color": {
+          "r": 92,
+          "g": 92,
+          "b": 92,
+          "alpha": 1
+        },
+        "boundaryPixelCount": 39478,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0
+      },
+      {
+        "id": "dark-red",
+        "color": {
+          "r": 82,
+          "g": 8,
+          "b": 8,
+          "alpha": 1
+        },
+        "boundaryPixelCount": 39478,
+        "detachedAlphaPixelCount": 0,
+        "neutralEdgePixelCount": 0,
+        "coolEdgePixelCount": 0
+      }
+    ],
+    "pngWebpDecodedRgbaParity": true
+  },
+  "generatedBackground": {
+    "runtime": "assets/backgrounds/bg-fire-chamber-yandex-v3.webp",
+    "fallback": "assets/backgrounds/bg-fire-chamber-yandex-v3.png",
+    "source": "visual-references/yandex-release-09/bg-fire-chamber-yandex-v3-source.png",
+    "method": "OpenAI ImageGen minimal local retouch; concentric/rune-like geometry replaced with irregular non-repeating heat-damaged basalt while retaining the natural central hearth"
+  },
+  "compatibilityManifest": "assets/yandex-compatibility-manifest-v1.json",
+  "legacyManifest": "assets/assets-manifest.json"
+}

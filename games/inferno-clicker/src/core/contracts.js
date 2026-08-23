@@ -6,7 +6,7 @@
 /** @typedef {'telegraph'|'effect'} EncounterPhase */
 /** @typedef {'rewarded'|'closed'|'unavailable'|'error'} RewardedOutcome */
 /** @typedef {import('./config.js').Stage} Stage */
-/** @typedef {'phaseChanged'|'pauseReasonsChanged'|'tapAccepted'|'tapRejected'|'stageChanged'|'stageBonus'|'infernoEntered'|'infernoExited'|'encounterStarted'|'encounterEffect'|'encounterEnded'|'rewardRequested'|'rewardResolved'|'boostStarted'|'boostEnded'|'runEnded'|'recordsChanged'} DomainEventType */
+/** @typedef {'phaseChanged'|'pauseReasonsChanged'|'tapAccepted'|'tapRejected'|'stageChanged'|'stageBonus'|'infernoEntered'|'infernoExited'|'encounterStarted'|'encounterEffect'|'encounterEnded'|'rewardRequested'|'rewardEarned'|'rewardResolved'|'boostStarted'|'boostEnded'|'runEnded'|'recordsChanged'} DomainEventType */
 
 /**
  * @typedef {object} PersistentRecords
@@ -60,9 +60,9 @@
  * @property {PauseReason[]} pauseReasons
  * @property {number|null} failGraceMsLeft
  * @property {boolean} reachedStageTwo
- * @property {boolean} rewardedUsedThisRun
  * @property {boolean} rewardSheetOpen
  * @property {string|null} activeRewardRequestId
+ * @property {boolean} activeRewardGranted
  * @property {number} sessionRewardCooldownMs
  * @property {boolean} boostUsed
  * @property {boolean} abandoned

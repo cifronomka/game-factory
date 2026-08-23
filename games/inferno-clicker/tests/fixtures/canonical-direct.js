@@ -25,6 +25,17 @@ import { GameEngine, canOfferRewarded } from '../../src/core/index.js';
  */
 
 /**
+ * @typedef {object} Cycle09RewardedTraceConfig
+ * @property {'canonicalDirectRewardedC09'} name
+ * @property {1} version
+ * @property {number} firstTapMs
+ * @property {number[]} intervalByRunHighestStageMs
+ * @property {number} stopMs
+ * @property {number[]} rewardAtMs Earliest active-game timestamps; an encounter may delay the safe offer.
+ * @property {ExpectedTrace & {rewardResolvedAtMs:number[],boostStartedAtMs:number[],boostEndedAtMs:number[],sessionRewardCooldownMs:number}} expected
+ */
+
+/**
  * @typedef {object} TapRateScenario
  * @property {string} name
  * @property {number} intervalMs
@@ -81,6 +92,56 @@ export function replayCanonicalDirect(config, fps) {
     }
   }
   return { state: engine.state, stageReachedAtMs, acceptedTaps };
+}
+
+/**
+ * Canonical Cycle 09 trace with two successful rewarded grants separated by
+ * exactly 90 active seconds. It proves 60-second boost expiry, cooldown carry,
+ * second-grant eligibility and render-rate independence together with balance.
+ * @param {Cycle09RewardedTraceConfig} config
+ * @param {15|30|60} fps
+ */
+export function replayCanonicalRewardedCycle09(config, fps) {
+  const engine = new GameEngine();
+  const frameMs = 1_000 / fps;
+  let scheduledTapMs = config.firstTapMs;
+  let tapQueued = false;
+  let nextReward = 0;
+  const stageReachedAtMs = {};
+  const rewardResolvedAtMs = [];
+  const boostStartedAtMs = [];
+  const boostEndedAtMs = [];
+  let acceptedTaps = 0;
+
+  while (engine.state.simulationTimeMs < config.stopMs) {
+    const rewardAt = config.rewardAtMs[nextReward];
+    if (rewardAt !== undefined && engine.state.simulationTimeMs >= rewardAt && canOfferRewarded(engine.state)) {
+      grantOptionalBoost(engine, `canonical-c09-${nextReward + 1}`);
+      nextReward += 1;
+    }
+    if (!tapQueued && scheduledTapMs < config.stopMs) {
+      engine.queueTap(scheduledTapMs, `canonical-c09-tap-${acceptedTaps + 1}`);
+      tapQueued = true;
+    }
+    engine.advanceFrame(frameMs);
+    for (const event of engine.drainEvents()) {
+      if (event.type === 'stageChanged' && typeof event.data?.to === 'number' && event.data.to > (event.data.from ?? 0)) {
+        stageReachedAtMs[String(event.data.to)] ??= event.atMs;
+      }
+      if (event.type === 'tapAccepted') {
+        acceptedTaps += 1;
+        tapQueued = false;
+        const interval = config.intervalByRunHighestStageMs[engine.state.runHighestStage - 1];
+        if (!interval) throw new Error(`Missing Cycle 09 interval for stage ${engine.state.runHighestStage}`);
+        scheduledTapMs += interval;
+      }
+      if (event.type === 'rewardResolved' && event.data?.outcome === 'rewarded') rewardResolvedAtMs.push(event.atMs);
+      if (event.type === 'boostStarted') boostStartedAtMs.push(event.atMs);
+      if (event.type === 'boostEnded') boostEndedAtMs.push(event.atMs);
+    }
+  }
+  if (nextReward !== config.rewardAtMs.length) throw new Error(`Only ${nextReward}/${config.rewardAtMs.length} Cycle 09 rewards resolved.`);
+  return { state: engine.state, stageReachedAtMs, acceptedTaps, rewardResolvedAtMs, boostStartedAtMs, boostEndedAtMs };
 }
 
 /**

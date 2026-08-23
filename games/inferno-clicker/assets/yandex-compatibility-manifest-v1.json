@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/build-yandex-compatibility-assets.mjs",
+  "policy": "Load WebP or PNG, never both, according to a synchronous browser capability probe.",
+  "files": [
+    {
+      "source": "assets/characters/character-inferno-host-main-v4.webp",
+      "sourceSha256": "899fd7adf074d4b1e00d97f4dc39577e743aae38da8591158db0d529cc2c396b",
+      "output": "assets/characters/character-inferno-host-main-v4.png",
+      "outputSha256": "cd27f5fcf45f2c905f3c586c18a51ddef642efd0adb76ca211095c73f7da4db7",
+      "bytes": 601716,
+      "width": 912,
+      "height": 512
+    },
+    {
+      "source": "assets/characters/character-inferno-host-sentinel-v4.webp",
+      "sourceSha256": "95b33b965b1af2f976edecd26e9ecb64cbeb2680b401f0778b60c0332a47f844",
+      "output": "assets/characters/character-inferno-host-sentinel-v4.png",
+      "outputSha256": "8eaef93911ec2eb181fc7479b470d32671c43869d6a41ae55beb5beacb003913",
+      "bytes": 399510,
+      "width": 912,
+      "height": 512
+    },
+    {
+      "source": "assets/flame/atlases/core-low-v2.webp",
+      "sourceSha256": "355a1490ed676236a7359fc6c90d2cbe00e31cb397d2ec808cf4aa7b419a63aa",
+      "output": "assets/flame/atlases/core-low-v2.png",
+      "outputSha256": "bd766eab73e6d3f6e76d3dc732a8e87255d07b7a3f3673e1bf5af94ca2ea710b",
+      "bytes": 651490,
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "source": "assets/flame/atlases/outer-low-v4.webp",
+      "sourceSha256": "59d8a78c348066c902c2a3290aa5ec38bb0fa33718328dd7a62d4e5098b3600a",
+      "output": "assets/flame/atlases/outer-low-v4.png",
+      "outputSha256": "5e6d9c33992c01c5ca7ae6bf11bc2f1ebfe26773a7aafc80ba5e4fa03241fd44",
+      "bytes": 612459,
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "source": "assets/flame/atlases/core-mid-v2.webp",
+      "sourceSha256": "1ff494f788f0a6b5c8e162136ad2f637796127728752641c1b763c290d1874c6",
+      "output": "assets/flame/atlases/core-mid-v2.png",
+      "outputSha256": "2ae3c05bfb4f4ec1d213e7605e4233500b1459f28f5d74db4eae177c2253a7c3",
+      "bytes": 1919633,
+      "width": 1600,
+      "height": 1280
+    },
+    {
+      "source": "assets/flame/atlases/outer-mid-v4.webp",
+      "sourceSha256": "0f7b0f7afeb41b407154405c340af0cbf24e5ae7552ff0a820d048fbd4526218",
+      "output": "assets/flame/atlases/outer-mid-v4.png",
+      "outputSha256": "e34dd3402f1f5103ba7c7a0ddafe5290d96efc973bb0c18cc432e1269f104192",
+      "bytes": 1912974,
+      "width": 1600,
+      "height": 1280
+    },
+    {
+      "source": "assets/flame/atlases/core-high-v2.webp",
+      "sourceSha256": "6f6d5d6c7359d83f5a9aaf872fb907b8e81609c0b896c5658f899963efa22821",
+      "output": "assets/flame/atlases/core-high-v2.png",
+      "outputSha256": "53a398cea0013e661a055939ad77b0c7d930860dd4aad418313bb45a45ef7292",
+      "bytes": 2569398,
+      "width": 1536,
+      "height": 1280
+    },
+    {
+      "source": "assets/flame/atlases/outer-high-v4.webp",
+      "sourceSha256": "b03865f89c9aa733258444fe5050f3833d29b20f1117e21591d232880dd8672d",
+      "output": "assets/flame/atlases/outer-high-v4.png",
+      "outputSha256": "66b7f900e4ac1e7c2553998e30da9f64d20a890a6958ba60e52bbf03d45820fb",
+      "bytes": 2807761,
+      "width": 1536,
+      "height": 1280
+    },
+    {
+      "source": "assets/flame/transitions/stage-flare-v3.webp",
+      "sourceSha256": "b0891a2ec4143f3e81acf4d9956f0eace1bf6515200a0b5e5ff600cb2b6529a8",
+      "output": "assets/flame/transitions/stage-flare-v3.png",
+      "outputSha256": "f3cdff549b03dddd20ce7ced4ebbee09d09ad9291451b3852fa5da0b16782be5",
+      "bytes": 1301678,
+      "width": 1024,
+      "height": 1024
+    }
+  ]
+}

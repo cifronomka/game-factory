@@ -1,8 +1,8 @@
-# Acceptance Criteria — «Зажги», corrective cycle 08 alpha, clarity and scale correction
+# Acceptance Criteria — «Зажги» / Ignite, Yandex Release Cycle 09
 
-Это единственный stop contract. DONE разрешён только для одного финального clean exact C08 build, когда все применимые строки ровно восьми групп ниже имеют `PASS`, evidence находится в `reports/corrective-cycle-08/<exact-build-id>/`, C08 evidence validator завершён с exit 0 и open Critical=0/High=0.
+Это единственный stop contract. Для 1.0.0 DONE разрешён только для одного final clean exact Cycle 09 build, когда все применимые новые строки раздела 9 имеют `PASS`, evidence находится в подкаталоге `reports/yandex-release-cycle-09/`, названном точным финальным Build ID (`NOT RUN — Build ID ещё не выбран`), validator/release gate exit 0, open Critical=0/High=0 и exact ZIP SHA прошёл Yandex draft verification.
 
-Статусы: `NOT RUN`, `PASS`, `FAIL`, `BLOCKED`, `N/A — причина`. Все новые Cycle 08 строки начинаются с `NOT RUN`. C07 строки и их `PASS` ниже сохраняют исторический результат принятого C07 build, но не закрывают C08 alpha/clarity/scale/evidence. Gameplay/audio/platform не меняются; C08 обязан заново доказать frozen fingerprints и neighboring/full regression.
+Статусы Cycle 09: `NOT RUN`, `PASS`, `FAIL`, `BLOCKED_EXTERNAL — точная причина`, `N/A — причина`; только `C09-RLS-01/02` могут временно иметь `READY_FOR_PACKAGE`, пока ещё не существует ZIP-аудита. Успешный `package:yandex` записывает их post-package `PASS` в exact `package-results.json`, не переписывая pre-package stop contract. `BLOCKED_EXTERNAL` допустим лишь для заранее перечисленных сред/Console-критериев и означает, что локальный RC не является DONE или promotable. Все новые Cycle 09 строки начинаются с `NOT RUN`. Строки C07/C08 и их прежние статусы ниже — историческая baseline-трассировка и не закрывают Cycle 09. Rewarded, goals, RU/EN, SDK, cloud, leaderboard, compatibility, content/visual, QA и release должны быть доказаны заново.
 
 ## 1. Functional
 
@@ -133,4 +133,62 @@
 | RLS-07 | `reports/corrective-cycle-08/<exact-build-id>/`, dist manifest, commit, C07 baseline fingerprints, C08 source/reference/asset hashes and final reports identify one clean patch candidate; historical C07 artifact/report remains intact | C08 evidence validator + release report audit | NOT RUN |
 | RLS-08 | Every applicable legacy and new C08 row is PASS on the same candidate; C08 validator exit 0, Critical=0/High=0, skipped=0; QA, independent reviewer and Release Agent sign that exact build | Final C08 stop audit | NOT RUN |
 
-**Current decision:** DONE = NO — CYCLE 08 `NOT RUN`. Cycle 07 остаётся исторически принятым для своего exact build, но новые C08 строки V-25…V-29, F-10, G-09, A-06, PERF-09, Y-07, Q-09/Q-10 и RLS-07/RLS-08 не имеют evidence и не могут быть объявлены PASS заранее.
+## 9. Active Yandex Release Cycle 09 — all affected rows NOT RUN
+
+### 9.1 Functional/gameplay
+
+| ID | Бинарное условие | Evidence | Статус |
+|---|---|---|---|
+| C09-F-01 | Production target всегда `yandex`; `/sdk.js` загружается до app независимо от hostname; SDK failure даёт playable local-only без test/free rewarded provider | Static bundle audit + SDK success/failure browser E2E | NOT RUN |
+| C09-F-02 | `PlatformCapabilities` содержит locale/authorized и отдельные remote booleans; `PresentationViewModel` содержит rewardOffer/goals/nextGoal и не содержит provider identity | Contract/type/runtime tests | NOT RUN |
+| C09-F-03 | Mouse, Pointer Events и touch/mouse fallback: один physical contact→один tap; right-click/contextmenu/drag/select/page gesture не активируют core | Browser input matrix | NOT RUN |
+| C09-F-04 | Ровно 8 goals вычисляются из V1 records в утверждённом порядке; nextGoal — первый incomplete/null; reload и local/cloud merge не откатывают completion | Goals/unit/persistence/browser trace | NOT RUN |
+| C09-F-05 | RU/EN title, HUD, stages, goals, dialogs, errors, instructions и ARIA полны; ru/be/kk/uk/uz→RU, other/unknown→EN | Dictionary completeness + mocked environment E2E | NOT RUN |
+| C09-F-06 | No-reward direct input достигает stages 1–7, records/goals/restart работают без SDK/network/auth/ads | 60/30/15 FPS fixture + full browser cycle | NOT RUN |
+
+| ID | Бинарное условие | Evidence | Статус |
+|---|---|---|---|
+| C09-G-01 | Offer становится eligible при `runHighestStage≥3` текущей попытки, не раньше; видим только в safe PLAYING; auto-open/start count=0 | State matrix + browser geometry | NOT RUN |
+| C09-G-02 | Первый `onRewarded` request ID даёт ровно один `tapPower×2` boost на 60 000 ms active gameplay; assisted heat не даёт direct tap-score | Deterministic reward trace | NOT RUN |
+| C09-G-03 | Cooldown 90 000 ms active time от reward, переносится между runs session и не persisted; repeated reward разрешён только после boost/cooldown | Active-clock/restart/reload trace | NOT RUN |
+| C09-G-04 | Close без reward/error/timeout без prior `onRewarded`/unavailable/duplicate/late дают reward/cooldown/heat/score/progression mutation=0; earned reward после prior `onRewarded` сохраняется ровно один раз; следующий добровольный request безопасен | Provider terminal matrix | NOT RUN |
+| C09-G-05 | Новый rewarded C09 fixture rebaseline утверждён и совпадает на 60/30/15 FPS; no-reward V5 timings остаются неизменными | Balance report + deterministic fixtures | NOT RUN |
+
+### 9.2 Visual/content/audio/performance
+
+| ID | Бинарное условие | Evidence | Статус |
+|---|---|---|---|
+| C09-V-01 | Official desktop matrix, zoom 80/100/125%, mobile/tablet portrait+landscape и rotation: crop/distortion/page scroll=0; active field≤2:1; targets доступны | Screenshot/geometry matrix | NOT RUN |
+| C09-V-02 | 64 character frames × black/gray/red × DPR1/2/3 и stages 1–7 normal/reduced/forced-low: white/neutral matte, fringe, islands, internal residue, detached alpha, filter-amplified spots=0 | Automated alpha/composite audit + independent Human-Eye review | NOT RUN |
+| C09-V-03 | Visible RU/EN text/art contains rune/ritual/religious/esoteric references=0; exact visible names Ember Warden/Хранительница угасания и Fire Ring/Огненное кольцо используются | Content inventory + screenshots + Reviewer sign-off | NOT RUN |
+| C09-V-04 | Reward/goals UI — DOM/CSS, не bitmap/fake-ad; short landscape dialogs fit, only goals list internally scrolls; 48×48/96×96 targets PASS | DOM/static + viewport matrix | NOT RUN |
+| C09-A-01 | Before gesture audible=0; menu/hidden/platform/rewarded silence≤100 ms; stale/duplicate resume=0; muted gameplay полностью понятен | Audio graph + lifecycle browser trace | NOT RUN |
+| C09-PERF-01 | Четыре meaningful traces ≥12 min desktop/mobile × reward/no-reward: median FPS≥55/30, frames>50 ms≤1%, heap≤150 MB, input p95≤100 ms | Exact-candidate performance traces | NOT RUN |
+| C09-PERF-02 | Decoded textures≤64 MiB; loader выбирает один WebP/PNG format; unpacked ZIP<90 MB; unexpected refetch/growth/leak=0 | Asset/package/residency audit | NOT RUN |
+
+### 9.3 Yandex SDK/data/draft
+
+| ID | Бинарное условие | Evidence | Статус |
+|---|---|---|---|
+| C09-Y-01 | `YaGames.init` once; early pause subscription; `LoadingAPI.ready` once only after interactive state; debug panel Game Ready green | Mocked SDK E2E + Yandex draft debug evidence | NOT RUN |
+| C09-Y-02 | GameplayAPI and reason-set точно отражают playing/menu/results/hidden/platform/ad; timers/audio freeze, catch-up=0 | Lifecycle matrix + draft trace | NOT RUN |
+| C09-Y-03 | Local save immediate; cloud maxima latest-wins; `Player.setData`≤1/5 s; result/lifecycle flush; active run/boost/cooldown never restored | Fake-clock adapter suite + authorized draft reload | NOT RUN |
+| C09-Y-04 | Guest/denied/error remains full local game, forced login=0, unhandled errors=0 | Guest/error draft trace | NOT RUN |
+| C09-Y-05 | `best-score` numeric DESC exists; `isAvailableMethod` guards read/write; only improved integer submit once; lower/duplicate/unavailable safe | Console config + adapter/draft trace | NOT RUN |
+| C09-Y-06 | Real rewarded success/close/error path in Yandex draft obeys exact 60/90/onRewarded contract and ad pause/audio rules | Draft ad recordings + state log | NOT RUN |
+| C09-Y-07 | Console config exactly Desktop+Android+iOS, Any, 12+, RU+EN, Arcade/Casual, cloud saves+rewarded only; TV/IAP/sticky/interstitial off | Console screenshots/export | NOT RUN |
+| C09-Y-08 | Submission metadata RU/EN final; icon+cover not screenshots; ≥4 desktop 16:9 and ≥4 mobile 9:16 actual-gameplay≥70%; rights/provenance complete | Submission manifest + visual audit | NOT RUN |
+
+### 9.4 QA/release
+
+| ID | Бинарное условие | Evidence | Статус |
+|---|---|---|---|
+| C09-Q-01 | Clean automation, mocked SDK browser E2E, visual/content/asset audits and compatibility checks exit 0, skipped required=0 | Gate 1 immutable logs | NOT RUN |
+| C09-Q-02 | Every issue has severity/env/build/steps/expected/actual/evidence/AC; fix owner не закрывает issue; independent targeted retest + neighboring regression complete | Issue/retest manifest | NOT RUN |
+| C09-Q-03 | Four ≥12 min session traces and full cross-browser/device matrix complete; console errors/warnings and unexpected network failures=0 | Gate 5 report | NOT RUN |
+| C09-RLS-01 | Historical 0.1.0/0.1.1 artifacts unchanged; one clean 1.0.0 Build ID/commit/dist/report/ZIP SHA/evidence identity | Git/artifact/manifest audit | NOT RUN |
+| C09-RLS-02 | ZIP has one root index, relative safe paths, no docs/tests/mocks/secrets/source maps/dev provider, unpacked static smoke PASS | ZIP audit + fresh-temp HTTP smoke | NOT RUN |
+| C09-RLS-03 | The exact ZIP SHA tested in Yandex draft is promoted without rebuild to `inferno-clicker-1.0.0.zip`; checksum and release report complete | Draft/build identity + SHA comparison | NOT RUN |
+| C09-RLS-04 | Every applicable C09 row PASS on same candidate; Critical=0/High=0; QA, Reviewer and Release Agent sign; moderation/publication not performed | Final stop audit + sign-offs | NOT RUN |
+
+**Current decision:** DONE = NO — YANDEX RELEASE CYCLE 09 `NOT RUN`. Исторические C07/C08 результаты не переносятся; ни один новый статус нельзя повысить без exact-candidate evidence.

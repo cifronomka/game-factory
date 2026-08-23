@@ -24,19 +24,20 @@ function fakeImage(width, height) {
   };
 }
 
-test('asset URLs remain relative to the copied src/assets dist layout', () => {
-  assert.match(INFERNAL_CHAMBER_URL, /\/assets\/backgrounds\/bg-infernal-chamber-production\.webp$/);
-  assert.match(ASH_SERVANT_ATLAS_URL, /\/assets\/characters\/ash-servant\/ash-servant-idle-v6\.webp$/);
-  assert.match(ASH_SERVANT_ATLAS_URLS.recovery, /\/assets\/characters\/ash-servant\/ash-servant-recovery-v6\.webp$/);
-  assert.match(DEMONESS_ATLAS_URL, /\/assets\/characters\/demoness\/demoness-idle-v7\.webp$/);
-  assert.match(DEMONESS_ATLAS_URLS.cast, /\/assets\/characters\/demoness\/demoness-cast-v7\.webp$/);
-  assert.match(INFERNO_HOST_URL, /\/assets\/characters\/character-inferno-host-main-v4\.webp$/);
-  assert.match(INFERNO_HOST_URLS.sentinel, /\/assets\/characters\/character-inferno-host-sentinel-v4\.webp$/);
-  assert.match(FLAME_ATLAS_URLS.low.core, /\/assets\/flame\/atlases\/core-low-v2\.webp$/);
-  assert.match(FLAME_ATLAS_URLS.low.outer, /\/assets\/flame\/atlases\/outer-low-v2\.webp$/);
-  assert.match(FLAME_ATLAS_URLS.mid.core, /\/assets\/flame\/atlases\/core-mid-v2\.webp$/);
-  assert.match(FLAME_ATLAS_URLS.high.outer, /\/assets\/flame\/atlases\/outer-high-v2\.webp$/);
-  assert.match(STAGE_FLARE_URL, /\/assets\/flame\/transitions\/stage-flare-v2\.webp$/);
+test('asset URLs remain root-relative and select the committed PNG fallback when WebP is unavailable', () => {
+  assert.match(INFERNAL_CHAMBER_URL, /\/assets\/backgrounds\/bg-fire-chamber-yandex-v3\.png$/);
+  assert.match(ASH_SERVANT_ATLAS_URL, /\/assets\/characters\/ash-servant\/ash-servant-idle-v7\.png$/);
+  assert.match(ASH_SERVANT_ATLAS_URLS.recovery, /\/assets\/characters\/ash-servant\/ash-servant-recovery-v7\.png$/);
+  assert.match(DEMONESS_ATLAS_URL, /\/assets\/characters\/demoness\/demoness-idle-v8\.png$/);
+  assert.match(DEMONESS_ATLAS_URLS.cast, /\/assets\/characters\/demoness\/demoness-cast-v8\.png$/);
+  assert.match(INFERNO_HOST_URL, /\/assets\/characters\/character-inferno-host-main-v4\.png$/);
+  assert.match(INFERNO_HOST_URLS.sentinel, /\/assets\/characters\/character-inferno-host-sentinel-v4\.png$/);
+  assert.match(FLAME_ATLAS_URLS.low.core, /\/assets\/flame\/atlases\/core-low-v2\.png$/);
+  assert.match(FLAME_ATLAS_URLS.low.outer, /\/assets\/flame\/atlases\/outer-low-v4\.png$/);
+  assert.match(FLAME_ATLAS_URLS.mid.core, /\/assets\/flame\/atlases\/core-mid-v2\.png$/);
+  assert.match(FLAME_ATLAS_URLS.mid.outer, /\/assets\/flame\/atlases\/outer-mid-v4\.png$/);
+  assert.match(FLAME_ATLAS_URLS.high.outer, /\/assets\/flame\/atlases\/outer-high-v4\.png$/);
+  assert.match(STAGE_FLARE_URL, /\/assets\/flame\/transitions\/stage-flare-v3\.png$/);
 });
 
 test('optional bitmap is unavailable without Image and scenes fail safely without geometric characters', () => {

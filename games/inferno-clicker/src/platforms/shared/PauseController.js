@@ -21,12 +21,17 @@ export class PauseController {
     if (changed) this.#publish();
   }
 
-  /** Public/app resume also records that an active gameplay session is desired. @param {string} reason */
+  /** Removes one app pause reason without inventing a gameplay session. @param {string} reason */
   requestResume(reason) {
-    this.gameplayRequested = true;
     const changed = this.reasons.delete(reason);
     if (changed) this.#publish();
     else this.#syncActive();
+  }
+
+  startGameplay() {
+    if (this.gameplayRequested) return;
+    this.gameplayRequested = true;
+    this.#publish();
   }
 
   /** Platform/browser resume never starts gameplay that the app has not requested. @param {string} reason */

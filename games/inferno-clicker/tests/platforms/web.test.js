@@ -25,14 +25,18 @@ test('web adapter quarantines corrupt storage and returns safe defaults', async 
   assert.equal(storage.getItem('save:corrupt:123'), '{broken');
 });
 
-test('web adapter keeps a local Best Score and review test rewards are async, idempotent, and show no fake ad', async () => {
+test('web adapter keeps a local Best Score and never exposes a fake reward', async () => {
   const storage = new MemoryStorage();
-  const service = new WebPlatformService({ storage, documentTarget: null, windowTarget: null });
+  const service = new WebPlatformService({ storage, locale: 'en', documentTarget: null, windowTarget: null });
   const initialized = await service.init();
   assert.equal(initialized.ok, true);
   if (initialized.ok) {
-    assert.equal(initialized.value.rewardedProvider, 'test');
-    assert.equal(initialized.value.rewardedAds, true);
+    assert.equal(initialized.value.locale, 'en');
+    assert.equal(initialized.value.authorized, false);
+    assert.equal(initialized.value.leaderboardRead, false);
+    assert.equal(initialized.value.leaderboardWrite, false);
+    assert.equal(initialized.value.rewardedProvider, 'unavailable');
+    assert.equal(initialized.value.rewardedAds, false);
   }
   await service.saveData(makeSave({ bestScore: 10 }));
   assert.equal((await service.submitScore(9)).ok, true);
@@ -40,40 +44,45 @@ test('web adapter keeps a local Best Score and review test rewards are async, id
   const board = await service.getLeaderboard();
   assert.equal(board.ok, true);
   if (board.ok) assert.deepEqual(board.value.map(({ score, source }) => ({ score, source })), [{ score: 15, source: 'local' }]);
-  let settled = false;
-  const first = service.showRewardedAd('inferno-seal');
-  first.then(() => { settled = true; });
-  const duplicate = service.showRewardedAd('inferno-seal');
-  assert.equal(settled, false);
-  assert.strictEqual(duplicate, first);
-  const reward = await first;
-  assert.equal(reward.status, 'rewarded');
-  assert.equal(reward.wasShown, false);
-  assert.equal((await duplicate).requestId, reward.requestId);
+  const reward = await service.showRewardedAd('heat-power-2x-60s');
+  assert.equal(reward.status, 'unavailable');
+  assert.equal(reward.wasShown, undefined);
   assert.equal((await service.showInterstitial('never')).status, 'unavailable');
 });
 
-test('web adapter can explicitly disable the test reward provider', async () => {
-  const service = new WebPlatformService({
+test('concurrent local score submissions cannot let a lower score overwrite a higher one', async () => {
+  const storage = new MemoryStorage();
+  const service = new WebPlatformService({ storage, documentTarget: null, windowTarget: null });
+  await service.init();
+  const [higher, lower] = await Promise.all([service.submitScore(200), service.submitScore(100)]);
+  assert.equal(higher.ok, true);
+  assert.equal(lower.ok, true);
+  assert.equal(JSON.parse(storage.getItem('inferno-clicker:save:v1')).bestScore, 200);
+});
+
+test('legacy Web test-provider input cannot re-enable a fake reward', async () => {
+  const service = new WebPlatformService(/** @type {any} */ ({
     storage: new MemoryStorage(),
-    rewardedProvider: 'unavailable',
+    rewardedProvider: 'test',
     documentTarget: null,
     windowTarget: null,
-  });
+  }));
   const initialized = await service.init();
   assert.equal(initialized.ok, true);
   if (initialized.ok) {
     assert.equal(initialized.value.rewardedProvider, 'unavailable');
     assert.equal(initialized.value.rewardedAds, false);
   }
-  const result = await service.showRewardedAd('inferno-seal');
+  const result = await service.showRewardedAd('heat-power-2x-60s');
   assert.equal(result.status, 'unavailable');
   assert.equal(result.wasShown, undefined);
 });
 
-test('web adapter rejects a Yandex or unknown provider so providers remain mutually exclusive', () => {
-  assert.throws(() => new WebPlatformService(/** @type {any} */ ({ rewardedProvider: 'yandex' })), /must be "test" or "unavailable"/);
-  assert.throws(() => new WebPlatformService(/** @type {any} */ ({ rewardedProvider: 'other' })), /must be "test" or "unavailable"/);
+test('web adapter rejects legacy reward placement', async () => {
+  const service = new WebPlatformService({ storage: new MemoryStorage(), documentTarget: null, windowTarget: null });
+  const result = await service.showRewardedAd(/** @type {any} */ ('inferno-seal'));
+  assert.equal(result.status, 'unavailable');
+  assert.match(result.error?.message ?? '', /Invalid placement/);
 });
 
 test('web adapter converts storage exceptions into typed results', async () => {
@@ -100,6 +109,7 @@ test('visibility and menu reasons cannot clear each other or double-resume', asy
     onGameplayActiveChange: (active) => activeChanges.push(active),
   });
   await service.init();
+  service.startGameplay();
   service.resumeGame('menu');
   service.pauseGame('menu');
   service.pauseGame('menu');

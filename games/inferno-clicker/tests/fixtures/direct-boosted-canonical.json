@@ -7,11 +7,11 @@
   "rewardAtMs": 65000,
   "rewardRequestId": "canonical-direct-v5",
   "expected": {
-    "stageReachedAtMs": { "2": 9000, "3": 43500, "4": 64500, "5": 75750, "6": 83950, "7": 102710 },
+    "stageReachedAtMs": { "2": 9000, "3": 43500, "4": 64500, "5": 75750, "6": 83950, "7": 90950 },
     "acceptedTaps": 944,
-    "score": 180220,
-    "heat": 936.94,
-    "currentInfernoHoldMs": 65950,
+    "score": 188899,
+    "heat": 936.9399999999998,
+    "currentInfernoHoldMs": 88910,
     "runHighestStage": 7
   }
 }

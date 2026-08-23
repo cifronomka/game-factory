@@ -167,8 +167,8 @@
     },
     {
       "id": "FX-STAGE-FLARE",
-      "path": "assets/flame/transitions/stage-flare-v2.webp",
-      "metadata": "assets/flame/transitions/stage-flare-v2.json",
+      "path": "assets/flame/transitions/stage-flare-v3.webp",
+      "metadata": "assets/flame/transitions/stage-flare-v3.json",
       "kind": "stage-transition-atlas",
       "stages": [
         1,
@@ -181,13 +181,13 @@
       ],
       "width": 1024,
       "height": 1024,
-      "bytes": 533852,
+      "bytes": 936194,
       "transparent": true,
       "critical": false,
       "preload": "stage 1 progress >= 0.6",
       "animation": "8 frames at 8 fps; forward upward, reverse/cool-tint downward",
-      "sha256": "3b2b549ffca0ea40a8a4904e2af63e5e4eadfd2524599df305152d2e1a530ffe",
-      "metadataSha256": "f19a993c45000509eb58eaa7d883d3d2ed9aef2b6f52bdf6b75154a32931ce44"
+      "sha256": "b0891a2ec4143f3e81acf4d9956f0eace1bf6515200a0b5e5ff600cb2b6529a8",
+      "metadataSha256": "5967aa0c1c94b1f58c11f58f5b8a48bb4afe340d83b9f2b91540b4d75fd02d13"
     },
     {
       "id": "CH-ASH-SERVANT-IDLE-C08",

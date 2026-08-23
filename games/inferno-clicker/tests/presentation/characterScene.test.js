@@ -322,11 +322,32 @@ test('character atlases preload immediately before their stage dependencies', ()
   scene.setState(state({ stage: 3, stageProgress: 0.61 }));
   assert.equal(created, 3);
   scene.setState(state({ stage: 5, stageProgress: 0.61 }));
-  assert.equal(created, 5, 'Demoness warm-up is hint-only and does not decode a second atlas');
+  assert.equal(created, 3, 'host decode waits for the FlameRig mid→high transition release');
   const demoness = scene.getDiagnostics().demoness;
   assert.equal(demoness.warmClip, 'cast');
   assert.deepEqual(demoness.residentClips, ['idle']);
   assert.equal(demoness.withinResidencyLimit, true);
+  scene.prepareHostAssets();
+  assert.equal(created, 5, 'both host parts decode only after explicit residency coordination');
+  assert.equal(scene.getDiagnostics().host.asset, 'ready');
+  scene.setState(state({ stage: 5 }));
+  assert.equal(scene.getDiagnostics().host.asset, 'idle', 'stage fallback releases both host atlases before a high→mid flame transition');
+});
+
+test('Servant loader never retains more than current plus one imminent atlas', () => {
+  const imageFactory = () => ({
+    complete: true, naturalWidth: 1_024, naturalHeight: 640, decoding: 'auto', src: '', addEventListener() {},
+  });
+  const scene = new CharacterScene({ imageFactory });
+  const resident = () => Object.values(scene.servantBitmaps).filter((bitmap) => bitmap.isReady()).map((bitmap) => bitmap.url);
+  const snapshots = [];
+  const apply = (next) => { scene.setState(next); snapshots.push(resident()); };
+  apply(state({ stage: 3, encounters: [] }));
+  apply(state({ stage: 3, encounters: [{ kind: 'servant', phase: 'telegraph', progress: 0.25 }] }));
+  apply(state({ stage: 3, encounters: [{ kind: 'servant', phase: 'active', progress: 0.5 }] }));
+  apply(state({ stage: 3, encounters: [] }));
+  assert.ok(snapshots.every((entries) => entries.length <= 2), JSON.stringify(snapshots));
+  assert.equal(Math.max(...snapshots.map((entries) => entries.length)), 2);
 });
 
 test('production Demoness swaps use one bounded 512x832 canvas frame and at most one decoded atlas', async () => {

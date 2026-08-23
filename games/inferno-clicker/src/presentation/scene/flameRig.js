@@ -2,6 +2,7 @@
 
 import { OptionalBitmap } from './optionalBitmap.js';
 import { SpriteAnimator, drawSpriteFrame, gridFrames } from './spriteAnimator.js';
+import { preferredRuntimeRasterUrl } from './rasterFormat.js';
 
 const HEARTH_X = 540;
 const HEARTH_Y = 1225;
@@ -14,19 +15,19 @@ const FAMILY_DEFINITIONS = Object.freeze({
 
 export const FLAME_ATLAS_URLS = Object.freeze({
   low: Object.freeze({
-    core: new URL('../../../assets/flame/atlases/core-low-v2.webp', import.meta.url).href,
-    outer: new URL('../../../assets/flame/atlases/outer-low-v2.webp', import.meta.url).href,
+    core: preferredRuntimeRasterUrl('assets/flame/atlases/core-low-v2.webp', 'assets/flame/atlases/core-low-v2.png'),
+    outer: preferredRuntimeRasterUrl('assets/flame/atlases/outer-low-v4.webp', 'assets/flame/atlases/outer-low-v4.png'),
   }),
   mid: Object.freeze({
-    core: new URL('../../../assets/flame/atlases/core-mid-v2.webp', import.meta.url).href,
-    outer: new URL('../../../assets/flame/atlases/outer-mid-v2.webp', import.meta.url).href,
+    core: preferredRuntimeRasterUrl('assets/flame/atlases/core-mid-v2.webp', 'assets/flame/atlases/core-mid-v2.png'),
+    outer: preferredRuntimeRasterUrl('assets/flame/atlases/outer-mid-v4.webp', 'assets/flame/atlases/outer-mid-v4.png'),
   }),
   high: Object.freeze({
-    core: new URL('../../../assets/flame/atlases/core-high-v2.webp', import.meta.url).href,
-    outer: new URL('../../../assets/flame/atlases/outer-high-v2.webp', import.meta.url).href,
+    core: preferredRuntimeRasterUrl('assets/flame/atlases/core-high-v2.webp', 'assets/flame/atlases/core-high-v2.png'),
+    outer: preferredRuntimeRasterUrl('assets/flame/atlases/outer-high-v4.webp', 'assets/flame/atlases/outer-high-v4.png'),
   }),
 });
-export const STAGE_FLARE_URL = new URL('../../../assets/flame/transitions/stage-flare-v2.webp', import.meta.url).href;
+export const STAGE_FLARE_URL = preferredRuntimeRasterUrl('assets/flame/transitions/stage-flare-v3.webp', 'assets/flame/transitions/stage-flare-v3.png');
 
 /** @typedef {'low'|'mid'|'high'} FlameFamily */
 /** @typedef {{x:number,y:number,vx:number,vy:number,age:number,life:number,size:number,kind:'ember'|'smoke'}} Particle */
@@ -176,8 +177,8 @@ export class FlameRig {
     const targetFamily = familyForStage(state.stage);
     this.ensureFamilyLoaded(targetFamily);
     if ((state.stage === 1 && state.stageProgress >= 0.6) || state.stage > 1) this.flareBitmap.startLoad();
-    if ((state.stage === 2 && state.stageProgress >= 0.6) || state.stage > 2) this.ensureFamilyLoaded('mid');
-    if ((state.stage === 5 && state.stageProgress >= 0.6) || state.stage > 5) this.ensureFamilyLoaded('high');
+    if (state.stage === 2 && state.stageProgress >= 0.6) this.ensureFamilyLoaded('mid');
+    if (state.stage === 5 && state.stageProgress >= 0.6) this.ensureFamilyLoaded('high');
     if (targetFamily !== this.currentFamily) {
       const source = this.families[this.currentFamily];
       const target = this.families[targetFamily];
@@ -214,6 +215,11 @@ export class FlameRig {
       family.coreBitmap.release();
       family.outerBitmap.release();
     }
+  }
+
+  /** Host assets may decode only after the mid→high handoff releases mid. */
+  isHighFamilySettled() {
+    return this.currentFamily === 'high' && this.previousFamily === null;
   }
 
   /** @param {{bend?:number,suppression?:number,emberDrift?:number,cold?:number,source?:string}} reaction */
@@ -291,7 +297,10 @@ export class FlameRig {
     }
     if (this.flareActive) {
       this.flareAnimator.update(step);
-      if (this.flareAnimator.isComplete()) this.flareActive = false;
+      if (this.flareAnimator.isComplete()) {
+        this.flareActive = false;
+        this.flareBitmap.release();
+      }
     }
     if (this.previousFamily) {
       this.transitionAge += step;
@@ -495,7 +504,7 @@ export class FlameRig {
       targetAnchor: this.getTargetAnchor(),
       characterReaction: this.characterReaction,
       infernoEntryProgress: this.infernoEntryAge < 1.5 ? Math.round(this.infernoEntryAge / 1.5 * 1_000_000) / 1_000_000 : 1,
-      infernoPayoff: Object.freeze({ durationMs: 1_500, highFlameExpansion: true, emberBurst: true, runeWave: true, lightingPulse: true }),
+      infernoPayoff: Object.freeze({ durationMs: 1_500, highFlameExpansion: true, emberBurst: true, heatWave: true, lightingPulse: true }),
       flareActive: this.flareActive,
       flareTemporal: directionalSample(this.flareAnimator, this.flareDirection),
       assets: Object.freeze({ ...familyAssets, flare: this.flareBitmap.status }),

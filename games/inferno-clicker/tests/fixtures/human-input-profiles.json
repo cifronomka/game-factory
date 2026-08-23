@@ -50,7 +50,7 @@
       "stopMs": 180000,
       "rewardAfterMs": 65000,
       "tapPattern": { "kind": "burst-rest", "intervalsMs": [120, 140, 160, 150, 130], "activeMs": 8000, "restMs": 1300 },
-      "expected": { "stageReachedAtMs": { "2": 2360, "3": 10820, "4": 21820, "5": 35720, "6": 59420, "7": 67770 }, "acceptedTaps": 1126, "score": 209713, "heat": 911.3691452101481, "maxHeat": 999.46, "currentInfernoHoldMs": 11200, "runLongestInfernoHoldMs": 74809.38271604983, "runHighestStage": 7, "finalStage": 7, "maxConcurrentEnemyDebuffs": 2, "rewardResolvedAtMs": 65000 }
+      "expected": { "stageReachedAtMs": { "2": 2360, "3": 10820, "4": 21820, "5": 35720, "6": 59420, "7": 67770 }, "acceptedTaps": 1126, "score": 212719, "heat": 914.6489558539629, "maxHeat": 999.46, "currentInfernoHoldMs": 12180, "runLongestInfernoHoldMs": 99343.88888888934, "runHighestStage": 7, "finalStage": 7, "maxConcurrentEnemyDebuffs": 2, "rewardResolvedAtMs": 65000 }
     }
   ]
 }

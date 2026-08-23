@@ -15,6 +15,10 @@ import {
 import { createDefaultRecords, sanitizeRecords } from '../../src/core/engine.js';
 
 test('seven-stage config has the committed thresholds, decay, multipliers and bonuses', () => {
+  assert.deepEqual(STAGES.map((entry) => entry.nameKey), [
+    'stage.1', 'stage.2', 'stage.3', 'stage.4', 'stage.5', 'stage.6', 'stage.7',
+  ]);
+  assert.equal(STAGES.some((entry) => Object.hasOwn(entry, 'name')), false, 'core must not contain localized stage names');
   assert.deepEqual(STAGES.map((entry) => entry.lowerHeat), [0, 80, 220, 380, 560, 730, 900]);
   assert.deepEqual(STAGES.map((entry) => entry.decayPerSecond), [0.5, 2, 4, 6.5, 9, 13, 18]);
   assert.deepEqual(STAGES.map((entry) => entry.multiplier), [1, 1.25, 1.5, 2, 2.5, 3.25, 5]);

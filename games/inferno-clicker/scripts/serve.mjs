@@ -10,9 +10,11 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((pairs, item, index
 }, []));
 const root = resolve(gameRoot, args.root ?? '.');
 const port = Number(args.port ?? 4173);
+const serverNonce = String(args.nonce ?? '');
 const mime = new Map([['.html', 'text/html; charset=utf-8'], ['.js', 'text/javascript; charset=utf-8'], ['.css', 'text/css; charset=utf-8'], ['.json', 'application/json; charset=utf-8'], ['.txt', 'text/plain; charset=utf-8'], ['.svg', 'image/svg+xml'], ['.webp', 'image/webp'], ['.png', 'image/png'], ['.mp3', 'audio/mpeg'], ['.ogg', 'audio/ogg'], ['.opus', 'audio/ogg'], ['.flac', 'audio/flac']]);
 
-createServer(async (request, response) => {
+const server = createServer(async (request, response) => {
+  if (serverNonce) response.setHeader('X-Inferno-Server-Nonce', serverNonce);
   const pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://localhost').pathname);
   let file = normalize(join(root, pathname === '/' ? 'index.html' : pathname));
   if (!file.startsWith(root)) { response.writeHead(403).end('Forbidden'); return; }
@@ -25,4 +27,9 @@ createServer(async (request, response) => {
   } catch {
     response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Not found');
   }
-}).listen(port, '127.0.0.1', () => console.log(`Serving ${root} at http://127.0.0.1:${port}`));
+});
+server.listen(port, '127.0.0.1', () => {
+  const address = server.address();
+  const actualPort = typeof address === 'object' && address ? address.port : port;
+  console.log(`INFERNO_SERVER_READY ${JSON.stringify({ root, port: actualPort, nonce: serverNonce })}`);
+});

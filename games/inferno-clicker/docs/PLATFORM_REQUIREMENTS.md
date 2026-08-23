@@ -1,112 +1,121 @@
-# Platform Requirements — «Зажги»
+# Platform Requirements — «Зажги» / Ignite 1.0.0
 
-## Назначение
+## Scope и источник истины
 
-Документ задаёт внешние платформенные контракты. Первая реализация ориентирована на Yandex Games; VK Mini Apps, generic Web и Android/RuStore являются future adapters и не меняют game core.
+Active platform scope — Yandex Release Cycle 09: Desktop, Android и iOS, ориентация `Any`, RU+EN, возраст 12+. TV, VK, RuStore и native wrappers: `N/A — не входят в Cycle 09`. Правила и SDK перепроверены по официальной документации 2026-08-23; snapshot URL зафиксированы ниже и должны быть повторно проверены непосредственно перед отправкой на модерацию.
 
-## Статус проверки источников
+Game core не импортирует SDK, DOM или provider-specific data. Application использует `PlatformService`; отсутствующая capability возвращает typed result и никогда не блокирует direct-tap gameplay.
 
-- Yandex Games official SDK/requirements проверены 2026-08-18.
-- VK Mini Apps и Android/RuStore не входят в текущий implementation scope; их API и submission rules должны быть повторно проверены по официальным источникам при начале соответствующего adapter. Ни одно предположение ниже не считается разрешением на публикацию.
+## Production target и capabilities
 
-## Общий контракт и capability policy
+- Production-команда `build:yandex` фиксирует target `yandex`. `/sdk.js` загружается до application entry независимо от hostname; adapter выбирается target-ом, а не `globalThis.YaGames`.
+- `YaGames.init()` инициализируется один раз. Timeout/reject переводит remote features в unavailable, но сохраняет local-only игру.
+- Test rewarded-provider, `(тест)`, fake-ad UI и бесплатный success callback запрещены во всех Yandex production artifacts.
+- `PlatformCapabilities` после init содержит минимум `locale`, `authorized`, `rewarded`, `leaderboardRead`, `leaderboardWrite`, `cloudRead`, `cloudWrite`; provider identity не передаётся в presentation.
+- `locale`: `ru/be/kk/uk/uz → ru`, остальные/unknown → `en`, источник — `ysdk.environment.i18n.lang` при startup.
 
-Application layer использует только `PlatformService`: `init`, `markReady`, `saveData`, `loadData`, `submitScore`, `getLeaderboard`, `showRewardedAd`, `showInterstitial`, `pauseGame`, `resumeGame`, `subscribePauseChanges`, `getPauseSnapshot`, `dispose`. Core остаётся headless и не импортирует adapter. Реализованные adapters расположены в `src/platforms/yandex`, `web`, `dev`; `vk` и `android` являются future scope.
+| Capability | Yandex success | SDK/guest/unavailable fallback |
+|---|---|---|
+| Ready | `LoadingAPI.ready()` once после интерактивной готовности | local app становится интерактивным; remote status unavailable |
+| Save/load | local-first + Player data | versioned localStorage, active run не восстанавливается |
+| Leaderboard | `best-score`, integer DESC | local Best Score; remote UI нейтрально unavailable |
+| Rewarded | официальный `showRewardedVideo` | offer скрыт; бесплатной награды нет |
+| Lifecycle | SDK events + browser reason-set | visibility/blur/focus reason-set |
+| Interstitial/IAP/sticky | `N/A — не реализуются` | `N/A — не реализуются` |
 
-Любой метод возвращает typed result, а не бросает platform exception в core. Отсутствующая capability скрывает соответствующую CTA или использует явно описанный local fallback. Инициализация платформы ограничена 5 s; после timeout игра продолжает запуск с web adapter.
+## Initialization и Game Ready
 
-## Матрица capabilities
+1. Создать pause coordinator и подписать browser lifecycle до запуска симуляции.
+2. Загрузить `/sdk.js`, вызвать `YaGames.init()`, сразу подписать `game_api_pause`/`game_api_resume` и получить environment locale.
+3. Параллельно загрузить local save и critical assets; cloud merge не задерживает первый playable screen сверх согласованного timeout.
+4. Показать локализованный HUD, убрать loader и убедиться, что touch/mouse input принимается.
+5. Вызвать `ysdk.features.LoadingAPI.ready()` ровно один раз. Retry boot не имеет права посылать второй ready.
 
-| Capability | Yandex — primary | VK — future | Web fallback | Android/RuStore — future | Core при отсутствии |
-|---|---|---|---|---|---|
-| Init/ready | `YaGames.init`, затем `LoadingAPI.ready` в точный interactive момент | Bridge init после актуальной проверки | immediate local init | native bridge init | продолжить local mode |
-| Save/load | local-first + Player data, если доступно | bridge storage/cloud после проверки | versioned localStorage | local/native storage | records остаются локальными |
-| Best Score leaderboard | Yandex leaderboard adapter | VK leaderboard/service после проверки | local best only | provider-specific/disabled | CTA leaderboard скрыта |
-| Rewarded | Yandex SDK, explicit voluntary CTA | provider ad API после проверки | до Yandex integration: явно маркированный `test` provider; Yandex release: unavailable | provider SDK после проверки | все stages доступны; исчезает только optional ×2 |
-| Interstitial | MVP: не вызывается игрой | N/A в MVP | unavailable | N/A в MVP | ничего не происходит |
-| Pause/resume | SDK events + ad callbacks + visibility | bridge lifecycle + visibility | Page Visibility/blur | native lifecycle | idempotent local lifecycle |
+Yandex debug panel должен показывать корректный SDK init и зелёный Game Ready не позднее 90 секунд; фактическая продуктовая цель ready-to-interactive — p75 ≤3 секунды на согласованном mid-tier Android/4G профиле.
 
-## Yandex Games — primary
+## Gameplay, focus и fullscreen lifecycle
 
-### Initialization и ready
+- `GameplayAPI.start()` вызывается при фактическом первом/повторном входе в активный `PLAYING`; `stop()` — при menu, results, hidden, ad и окончании run.
+- `game_api_pause`, `game_api_resume`, `visibilitychange`, `pagehide`, `blur/focus`, `menu`, `ad` и `game-ended` входят в единый idempotent reason-set. Снятие одной причины не снимает остальные.
+- Startup ad может поставить platform pause до первого run. До valid resume simulation clock и audible sources не стартуют.
+- Перед rewarded gameplay и audio остановлены. На pause audio достигает silence ≤100 ms; stale one-shots не проигрываются после resume.
+- Hidden/ad/menu время не уменьшает heat и не расходует encounter, animation, boost или cooldown timers; catch-up запрещён.
 
-SDK загружается текущим официальным loader `/sdk.js` только на Yandex host и инициализируется через `YaGames.init()`. Generic Web не делает заведомо ошибочный SDK request. `ysdk.features.LoadingAPI?.ready()` вызывается ровно один раз, только когда critical assets загружены (либо после явного retry включён documented procedural fallback), HUD видим, loading overlay снят и первый tap/click может быть принят. Ошибка SDK не блокирует web fallback.
+## Player data
 
-### Gameplay lifecycle
+- Сначала синхронно читается local `InfernoSaveV1`; затем при доступности Player API — cloud snapshot.
+- Merge использует maxima для `bestScore`, `highestStageReached`, `longestInfernoHoldMs`, `maxMultiplier`, `runsPlayed`; preferences выбираются по более новому `updatedAt`. Активный run, boost и cooldown не persisted.
+- Local save записывается сразу. Cloud latest-wins queue объединяет последнюю запись и вызывает `Player.setData` не чаще одного раза за 5 секунд, то есть не более 60 вызовов за 5 минут при непрерывных изменениях.
+- Final cloud flush выполняется на results и best-effort на pause/pagehide. Ошибка не откатывает local record и не создаёт unhandled rejection.
+- Отказ пользователя от profile data или гостевой режим не вызывает обязательный login dialog и не ограничивает игру.
+- В Console включается cloud-save capability. Payload должен оставаться ниже 200 KB; release audit фиксирует фактический размер.
 
-- При фактическом начале/возобновлении active run adapter вызывает `GameplayAPI.start()`.
-- При menu pause, hidden tab, окончании run и перед fullscreen/rewarded ad вызывает `GameplayAPI.stop()`.
-- `game_api_pause` добавляет pause reason и немедленно останавливает simulation/audio. SDK уже согласует этот event с Gameplay API, поэтому adapter не дублирует `stop()` для самого platform-event.
-- `game_api_resume` снимает только platform reason; resume происходит лишь при отсутствии `ad`, `visibility`, `menu` и других reasons. Если local reason остаётся, adapter повторно фиксирует `stop()`, но не делает ложный `start()`.
-- Startup ad учитывается через platform pause/resume events; до первого valid resume audio/game clock не стартуют.
+## Leaderboard `best-score`
 
-### Player data и leaderboard
+- В Console создать одно поле `best-score`, numeric integer, descending; имя в adapter совпадает побайтно.
+- Использовать актуальные прямые методы `ysdk.leaderboards` и проверять `ysdk.isAvailableMethod` перед read/write.
+- Submit только после завершения run, только если integer `0..2_147_483_647` выше последнего подтверждённого local/submitted best. Lower/duplicate/retry не уменьшают и не дублируют запись.
+- Read/write unavailable и auth-required отображаются нейтрально; login prompt возможен только после отдельного явного действия игрока, которого в Cycle 09 нет.
 
-- Сначала загружается local save, затем при доступном `ysdk.getPlayer()` — cloud data.
-- Отказ пользователя от profile data не блокирует игру; неавторизованный пользователь получает local records.
-- Merge: максимум для `bestScore`, all-time `highestStageReached`, `longestInfernoHoldMs`, `maxMultiplier` и `runsPlayed`; daily-ritual status объединяется только для совпадающей календарной даты без повторной награды, настройки — более новый `updatedAt`.
-- Публичный leaderboard: одно понятное значение **Best Score**, technical name в Yandex Console и adapter — строго `best-score`, integer `0..2_147_483_647`. Submission только при завершении run и только если новый local best прошёл sanity checks. Несовпадение console name является внешним configuration blocker и даёт nonblocking local fallback.
-- Leaderboard unavailable/auth-required отображается нейтрально и не открывает login dialog без явного действия игрока.
+## Rewarded
 
-### Rewarded ads
+- Единственный placement — `heat-power-2x-60s`, eligible после достижения stage 3 текущей попытки.
+- CTA до запуска точно сообщает просмотр рекламы, множитель и 60 активных секунд. Отдельное подтверждение вызывает `ysdk.adv.showRewardedVideo`.
+- Reward выдаётся только один раз по `onRewarded`; `onClose` без него, `onError`, timeout без предшествующего `onRewarded` и unavailable дают 0. Уже полученный `onRewarded` не отменяется, если `onClose` отсутствует; terminal timeout лишь освобождает lifecycle. Cooldown 90 active seconds начинается только при reward.
+- Повтор разрешён после boost и cooldown; platform frequency limit на дату snapshot отсутствует. Одновременно разрешён один request.
+- Все pause/audio/gameplay требования выполняются на протяжении fullscreen lifecycle; progression без provider идентична.
 
-CTA до запуска явно сообщает: «Посмотреть рекламу и получить ×2 к силе жара на 20 секунд». Gameplay и весь audio паузятся до вызова SDK и остаются paused до terminal callback/platform resume. Reward выдаётся ровно один раз только по rewarded callback и создаёт только queued boost. Close/error/unavailable не меняют heat, score, progression, cooldown или использованный лимит; отображается короткое ненавязчивое сообщение.
+## Desktop и mobile display/input
 
-### Submission и content
+- Console platforms: Desktop, Android, iOS; orientation: `Any`. TV не выбирать.
+- Active game field касается минимум одного края viewport, не искажается и имеет long-side/short-side ratio `≤2`. На ultrawide используются оформленные CSS-боковины.
+- Обязательная desktop-матрица: 1280×1024, 1366×768, 1600×900, 1680×1050, 1920×1080, 1920×1200, 2560×1080, 2560×1440, 3840×2160; zoom 80%, 100%, 125%.
+- Mobile: portrait/landscape Android и iOS, safe areas, rotation, virtual browser chrome и `visualViewport`. Минимальные interactive targets 48×48 CSS px, flame target 96×96 CSS px.
+- Touch gestures, long press, context menu, drag/select, callout, swipe refresh и page scroll не перехватывают gameplay. Mouse primary click работает на desktop; right click ничего не активирует.
+- Browser QA: Yandex Browser, Chrome, Firefox, Opera и Safari; Android 5+ и iOS 9+ compatibility подтверждается build/runtime test, а не только современным Chromium.
 
-- Только SDK Yandex используется для рекламы; third-party ad code отсутствует.
-- Rewarded полностью добровольна и не участвует в stage calculation: stages 1–7, score-run, restart и local records доступны без provider. Она даёт только временный `tapPower ×2` на 20 активных секунд; modal никогда не открывается автоматически.
-- Реклама не вызывается неожиданно на tap target или во время активного gameplay.
-- Sound/gameplay полностью paused на fullscreen ads.
-- Русский интерфейс обязателен; архитектура допускает locale bundles и platform locale.
-- Материалы: stylized fantasy без gore, крови, натуралистичного ужаса и откровенного контента; возрастной рейтинг уточняется в console до submission.
-- Production ZIP содержит entry `index.html` в корне, относительные URLs и только runtime files; финальные ограничения сверяются в console перед release.
+## Submission/content configuration
 
-### Официальные источники Yandex, проверены 2026-08-18
+- Card titles: RU `Зажги`, EN `Ignite`; age `12+`; categories `Аркады / Arcade` и `Казуальные / Casual`.
+- RU+EN About и How to play берутся без изменений из `releases/yandex-submission-1.0.0/`.
+- Из видимых art/text удалены руны, ритуальные/религиозные знаки и узнаваемая эзотерика. Видимые имена: `Хранительница угасания / Ember Warden`, `Огненное кольцо / Fire Ring`.
+- Только rewarded monetization. Interstitial, sticky, IAP и third-party ads не включать.
+- ZIP распакованным `<90 MB` при platform limit 100 MB; `index.html` в корне; относительные URLs; имена путей без Cyrillic/spaces; dev/test files отсутствуют.
+- Минимум 4 desktop screenshots 16:9 и 4 mobile screenshots 9:16; actual gameplay ≥70%; icon/cover не являются скриншотами.
+- Draft upload и debug-panel verification обязательны до release PASS. Submission to moderation/public publish не выполняются без отдельного разрешения.
 
-- SDK connection: https://yandex.ru/dev/games/doc/ru/sdk/sdk-about
-- Game Ready и Gameplay API: https://yandex.ru/dev/games/doc/ru/sdk/sdk-game-events
-- Pause/resume events: https://yandex.com/dev/games/doc/en/sdk/sdk-events
-- Player data: https://yandex.ru/dev/games/doc/ru/sdk/sdk-player
-- Game and ad requirements: https://yandex.com/dev/games/doc/en/concepts/requirements
-- SDK moderation checks: https://yandex.com/dev/games/doc/en/requirements/1/19
+## Platform verification matrix
 
-## VK Mini Apps — future adapter contract
-
-До реализации необходимо проверить актуальные official VK Mini Apps и VK Bridge docs, создать приложение, подтвердить allowed origins/launch params, lifecycle, storage, ads и leaderboard availability. Планируемое поведение: bridge init за adapter boundary, Page Visibility как дополнительный сигнал, local-first save, отсутствие capability — graceful disable. Yandex-specific calls и data shapes не переиспользуются.
-
-Acceptance для будущего adapter добавляется отдельным change request; текущий release может пометить VK criteria `N/A — adapter вне scope`, но не заявлять VK support.
-
-## Generic Web adapter
-
-- Никаких внешних SDK; init немедленный.
-- `localStorage` с versioned schema; corrupt data → defaults с сохранением диагностического события.
-- Leaderboard скрыт, отображается local Best Score.
-- До подключения Yandex current Generic Web/dev review build сообщает `rewardedProvider='test'`: CTA называется строго `Получить ×2 (тест)`, confirm — `Активировать тестовый ×2 на 20 секунд`, а provider асинхронно возвращает тот же idempotent terminal `rewarded` contract без слов «реклама/просмотр».
-- Test provider взаимоисключается с Yandex adapter, передаёт `provider=test` в telemetry и не входит в Yandex release configuration. Если test provider выключен, rewarded/interstitial возвращают `unavailable`, а все семь stages и score-run остаются доступны.
-- `visibilitychange`, `pagehide`, `blur/focus` управляют reason-set pause; hidden time не уменьшает heat и rewarded duration.
-- Web adapter является обязательным dev/E2E fallback и должен проходить contract suite.
-
-## Android / RuStore — future adapter contract
-
-Рекомендуется lightweight WebView/Capacitor-style wrapper только после успешного browser release. Перед работой повторно проверить официальные RuStore требования к package/signing, privacy/data safety, supported Android versions, ads и review artifacts.
-
-Native bridge обязан передавать lifecycle/back button/storage/ad results в тот же `PlatformService`. Android back: сначала закрывает modal/menu, затем запрашивает выход; background/lock немедленно pauses simulation/audio. Web core и баланс не форкаются.
-
-## Platform test matrix
-
-| ID | Platform/environment | Scenario | Измеримый expected result |
+| ID | Сценарий | Expected | Текущий статус |
 |---|---|---|---|
-| PL-01 | Yandex debug panel | SDK init + ready | current loader detected; ready отправлен один раз после interactive state |
-| PL-02 | Yandex debug panel | start/menu/ad/hidden/resume | gameplay indicator соответствует active/paused; heat/audio не идут в pause |
-| PL-03 | Yandex authorized player | save → reload → cloud merge | все record/settings fields восстановлены по schema и merge rules; active run не восстановлен |
-| PL-04 | Yandex guest/denied data | полный run | game playable; local record сохраняется; uncaught errors = 0 |
-| PL-05 | Yandex rewarded success | accepted reward | один 20 s boost начинается после resume; progression state не меняется; повторной выдачи нет |
-| PL-06 | Yandex rewarded close/error | terminal callback | boost/heat/score/progression не меняются; gameplay безопасно resumes |
-| PL-07 | Yandex leaderboard | new best | ровно integer Best Score отправлен один раз после end state |
-| PL-08 | Generic Web/dev | no SDK/offline | игра запускается; local save и stages 1–7 работают; явно тестовая CTA выдаёт только optional ×2 через общий idempotent contract; ad/leaderboard UI не имитируется |
-| PL-09 | Any current target | rapid duplicate pause/resume | reason-set не допускает double resume или tick в pause |
+| PL09-01 | SDK success/failure + Game Ready | target всегда Yandex; ready once; failure playable local-only | NOT RUN |
+| PL09-02 | RU-group/other/unknown locale | RU/EN mapping и все visible/ARIA strings локализованы | NOT RUN |
+| PL09-03 | gameplay/menu/hidden/platform/ad/results lifecycle | indicator, simulation и audio точно соответствуют state | NOT RUN |
+| PL09-04 | authorized cloud save/merge/rate limit/flush | maxima не теряются; ≤1 write/5 s; active run не restored | NOT RUN |
+| PL09-05 | guest/denied/cloud error | full game local-only; login не навязывается; errors=0 | NOT RUN |
+| PL09-06 | rewarded success ×2 | один 60 s boost; следующий success ≥90 active s; repeated allowed | NOT RUN |
+| PL09-07 | close/error/timeout без prior `onRewarded`/duplicate/late | reward/cooldown/progression mutation=0; earned reward после prior `onRewarded` сохраняется один раз; safe retry/resume | NOT RUN |
+| PL09-08 | leaderboard new/lower/duplicate/unavailable | one improved integer submit; graceful fallback | NOT RUN |
+| PL09-09 | desktop/mobile/rotation/zoom/input | no crop/distortion/page gesture; targets accessible | NOT RUN |
+| PL09-10 | uploaded Yandex draft | SDK/Game Ready/reward/cloud/leaderboard verified on exact ZIP SHA | NOT RUN |
 
-## Перед integration и release
+## Official Yandex snapshot — checked 2026-08-23
 
-Platform Integration Agent повторно проверяет даты и URLs, актуальные loader/API signatures, moderation checklist, ZIP/package limits и console settings. Изменения требований обновляют этот документ, architecture adapter contract, QA cases и acceptance criteria до release.
+- Общие требования: https://yandex.ru/dev/games/doc/ru/concepts/requirements
+- Подключение SDK: https://yandex.ru/dev/games/doc/ru/sdk/sdk-about
+- Game Ready и Gameplay API: https://yandex.ru/dev/games/doc/ru/sdk/sdk-game-events
+- SDK pause/resume: https://yandex.ru/dev/games/doc/ru/sdk/sdk-events
+- Rewarded/interstitial API: https://yandex.ru/dev/games/doc/ru/sdk/sdk-adv
+- Player data: https://yandex.ru/dev/games/doc/ru/sdk/sdk-player
+- Leaderboards: https://yandex.ru/dev/games/doc/ru/sdk/sdk-leaderboard
+- Автоопределение языка: https://yandex.ru/dev/games/doc/ru/requirements/2/14
+- Длительность/реиграбельность: https://yandex.ru/dev/games/doc/ru/requirements/2/9
+- Механики: https://yandex.ru/dev/games/doc/ru/requirements/2/4
+- Адаптивное отображение: https://yandex.ru/dev/games/doc/ru/requirements/1/10
+- Проверки SDK: https://yandex.ru/dev/games/doc/ru/requirements/1/19
+- Возрастной рейтинг: https://yandex.ru/dev/games/doc/ru/requirements/2/7
+- Новый черновик и платформы: https://yandex.ru/dev/games/doc/ru/console/add-new-game/draft
+- Проверка игры: https://yandex.ru/dev/games/doc/ru/console/test-game
+- Модерация: https://yandex.ru/dev/games/doc/ru/concepts/moderation
+
+Любое изменение официальной страницы после snapshot открывает platform review; документация не является разрешением на фактическую публикацию.

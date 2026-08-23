@@ -1,5 +1,9 @@
 # Game Design — «Зажги»
 
+## Yandex Release Cycle 09 gameplay delta
+
+Cycle 09 имеет приоритет над прежними rewarded/visible-name/retention формулировками. Числовая модель heat, score, decay, stages, encounters и canonical no-reward trace сохраняется. Изменяются: eligibility stage `4→3`, boost `20→60` активных секунд, повторные rewarded после `90` активных секунд от награды, RU+EN presentation, восемь derived goals и безопасные видимые названия. Полный контракт — `YANDEX_RELEASE_CYCLE_09.md`.
+
 ## Cycle 07 presentation-only clarification
 
 Числовые правила, расписания и причинность событий ниже не меняются. Cycle 07 имеет precedence над конфликтующими presentation-формулировками Cycle 06 и заменяет только визуальное выражение событий:
@@ -38,7 +42,7 @@ tap/click
 → телеграфируемая помеха временно усиливает decay, не меняя управление
 → вход в новую stage даёт разовый score bonus
 → все семь stages открываются теми же прямыми taps без provider permission
-→ добровольный rewarded success может временно дать ×2 heat на 20 active seconds
+→ после stage 3 добровольный rewarded success может дать ×2 heat на 60 active seconds
 → после входа в Инферно игрок удерживает heat ради score и рекорда времени
 ```
 
@@ -122,13 +126,13 @@ Stage пересчитывается без гистерезиса по теку
 
 | # | Название | Heat range | Decay, heat/с | Раскрытие и gameplay |
 |---:|---|---:|---:|---|
-| 1 | Тьма | `[0,80)` | 0,5 | едва видимый уголёк, минимальное свечение, почти тишина; врагов нет |
-| 2 | Искра | `[80,220)` | 2,0 | проявляются камни, пепел, круг, трещины и первые руны; появляется crackle/ambient |
-| 3 | Пепельный слуга | `[220,380)` | 4,0 | появляется стилизованный бес; активируется Порыв слуги |
-| 4 | Алый порог | `[380,560)` | 6,5 | врата, цепи, яркие руны, огненные трещины и силуэт большой сущности |
-| 5 | Демонесса угасания | `[560,730)` | 9,0 | появляется стилизованная демонесса; активно Холодное клеймо |
-| 6 | Круг Инферно | `[730,900)` | 13,0 | наблюдатели, глаза, цепи, множество рун и жар; активны Окна жара |
-| 7 | Инферно | `[900,1000]` | 18,0 | огненный столб, максимальное раскрытие и множитель; цель — удержание |
+| 1 | Тьма / Darkness | `[0,80)` | 0,5 | едва видимый уголёк, минимальное свечение, почти тишина; врагов нет |
+| 2 | Искра / Spark | `[80,220)` | 2,0 | проявляются камни, пепел и огненные трещины; появляется crackle/ambient |
+| 3 | Пепельный слуга / Ash Servant | `[220,380)` | 4,0 | появляется стилизованный огненный слуга; активируется Порыв слуги |
+| 4 | Алый порог / Crimson Threshold | `[380,560)` | 6,5 | огненные врата, цепи, трещины и силуэт большой хранительницы |
+| 5 | Хранительница угасания / Ember Warden | `[560,730)` | 9,0 | появляется стилизованная хранительница; активно Холодное угасание |
+| 6 | Огненное кольцо / Fire Ring | `[730,900)` | 13,0 | наблюдатели, глаза, цепи и сильный жар; активны Окна жара |
+| 7 | Инферно / Inferno | `[900,1000]` | 18,0 | огненный столб, максимальное раскрытие и множитель; цель — удержание |
 
 Целевые ориентиры при постепенном росте частоты от 2 до 7,14 taps/с: стадия 2 — `5–15 с`, стадия 3 — `25–50 с`, stage 4 — `55–80 с`, stage 5 — `90–120 с`, первый вход в Инферно — `90–180 с`. Это playtest targets, а не скрытое scaling: формулы не меняются по пользователю. Обязательный no-reward V5 trace достигает stage 7; boosted trace измеряет только ускорение.
 
@@ -166,16 +170,16 @@ Stage пересчитывается без гистерезиса по теку
 - Внутри окна `heatWindowFactor=2`; окно не меняет stage multiplier.
 - Понижение ниже 730 отменяет telegraph/window; при возврате первый trigger снова через 6,0 с.
 
-Все события обязаны иметь отдельный визуальный сигнал; критический смысл не может передаваться только цветом или звуком. Активные enemy effects выводятся отдельными строками: `Пепельный слуга / Пепельный выдох / Decay ×1,80` и `Демонесса угасания / Холодное угасание / Decay ×1,50`, каждая со своим remaining time. При overlap обе строки видимы одновременно; optional total `Общий decay ×2,50` не заменяет источники.
+Все события обязаны иметь отдельный визуальный сигнал; критический смысл не может передаваться только цветом или звуком. Активные enemy effects выводятся отдельными локализованными строками: `Пепельный слуга / Пепельный выдох / Decay ×1,80` и `Хранительница угасания / Холодное угасание / Decay ×1,50`, каждая со своим remaining time. При overlap обе строки видимы одновременно; optional total `Общий decay ×2,50` не заменяет источники.
 
 ## Необязательный rewarded boost — «Усиление жара ×2»
 
-- Placement разблокируется, когда в текущем run одновременно выполнены `runHighestStage ≥4` и `activeRunTime ≥45,0 с`. Persisted all-time record `highestStageReached` не делает новый run eligible сам по себе. Компактная неблокирующая CTA видна только в safe PLAYING, не перекрывает flame и при click лишь открывает pause/boost confirm sheet с pause reason `menu`. Provider запускается отдельным confirm control внутри этого явно открытого sheet, после чего добавляется pause reason `ad`. Во время encounter, stage transition, любого другого pause, active boost или pending request opener CTA скрыта. Модальное предложение само не появляется.
-- После подтверждённого terminal `rewarded` callback ровно один раз запускается `20,0 с` активного gameplay времени с `rewardedFactor=2`; boost начинается только после valid resume и ничего не разблокирует.
+- Placement ID — `heat-power-2x-60s`. Eligibility текущей попытки начинается при `runHighestStage ≥3`; persisted all-time record не делает новый run eligible. Компактная DOM/CSS-плашка видна только в safe `PLAYING`, не перекрывает flame и при click лишь открывает pause/confirm sheet с reason `menu`. Provider запускается отдельным confirm control, после чего используется reason `ad`. Во время encounter, pause/modal, active boost, cooldown или pending request opener скрыт; presentation-only stage crossfade не меняет gameplay eligibility; auto-open отсутствует.
+- После первого подтверждённого `onRewarded` конкретного request ID queued boost запускается после valid resume и действует `60 000 ms` активного gameplay с `rewardedFactor=2`; он ничего не разблокирует.
 - Визуальный power mode: более светлое ядро/оттенок огня, усиленный glow и particles в пределах performance/reduced-motion budget; отдельный sound cue, не обязательный для понимания.
 - Boost не меняет stage thresholds, stage multiplier, decay или event schedule. Он усиливает heat tapPower; добавочная provider-половина tapPower исключается из прямого tap-score через `scoreTapPower`.
-- Лимит `1` подтверждённый boost за run; offer исчезает после успеха. Следующий показ в новом run разрешён не раньше чем через `90 с` активного времени текущей app session после успешного reward; session cooldown не сохраняется после полного перезапуска приложения.
-- Cancel/error/unavailable даёт 0 награды, не расходует единственную попытку и не запускает cooldown. Terminal callback снимает только pause reason `ad`: при отсутствии других reasons игра ровно один раз возвращается в `PLAYING`, иначе остаётся `PAUSED`. Повторный добровольный запрос разрешён. Игра, таймеры и звук не идут во время provider flow.
+- Cooldown `90 000 ms` активного gameplay начинается в момент `onRewarded`, переносится между runs текущей app session и не persisted. Повторные rewards разрешены после завершения boost и cooldown, в том числе в том же run. При непрерывной игре offer возвращается не раньше 30 секунд после окончания 60-секундного boost.
+- Close без reward, error, timeout без предшествующего `onRewarded` и unavailable дают 0 награды и cooldown. Если `onRewarded` уже получен, terminal timeout при отсутствующем `onClose` сохраняет earned reward и только снимает `ad`. Resume возможен только без других reasons. Повторный добровольный запрос разрешён после cleanup. Duplicate/late callback не выдаёт второй boost; одновременно существует один request.
 - Без offer доступны direct-tap run, stages 1–7, локальные рекорды и restart. Для аналитики/результата сохраняется только `boostUsed`; публичный `Best Score` принимает boosted и non-boosted runs.
 
 ## Прогрессия, leaderboard и persistence
@@ -196,6 +200,8 @@ Stage пересчитывается без гистерезиса по теку
 - `maxMultiplier` — максимальное фактически активное stage multiplier, диапазон 1–5; legacy значения выше 5 clamp'ятся до 5.
 - `runsPlayed`, флаги первого tutorial, mute/reduced-motion, дата и статус ежедневного ритуала.
 
+В Cycle 09 из этих уже сохраняемых рекордов без migration вычисляются восемь значков в фиксированном порядке release-плана: stage 3; stage 5; stage 7; 3 runs; 10 runs; Inferno hold 30 s; Inferno hold 60 s; Best Score 250 000. `nextGoal` — первый невыполненный пункт; при выполнении всех восьми показывается локализованное `Все цели выполнены / All goals complete`. Значки не дают heat, score, валюту или рекламный бонус.
+
 Сохранение требуется при новом рекорде, завершении run и lifecycle pause; submit публичного `Best Score` выполняется только при завершении run и только если итог выше ранее отправленного. Активный run (`heat`, `score`, timers, effects, boost) никогда не восстанавливается после reload/relaunch: начинается `READY` с `heat=30`, а сохранённые records/settings загружаются. Отсутствие авторизации/SDK оставляет локальный рекорд и не блокирует игру. Повреждённые/неизвестной версии данные заменяются безопасными defaults после попытки миграции поддерживаемой версии.
 
 Публичный leaderboard: одно поле `Best Score`, сортировка по убыванию; при равенстве используется platform-defined tie-breaker. Highest stage, longest Inferno hold и max multiplier показываются как персональная статистика и не создают отдельные публичные таблицы в 1.0.
@@ -203,7 +209,7 @@ Stage пересчитывается без гистерезиса по теку
 ### Retention без dark patterns
 
 - Экран результата явно сравнивает run с `bestScore`, `longestInfernoHold` и `maxMultiplier` и показывает один ближайший личный target (например, `+5 000 до рекорда` или `+3,2 с удержания`).
-- «Ритуал дня» выбирается детерминированно по локальной календарной дате: достичь заданной stage, набрать score или удерживать Inferno заданное время. Ни одна задача не требует provider/boost.
+- Видимая «Цель дня / Daily goal» выбирается детерминированно по локальной календарной дате: достичь заданной stage, набрать score или удерживать Inferno заданное время. Internal legacy save-key `dailyRitual` сохраняется только для совместимости и не показывается пользователю. Ни одна задача не требует provider/boost.
 - За первое выполнение дня выдаётся только визуальная отметка дня и result celebration, без heat/score преимущества. Пропуск дня ничего не сбрасывает; streak и наказание отсутствуют.
 - Clock rollback не может выдать вторую отметку за уже записанную календарную дату; невозможность определить дату отключает ежедневную задачу, но не core game.
 
@@ -211,7 +217,7 @@ Stage пересчитывается без гистерезиса по теку
 
 - Сложность растёт только через табличный stage decay, новые телеграфируемые события и более высокую цену ошибки на большом heat.
 - Dynamic difficulty adjustment, скрытое изменение tapPower, rubber-banding и зависимость progression от provider запрещены.
-- Игрок компенсирует рост decay только большей частотой полноценных базовых taps; Heat Window даёт короткий понятный запас, а rewarded/test boost — необязательный фиксированный power spike.
+- Игрок компенсирует рост decay только большей частотой полноценных базовых taps; Heat Window даёт короткий понятный запас, а Yandex rewarded boost — необязательный фиксированный power spike.
 - Measurable tuning: canonical cadence равна `2 taps/s` на stages 1–2, `4 taps/s` на stages 3–4, `5 taps/s` на stage 5 и `7,14 taps/s` на stages 6–7. Номинальный normal net без events: stage 4 `12−6,5=+5,5 heat/s`, stage 5 `15−9=+6`, stage 6 `21,43−13=+8,43`, stage 7 `21,43−18=+3,43`. В stage-7 servant effect требуется `>10,8 taps/s`, но это краткое event-window, а не постоянная cadence gate.
 - V5 fixture targets с независимыми concurrent schedules: no-reward stage 7 достигается в `164,80 с`; optional boost в `65,00 с` сокращает это до `102,71 с`. Gameplay tap-комбинации и cadence cooldown отсутствуют.
 - Если playtest funnel выходит за диапазоны из `PRODUCT_SPEC.md`, разрешён тюнинг только явных таблиц/чисел этого документа с обновлением тестов и acceptance, а не скрытая персонализация.
@@ -232,9 +238,9 @@ Stage пересчитывается без гистерезиса по теку
 | Stage bonus | первый upward entry в stage 2–7 за run | 500 / 1 500 / 3 000 / 6 000 / 10 000 / 20 000 score | один раз на stage за run |
 | Inferno hold | каждую активную секунду heat ≥900 | `50 × multiplier` score и hold time | пока условие истинно |
 | Heat Window | active world window stage 6+ | heat tapPower ×2 на 1,5 активных секунды | deterministic schedule, без combo |
-| Усиление жара ×2 | confirmed terminal `rewarded` после stage 4 eligibility | heat tapPower ×2 на 20 активных секунд; прямой tap score без provider-добавки; progression permission не меняется | 1/run; 90 с session cooldown после успеха; cancel/error без расхода |
+| Усиление жара ×2 | confirmed `onRewarded` после stage 3 eligibility | heat tapPower ×2 на 60 активных секунд; прямой tap score без provider-добавки; progression permission не меняется | повтор после 90 active s от reward; cancel/error без cooldown |
 | Personal best | превышение сохранённого значения | result celebration + сохранение/submit | без gameplay power |
-| Ритуал дня | первое выполнение дневной задачи | визуальная отметка и celebration | 1/локальную дату, без streak |
+| Цель дня | первое выполнение дневной задачи | визуальная отметка и celebration | 1/локальную дату, без streak |
 
 ## Игровые состояния
 
@@ -261,14 +267,15 @@ Stage пересчитывается без гистерезиса по теку
 9. При heat `558,34` normal tap даёт heat `561,34`, пересекает stage 5, начисляет bonus `6 000` и tap score `3×2,5×10=75` без reward или permission state.
 10. При том же heat и active rewarded boost tap имеет heat power `6`, но direct tap score всё равно использует `scoreTapPower=3`: `3×2,5×10=75`.
 
-### Paired canonical direct traces v5
+### Paired canonical direct traces — Cycle 09
 
 Обе обязательные fixtures начинаются с нового профиля/start defaults; первый tap в `t=0 ms`; следующий tap планируется от предыдущего scheduled timestamp по `runHighestStage`: stages 1–2 — `500 ms`, 3–4 — `250 ms`, 5 — `200 ms`, 6–7 — `140 ms`. Общий deterministic checkpoint — конец fixed step в `t=180 000 ms`. Автоматические events используют versioned schedules этого документа; pause, restart, secondary input и wall-clock jumps отсутствуют. Один generator/config исполняется на 60/30/15 FPS.
 
 - `canonicalDirectNoRewardV5`: provider action отсутствует. Stages 2/3/4/5/6/7 впервые достигаются в `9 000 / 43 500 / 64 500 / 102 000 / 145 200 / 164 800 ms`. В checkpoint: `runHighestStage=7`, heat `946,465417±0,01`, `786` accepted taps, score `110 498`, current Inferno hold `15 060 ms`.
-- `canonicalDirectBoostedV5`: в active time `65 000 ms` fixture выполняет explicit sheet confirm и один terminal `rewarded` success; wall/ad time не добавляется. Stages 2/3/4/5/6/7 впервые достигаются в `9 000 / 43 500 / 64 500 / 75 750 / 83 950 / 102 710 ms`. В checkpoint: `runHighestStage=7`, heat `936,94±0,01`, `944` accepted taps, score `180 220`, current Inferno hold `65 950 ms`; boost уже завершён.
+- `canonicalDirectBoostedV5` с одним 20-секундным boost остаётся исторической C08 fixture и не является Cycle 09 acceptance.
+- Новая `canonicalDirectRewardedC09` использует ту же timestamped input sequence и checkpoint `240 000 ms`. Первый success запрашивается в safe state в `65 000 ms`; второй становится cooldown-eligible в `155 000 ms` и выполняется в первом следующем safe state после encounter — `160 250 ms`. Boost windows: `65 000–125 000` и `160 250–220 250 ms`, ровно по 60 active seconds. Stages 2/3/4/5/6/7: `9 000 / 43 500 / 64 500 / 75 750 / 83 950 / 90 950 ms`; checkpoint: `runHighestStage=7`, heat `998,38±0,01`, `1 372` accepted taps, score `276 349`, current Inferno hold `148 910 ms`, cooldown remainder `10 250 ms`. Exact parity подтверждается `tests/core/canonical.test.js` на 60/30/15 FPS.
 
-Rebaseline обязан совпадать на 60/30/15 FPS: `±0,01 heat`, `±1 score`, exact accepted taps/stage timestamps. Threshold/decay/tap numbers не изменены; boosted fixture отличается только одним optional success. Любое изменение intervals, schedules или provider outcome создаёт новую fixture version.
+Rebaseline обязан совпадать на 60/30/15 FPS: `±0,01 heat`, `±1 score`, exact accepted taps/stage timestamps. Threshold/decay/tap numbers не изменены; rewarded fixture отличается только двумя явно запланированными success. Любое изменение intervals, schedules или provider outcome создаёт новую fixture version.
 
 ### Tap-rate simulation matrix v2
 
@@ -280,7 +287,9 @@ Rebaseline обязан совпадать на 60/30/15 FPS: `±0,01 heat`, `±
 | normal | `250 ms / 4 taps/s` | нет | stage 5 в `76 500 ms` | 5 / `686,392122` | `57 380` |
 | fast | `200 ms / 5 taps/s` | нет | stage 6 в `92 200 ms` | 6 / `842,172935` | `96 562` |
 | very-fast | `140 ms / 7,14 taps/s` | нет | stage 7 в `66 920 ms` | 7 / `932,08` | `238 888` |
-| boosted-normal | `250 ms / 4 taps/s` | success в `68 000 ms` | stage 6 в `83 250 ms` | 5 / `729,047761` | `73 972` |
+| boosted-normal C08 | `250 ms / 4 taps/s` | historical 20 s success | historical only | historical only | historical only |
+
+Двухнаградный Cycle 09 rebaseline находится в stage-dependent direct fixture выше, а не маскируется под constant-rate строку этой матрицы. Дополнительно `skilled-mouse-rewarded` остаётся неравномерным human-input control.
 
 ### Human-input profile contract v1
 
@@ -291,7 +300,7 @@ Rebaseline обязан совпадать на 60/30/15 FPS: `±0,01 heat`, `±
 - Background/visibility/platform pause/ad: активное время и все gameplay таймеры замораживаются; после resume запрещён catch-up decay или пачка пропущенных событий.
 - Rapid/multitouch input: каждый новый уникальный contact начисляет heat/score; duplicate inputId и synthetic click дедуплицируются. Emergency overflow начинается только с команды №257 внутри одного 50-ms step и не является tuning cap.
 - Low FPS: accumulator обрабатывает fixed steps 50 ms по monotonic active clock; threshold crossing интерполируется. Результат одного timestamped input trace одинаков в пределах tolerance `±0,01 heat`, `±1 score`, `±10 ms hold`.
-- Clock change: wall clock не влияет на run/boost; используется только для «Ритуала дня» с защитой от повторной выдачи.
+- Clock change: wall clock не влияет на run/boost/cooldown; используется только для видимой «Цели дня» с защитой от повторной выдачи.
 - Heat at max: taps продолжают начислять tap score, но heat остаётся 1000; particle/audio feedback не создаётся сверх performance caps.
 - Multiple threshold crossing: stage events/bonuses вызываются последовательно один раз; downward crossing не отнимает score.
 - Simultaneous event and stage exit: уже наложенное Холодное угасание доигрывает срок; Пепельный выдох/Окно жара отменяются согласно их правилам; независимые timers не сливаются, оба enemy-source rows остаются отдельными, а factor всегда ограничен `×2,50`.

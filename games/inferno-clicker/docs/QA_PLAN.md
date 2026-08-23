@@ -1,6 +1,83 @@
-# QA Plan — «Зажги», corrective cycle 08 alpha, clarity and scale correction
+# QA Plan — «Зажги» / Ignite, Yandex Release Cycle 09
 
-Case IDs этого документа квалифицируются как `QA:<ID>`, acceptance IDs — как `AC:<ID>`. Cycle 08 проверяет чистый внешний и внутренний alpha Ash Servant/Demoness, native sharp Demoness redraw, точное увеличение draw box `420×700 → 504×840`, visible-height dominance `≥1.25×` и строгую issue→fix→independent-retest→neighboring-regression traceability. Принятые C07 motion, scale stability, mouth/two-palm steam, host, quality и residency contracts сохраняются как baseline. Gameplay, reward, platform, flame/environment design и audio не переоткрываются; они проходят fingerprint regression на неизменность.
+## Cycle 09 status и stop rule
+
+Cycle 09 проверяет один clean exact `1.0.0` candidate. Исторические C07/C08 результаты являются baseline, но не закрывают rewarded, goals, RU/EN, SDK target, cloud rate limit, browser compatibility, content scrub, повторный white-spot audit, submission assets или Yandex draft. Все Cycle 09 cases и AC начинают как `NOT RUN`; DONE требует Critical=0, High=0, skipped required checks=0 и полный QA→fix→independent retest→neighboring regression.
+
+Каждое evidence содержит Build ID формата `1.0.0+` и первые 12 hex exact commit (`NOT RUN — финальный commit ещё не выбран`), full commit, ZIP SHA-256 где применимо, OS/browser/version, viewport, DPR, locale, input, timestamps и console/network log. `working`, dirty build и evidence другого ZIP запрещены.
+
+## Cycle 09 environments
+
+| ID | Среда | Обязательное покрытие | Статус |
+|---|---|---|---|
+| C09-QA-ENV-DESK | Yandex Browser/Chrome/Firefox/Opera, official desktop matrix, zoom 80/100/125% | mouse, layout, RU/EN, goals, lifecycle, rewarded mocks | NOT RUN |
+| C09-QA-ENV-SAFARI | Safari desktop + iOS 9+ compatibility/real-device environment | compatibility bundle, fallbacks, safe area, touch, rotation | NOT RUN |
+| C09-QA-ENV-ANDROID | Android 5+ compatibility/real-device environment, portrait+landscape | touch, browser chrome, orientation, ≥12 min sessions | NOT RUN |
+| C09-QA-ENV-YD | uploaded Yandex draft, Desktop | SDK/Game Ready, ad, cloud, leaderboard, mouse | NOT RUN |
+| C09-QA-ENV-YM | uploaded Yandex draft, Android/iOS | SDK/Game Ready, ad, lifecycle, touch/orientation | NOT RUN |
+
+Official desktop viewports: 1280×1024, 1366×768, 1600×900, 1680×1050, 1920×1080, 1920×1200, 2560×1080, 2560×1440, 3840×2160. Mobile adds 360×640, 390×844, 430×932, 800×360 and 768×1024 CSS px in both supported orientations where applicable; DPR visual matrix is 1/2/3.
+
+## Ordered Cycle 09 workflow
+
+### C09 Gate 1 — implementation automation
+
+Implementation owner на clean checkout фиксирует exit codes для lint, typecheck, full tests, asset/content/alpha audit, `build:yandex`, mocked-SDK browser E2E, performance checks и release audit. Deterministic SaveCoordinator/cloud/reward timers не используют wall-clock sleeps. Production static scan доказывает отсутствие `(тест)`, `rewardedProvider='test'`, fake ad, hostname adapter selection, native-ESM entry dependency и видимых запрещённых терминов/символов.
+
+### C09 Gate 2 — independent exploratory issue capture
+
+QA owner, не писавший affected production code/assets, проходит RU/EN, mouse/touch, all stages, goals, result/restart, reward success/close/error/timeout, lifecycle, save/leaderboard fallbacks и visual audit. Каждый дефект получает severity, environment, exact Build ID, steps, expected/actual, evidence, AC IDs и owner. Никакой дефект не закрывается автором исправления.
+
+### C09 Gate 3 — developer/art fix
+
+Ответственная роль исправляет issue на новом exact Build ID, перечисляет changed paths и targeted commands. Product rules не меняются молча; asset fix использует новый versioned output и provenance.
+
+### C09 Gate 4 — independent targeted retest + neighboring regression
+
+Другой QA owner повторяет исходные steps, затем соседние ветки: reward success↔close/error/cooldown/restart; save local↔cloud/guest/reload; locale RU↔EN/unknown; layout portrait↔landscape/zoom; visual frame↔весь clip/stage/quality tiers. FAIL возвращает issue в Gate 3.
+
+### C09 Gate 5 — full regression и submission sign-off
+
+На одном final candidate повторяются все обязательные cases, четыре 12-минутные session traces, package/unpack smoke и draft/debug-panel checks. QA, independent Reviewer и Release Agent подписывают один Build ID/ZIP SHA; лишь затем Cycle 09 AC могут стать PASS.
+
+## Functional/platform cases
+
+| ID | Сценарий | Expected | Статус |
+|---|---|---|---|
+| C09-QA-F-01 | production boot на любом hostname | target Yandex; `/sdk.js` before app; no test provider; failure local-only | NOT RUN |
+| C09-QA-F-02 | LoadingAPI + lifecycle | ready once; start/stop match active state; reason-set idempotent | NOT RUN |
+| C09-QA-F-03 | SDK locale RU group/EN/unknown | complete RU/EN visible + ARIA localization; unknown→EN | NOT RUN |
+| C09-QA-F-04 | mouse/touch/fallback input | one physical contact→one tap; right-click/page gesture=0 | NOT RUN |
+| C09-QA-F-05 | goals persistence | exact 8 ordered goals; next incomplete; reload/cloud merge cannot regress | NOT RUN |
+| C09-QA-F-06 | stage-3 reward visibility | hidden before stage 3/unsafe states; no auto-open; exact copy | NOT RUN |
+| C09-QA-F-07 | reward success/repeat | one 60 s boost; timers active-only; repeat success ≥90 active s | NOT RUN |
+| C09-QA-F-08 | close/error/timeout without prior `onRewarded`/duplicate/late | zero mutation without reward; earned reward survives missing close once; cleanup/resume safe | NOT RUN |
+| C09-QA-F-09 | local/cloud save | immediate local; latest-wins maxima; ≤1 setData/5 s; final flush | NOT RUN |
+| C09-QA-F-10 | guest/leaderboard | full local game; no forced login; one improved integer submit only | NOT RUN |
+| C09-QA-F-11 | no-reward full cycle | stages 1–7 and all goals remain attainable without provider/network | NOT RUN |
+| C09-QA-F-12 | compatibility bundle | no native-ESM requirement; input/fetch/layout/WebP fallbacks work | NOT RUN |
+
+## Responsive, content и visual cases
+
+| ID | Сценарий | Expected | Статус |
+|---|---|---|---|
+| C09-QA-V-01 | official desktop matrix + zoom | no crop/distortion/page scroll; active field≤2:1; designed ultrawide sides | NOT RUN |
+| C09-QA-V-02 | mobile portrait/landscape + rotation/safe area | HUD/dialogs/targets accessible; only goals panel internally scrolls | NOT RUN |
+| C09-QA-V-03 | long tap/contextmenu/drag/select/swipe-refresh | browser UI does not intercept gameplay; accidental activation=0 | NOT RUN |
+| C09-QA-V-04 | 64 character frames × black/gray/red × DPR1/2/3 | white/neutral matte, fringe, island, internal residue, detached alpha=0 | NOT RUN |
+| C09-QA-V-05 | stages 1–7 normal/reduced/forced-low | filter-amplified spot/crop/flash=0; core semantics retained | NOT RUN |
+| C09-QA-V-06 | content safety RU/EN + art | visible rune/ritual/religious/esoteric reference=0; required names used | NOT RUN |
+| C09-QA-V-07 | low-brightness first screen | flame/action/instruction found≤5 s; WCAG-style text contrast passes | NOT RUN |
+
+## Session/performance evidence
+
+Выполнить четыре meaningful traces по `≥12 минут`: desktop no-reward, desktop rewarded, mobile no-reward, mobile rewarded. Каждая включает минимум три attempts либо два attempts плюс sustained Inferno, goals/nextGoal, result/restart, persistence и pause/resume. Rewarded traces включают минимум два успешных rewards и один close/error; no-reward traces не вызывают provider.
+
+Пороги: console errors/warnings=0; unexpected network failures=0; median FPS≥55 desktop и≥30 mobile; frames>50 ms≤1%; heap≤150 MB; input feedback p95≤100 ms; decoded textures≤64 MiB; unpacked ZIP<90 MB. Метрики снимаются на exact production candidate, а не dev server.
+
+## Historical Cycle 08 plan — baseline reference only
+
+Следующие C08 sections квалифицируются как historical `QA:<ID>` и сохраняют прежнюю визуальную трассировку. Они не закрывают ни один новый C09 case. Cycle 08 проверял чистый внешний и внутренний alpha Ash Servant/Demoness, native sharp Demoness redraw, draw box `420×700 → 504×840` и visible-height dominance `≥1.25×`; Cycle 09 повторно открывает фактические white spots и полный runtime audit.
 
 DONE разрешён только для одной финальной clean exact build после полного ordered C08 workflow. C07 evidence остаётся историческим baseline и не может дать PASS новым C08 условиям. Single still, contact sheet, headless renderer, номинальный draw-box размер или авторское self-review не доказывают отсутствие matte во внутренних просветах, фактическую чёткость или visible-bbox dominance.
 
@@ -159,4 +236,4 @@ Validator hard-fails missing/stale/corrupt evidence, wrong gate order/owners, sa
 
 Cycle 08 не меняет принятые C07 числа: V5 no-reward stages 2–7 `9000/43500/64500/102000/145200/164800 ms`, checkpoint 180000 ms = 786 taps, score 110498±1, heat 946.465417±0.01, hold 15060±10 ms; optional ×2 starts 65000 ms, stages 5/6/7 `75750/83950/102710 ms`, 944 taps, score 180220±1, heat 936.94±0.01, hold 65950±10 ms. Tap matrix stays 2 tps→4, 4→5, 5→6, 7.14→7 without reward. Gameplay, audio assets/mix and platform contract stay unchanged; only paired replay/fingerprint and lifecycle regressions are repeated.
 
-Historical Cycle 07 remains accepted for its own build. All new Cycle 08 checks are `NOT RUN`; current decision is `DONE = NO`. Authoritative C08 identity, hashes and evidence must be published in `reports/corrective-cycle-08/<exact-build-id>/` before any status changes to PASS.
+Historical Cycle 07/C08 evidence remains bound only to its own exact build. Current decision is `DONE = NO — CYCLE 09 NOT RUN`; authoritative Cycle 09 evidence belongs to a Build-ID-named subdirectory of `reports/yandex-release-cycle-09/` and must satisfy the new top-level gates before any Cycle 09 status changes to PASS.

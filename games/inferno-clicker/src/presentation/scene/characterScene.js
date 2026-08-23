@@ -4,18 +4,19 @@ import { OptionalBitmap } from './optionalBitmap.js';
 import { SpriteAnimator, drawSpriteFrame, gridFrames } from './spriteAnimator.js';
 import { sceneTransform } from './infernoScene.js';
 import { drawSteamStream, steamStreamGeometry } from './steamEmitter.js';
+import { preferredRuntimeRasterUrl } from './rasterFormat.js';
 
 export const ASH_SERVANT_ATLAS_URLS = Object.freeze(Object.fromEntries(['idle', 'inhale', 'blow', 'recovery'].map((clip) => [clip,
-  new URL(`../../../assets/characters/ash-servant/ash-servant-${clip}-v6.webp`, import.meta.url).href,
+  preferredRuntimeRasterUrl(`assets/characters/ash-servant/ash-servant-${clip}-v7.webp`, `assets/characters/ash-servant/ash-servant-${clip}-v7.png`),
 ])));
 export const DEMONESS_ATLAS_URLS = Object.freeze(Object.fromEntries(['idle', 'cast', 'hold', 'recovery'].map((clip) => [clip,
-  new URL(`../../../assets/characters/demoness/demoness-${clip}-v7.webp`, import.meta.url).href,
+  preferredRuntimeRasterUrl(`assets/characters/demoness/demoness-${clip}-v8.webp`, `assets/characters/demoness/demoness-${clip}-v8.png`),
 ])));
 export const ASH_SERVANT_ATLAS_URL = ASH_SERVANT_ATLAS_URLS.idle;
 export const DEMONESS_ATLAS_URL = DEMONESS_ATLAS_URLS.idle;
 export const INFERNO_HOST_URLS = Object.freeze({
-  main: new URL('../../../assets/characters/character-inferno-host-main-v4.webp', import.meta.url).href,
-  sentinel: new URL('../../../assets/characters/character-inferno-host-sentinel-v4.webp', import.meta.url).href,
+  main: preferredRuntimeRasterUrl('assets/characters/character-inferno-host-main-v4.webp', 'assets/characters/character-inferno-host-main-v4.png'),
+  sentinel: preferredRuntimeRasterUrl('assets/characters/character-inferno-host-sentinel-v4.webp', 'assets/characters/character-inferno-host-sentinel-v4.png'),
 });
 export const INFERNO_HOST_URL = INFERNO_HOST_URLS.main;
 
@@ -341,6 +342,10 @@ export class CharacterScene {
       return;
     }
     const bitmaps = kind === 'servant' ? this.servantBitmaps : this.demonessBitmaps;
+    if (this.servantAssetKey !== this.servantReadyKey && key !== this.servantAssetKey) return;
+    for (const [otherKey, other] of Object.entries(bitmaps)) {
+      if (otherKey !== this.servantReadyKey && otherKey !== key) other.release();
+    }
     bitmaps[key].startLoad();
   }
 
@@ -359,6 +364,9 @@ export class CharacterScene {
       const animator = kind === 'servant' ? this.servantAnimator : this.demonessAnimator;
       this[`${kind}PendingFrame`] = animator.getFrameIndex();
       this[assetKey] = key;
+    }
+    for (const [otherKey, other] of Object.entries(bitmaps)) {
+      if (otherKey !== this[readyKey] && otherKey !== key) other.release();
     }
     const settle = bitmap.startLoad();
     const commit = () => {
@@ -479,6 +487,11 @@ export class CharacterScene {
     this.spellGeometry = Object.freeze({ origins: null, target: this.flameTarget, leading: null, contact: false });
   }
 
+  /** Called only after FlameRig has released its transition family. */
+  prepareHostAssets() {
+    for (const bitmap of Object.values(this.hostBitmaps)) bitmap.startLoad();
+  }
+
   /** Keep the previous atlas on a stable authored frame while a requested clip decodes. */
   activeFrame(kind) {
     const animator = kind === 'servant' ? this.servantAnimator : this.demonessAnimator;
@@ -489,9 +502,9 @@ export class CharacterScene {
 
   /** @param {any} state */
   setState(state) {
+    if (state.stage < 6) for (const bitmap of Object.values(this.hostBitmaps)) bitmap.release();
     if (this.servantAssetKey === 'idle' && ((state.stage === 2 && state.stageProgress >= 0.6) || state.stage > 2)) this.requestClipAsset('servant', 'idle');
     if (this.demonessAssetKey === 'idle' && ((state.stage === 3 && state.stageProgress >= 0.6) || state.stage > 3)) this.requestClipAsset('demoness', 'idle');
-    if ((state.stage === 5 && state.stageProgress >= 0.6) || state.stage > 5) for (const bitmap of Object.values(this.hostBitmaps)) bitmap.startLoad();
     this.paused = Boolean(state.paused);
     if (state.hostLevel === 2 && this.previousHostLevel < 2) this.hostEntryAge = 0;
     this.previousHostLevel = state.hostLevel;
@@ -501,12 +514,6 @@ export class CharacterScene {
     const encounters = Array.isArray(state.encounters) ? state.encounters : [];
     const servantEncounter = encounters.find((item) => item.kind === 'servant') ?? null;
     const demonessEncounter = encounters.find((item) => item.kind === 'demoness') ?? null;
-    if (state.stage >= 3 && !servantEncounter) this.warmClipAsset('servant', 'inhale');
-    if (servantEncounter?.phase === 'telegraph') this.warmClipAsset('servant', 'blow');
-    if (servantEncounter?.phase === 'active' && servantEncounter.progress >= 0.35) this.warmClipAsset('servant', 'recovery');
-    if (state.stage >= 5 && !demonessEncounter) this.warmClipAsset('demoness', 'cast');
-    if (demonessEncounter?.phase === 'telegraph') this.warmClipAsset('demoness', 'hold');
-    if (demonessEncounter?.phase === 'active' && demonessEncounter.progress >= 0.35) this.warmClipAsset('demoness', 'recovery');
     const servantRequested = state.stage < 3 ? 'hidden' : servantEncounter ? servantEncounter.phase === 'telegraph' ? 'inhale' : 'blow' : 'idle';
     const demonessRequested = state.stage < 4
       ? 'hidden'
@@ -588,6 +595,15 @@ export class CharacterScene {
       this.demonessSpellReach = 0;
       this.clearDemonessSteam();
     }
+    // Warm only after the current state request has committed. This ordering,
+    // together with the two-slot loader above, prevents a third Servant atlas
+    // from becoming resident during telegraph/active/recovery handoffs.
+    if (state.stage >= 3 && !servantEncounter) this.warmClipAsset('servant', 'inhale');
+    if (servantEncounter?.phase === 'telegraph') this.warmClipAsset('servant', 'blow');
+    if (servantEncounter?.phase === 'active' && servantEncounter.progress >= 0.35) this.warmClipAsset('servant', 'recovery');
+    if (state.stage >= 5 && !demonessEncounter) this.warmClipAsset('demoness', 'cast');
+    if (demonessEncounter?.phase === 'telegraph') this.warmClipAsset('demoness', 'hold');
+    if (demonessEncounter?.phase === 'active' && demonessEncounter.progress >= 0.35) this.warmClipAsset('demoness', 'recovery');
   }
 
   /** @param {string} requested */

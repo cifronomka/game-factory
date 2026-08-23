@@ -30,16 +30,16 @@
  * @property {number} multiplier
  * @property {number} infernoHoldMs
  * @property {readonly EncounterViewModel[]} encounters
- * @property {readonly {kind:'servant'|'demoness',sourceLabel:string,effectLabel:string,decayFactor:number,decayIncreasePercent:number,remainingMs:number}[]} debuffs
+ * @property {readonly {kind:'servant'|'demoness',sourceKey:string,effectKey:string,decayFactor:number,decayIncreasePercent:number,remainingMs:number}[]} debuffs
  * @property {number} combinedDecayFactor
  * @property {BoostViewModel|null} boost
  * @property {boolean} paused
  * @property {boolean} muted
  * @property {QualityTier} quality
  * @property {boolean} reducedMotion
- * @property {boolean} rewardedAvailable
- * @property {boolean} rewardedSupported
- * @property {'yandex'|'test'|'unavailable'} rewardedProvider
+ * @property {{placementId:'heat-power-2x-60s',labelKey:string,confirmTitleKey:string,confirmBodyKey:string,supported:boolean,unlocked:boolean,visible:boolean,available:boolean,durationMs:number,cooldownRemainingMs:number}} rewardOffer
+ * @property {readonly import('../app/goals.js').GoalViewModel[]} goals
+ * @property {import('../app/goals.js').GoalViewModel|null} nextGoal
  * @property {boolean} showTapHint
  */
 
@@ -69,6 +69,7 @@
  * @property {()=>void} onMuteToggle
  * @property {()=>void} onReducedMotionToggle
  * @property {()=>void} onRewardRequest
+ * @property {()=>void} onGoalsRequest
  */
 
 /** @type {PresentationCallbacks} */
@@ -78,6 +79,7 @@ export const DEFAULT_PRESENTATION_CALLBACKS = Object.freeze({
   onMuteToggle: () => undefined,
   onReducedMotionToggle: () => undefined,
   onRewardRequest: () => undefined,
+  onGoalsRequest: () => undefined,
 });
 
 export const LOGICAL_WIDTH = 1080;

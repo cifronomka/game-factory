@@ -35,6 +35,20 @@ test('family switch crossfades for at least 0.8 seconds and authored flare plays
   assert.equal(rig.families.low.outerBitmap.status, 'idle');
 });
 
+test('host residency gate opens only after the mid to high family handoff releases mid', () => {
+  const rig = new FlameRig();
+  rig.setState(state({ stage: 5 }));
+  for (let index = 0; index < 22; index += 1) rig.update(0.05);
+  rig.setState(state({ stage: 6 }));
+  assert.equal(rig.isHighFamilySettled(), false);
+  for (let index = 0; index < 20; index += 1) rig.update(0.05);
+  assert.equal(rig.isHighFamilySettled(), false);
+  rig.update(0.05);
+  assert.equal(rig.isHighFamilySettled(), true);
+  assert.equal(rig.families.mid.coreBitmap.status, 'idle');
+  assert.equal(rig.families.mid.outerBitmap.status, 'idle');
+});
+
 test('pause freezes authored flame and stage flare frames', () => {
   const rig = new FlameRig();
   rig.setState(state({ stage: 3 }));
@@ -132,7 +146,7 @@ test('Stage 6 to 7 starts one bounded 1.5 second Inferno entry payoff', () => {
   rig.setState(state({ stage: 7 }));
   rig.handleEvent({ type: 'stage-changed', from: 6, to: 7 });
   assert.equal(rig.getStats().infernoEntryProgress, 0);
-  assert.deepEqual(rig.getStats().infernoPayoff, { durationMs: 1_500, highFlameExpansion: true, emberBurst: true, runeWave: true, lightingPulse: true });
+  assert.deepEqual(rig.getStats().infernoPayoff, { durationMs: 1_500, highFlameExpansion: true, emberBurst: true, heatWave: true, lightingPulse: true });
   for (let index = 0; index < 15; index += 1) rig.update(0.05);
   assert.equal(rig.getStats().infernoEntryProgress, 0.5);
   for (let index = 0; index < 15; index += 1) rig.update(0.05);

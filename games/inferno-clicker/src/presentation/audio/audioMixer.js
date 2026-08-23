@@ -1,37 +1,55 @@
 // @ts-check
 
 import { AudioMixerState } from './audioMixerState.js';
+import { runtimeAssetUrl } from '../scene/rasterFormat.js';
 
 export const AUDIO_ASSET_URLS = Object.freeze({
   wood: Object.freeze([
-    new URL('../../../assets/audio/fire/embers-wood-bed.ogg', import.meta.url),
-    new URL('../../../assets/audio/fire/embers-wood-bed.mp3', import.meta.url),
+    runtimeAssetUrl('assets/audio/fire/embers-wood-bed.ogg'),
+    runtimeAssetUrl('assets/audio/fire/embers-wood-bed.mp3'),
   ]),
   crackle: Object.freeze([
-    new URL('../../../assets/audio/fire/charcoal-crackle.ogg', import.meta.url),
-    new URL('../../../assets/audio/fire/charcoal-crackle.mp3', import.meta.url),
+    runtimeAssetUrl('assets/audio/fire/charcoal-crackle.ogg'),
+    runtimeAssetUrl('assets/audio/fire/charcoal-crackle.mp3'),
   ]),
   fanA: Object.freeze([
-    new URL('../../../assets/audio/fan/fan-soft-a.ogg', import.meta.url),
-    new URL('../../../assets/audio/fan/fan-soft-a.mp3', import.meta.url),
+    runtimeAssetUrl('assets/audio/fan/fan-soft-a.ogg'),
+    runtimeAssetUrl('assets/audio/fan/fan-soft-a.mp3'),
   ]),
   fanB: Object.freeze([
-    new URL('../../../assets/audio/fan/fan-soft-b.ogg', import.meta.url),
-    new URL('../../../assets/audio/fan/fan-soft-b.mp3', import.meta.url),
+    runtimeAssetUrl('assets/audio/fan/fan-soft-b.ogg'),
+    runtimeAssetUrl('assets/audio/fan/fan-soft-b.mp3'),
   ]),
   fanC: Object.freeze([
-    new URL('../../../assets/audio/fan/fan-soft-c.ogg', import.meta.url),
-    new URL('../../../assets/audio/fan/fan-soft-c.mp3', import.meta.url),
+    runtimeAssetUrl('assets/audio/fan/fan-soft-c.ogg'),
+    runtimeAssetUrl('assets/audio/fan/fan-soft-c.mp3'),
   ]),
 });
+
+/** @param {URL} url */
+async function loadBytes(url) {
+  if (typeof globalThis.fetch === 'function') {
+    const response = await globalThis.fetch(url);
+    if (!response.ok) throw new Error(`Audio request failed: ${response.status}`);
+    return response.arrayBuffer();
+  }
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open('GET', url.href, true);
+    request.responseType = 'arraybuffer';
+    request.onload = () => request.status >= 200 && request.status < 300
+      ? resolve(request.response)
+      : reject(new Error(`Audio request failed: ${request.status}`));
+    request.onerror = () => reject(new Error('Audio request failed.'));
+    request.send();
+  });
+}
 
 /** @param {BaseAudioContext} context @param {keyof typeof AUDIO_ASSET_URLS} key */
 async function loadAuthoredAsset(context, key) {
   for (const url of AUDIO_ASSET_URLS[key]) {
     try {
-      const response = await fetch(url);
-      if (!response.ok) continue;
-      const bytes = await response.arrayBuffer();
+      const bytes = await loadBytes(url);
       return await context.decodeAudioData(bytes.slice(0));
     } catch { /* matching MP3 fallback, then silence for this optional asset */ }
   }

@@ -1,20 +1,25 @@
 // @ts-check
 
 import { ok } from '../types/result.js';
+import { REWARDED_PLACEMENT } from '../types/platform.js';
 import { WebPlatformService } from '../web/WebPlatformService.js';
 
 class DevPlatformService extends WebPlatformService {
   /** @param {object} options @param {'rewarded'|'closed'|'error'} options.rewardedResult */
   constructor(options) {
-    super({ ...options, rewardedProvider: 'test' });
+    super(options);
     this.rewardedResult = options.rewardedResult;
     /** @type {Promise<import('../types/platform.js').RewardedResult>|null} */
     this.pendingDevReward = null;
     this.capabilities = Object.freeze({
       platform: 'development',
+      locale: this.capabilities.locale,
+      authorized: false,
       localSave: this.capabilities.localSave,
       cloudSave: false,
       leaderboard: 'local-only',
+      leaderboardRead: false,
+      leaderboardWrite: false,
       rewardedProvider: 'test',
       rewardedAds: true,
       interstitialAds: false,
@@ -27,8 +32,9 @@ class DevPlatformService extends WebPlatformService {
     return ok(this.capabilities);
   }
 
-  /** @param {'inferno-seal'} _placement Internal legacy-compatible id for the optional timed boost. */
-  showRewardedAd(_placement) {
+  /** @param {typeof REWARDED_PLACEMENT} placement */
+  showRewardedAd(placement) {
+    if (placement !== REWARDED_PLACEMENT) return super.showRewardedAd(placement);
     if (this.pendingDevReward) return this.pendingDevReward;
     this.requestCounter += 1;
     const requestId = `dev-rewarded-${this.requestCounter}`;

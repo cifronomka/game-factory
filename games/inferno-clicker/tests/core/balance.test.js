@@ -52,7 +52,7 @@ test('no-reward skilled pattern reaches Inferno and optional x2 materially impro
   const direct = replayHumanInputProfile(skilled, 60);
   const assisted = replayHumanInputProfile(rewarded, 60);
   assert.equal(direct.state.runHighestStage, 7);
-  assert.equal(direct.state.rewardedUsedThisRun, false);
+  assert.equal('rewardedUsedThisRun' in direct.state, false);
   assert.ok((direct.stageReachedAtMs['7'] ?? Infinity) - (assisted.stageReachedAtMs['7'] ?? 0) >= 20_000);
   assert.ok(assisted.state.runLongestInfernoHoldMs - direct.state.runLongestInfernoHoldMs >= 60_000);
   assert.ok(assisted.state.score - direct.state.score >= 18_000);

@@ -43,12 +43,16 @@ test('flame and characters use authored frame atlases without static-card deform
     source('../../src/presentation/scene/steamEmitter.js'),
   ]);
   assert.match(flame, /core-low-v2\.webp/);
-  assert.match(flame, /outer-high-v2\.webp/);
-  assert.match(flame, /stage-flare-v2\.webp/);
+  assert.match(flame, /outer-low-v4\.webp/);
+  assert.match(flame, /outer-mid-v4\.webp/);
+  assert.match(flame, /outer-high-v4\.webp/);
+  assert.match(flame, /stage-flare-v3\.webp/);
   assert.match(flame, /SpriteAnimator/);
   assert.doesNotMatch(flame, /flame-core-organic|flame-outer-organic|inferno-beam-organic|drawSlice|slice deformation/i);
-  assert.match(characters, /ash-servant-\$\{clip\}-v6\.webp/);
-  assert.match(characters, /demoness-\$\{clip\}-v7\.webp/);
+  assert.match(characters, /ash-servant-\$\{clip\}-v7\.webp/);
+  assert.match(characters, /demoness-\$\{clip\}-v8\.webp/);
+  assert.match(characters, /ash-servant-\$\{clip\}-v7\.png/);
+  assert.match(characters, /demoness-\$\{clip\}-v8\.png/);
   assert.match(characters, /appearance.*idle.*inhale.*blow.*recovery/s);
   assert.match(characters, /appearance.*idle.*cast.*hold.*recovery/s);
   assert.match(characters, /servantMouthSocket/);
@@ -63,15 +67,16 @@ test('flame and characters use authored frame atlases without static-card deform
   assert.doesNotMatch(characters, /drawServant|drawDemoness|fallback character/i);
 });
 
-test('test rewarded provider remains explicit and removed seal presentation cannot regress', async () => {
+test('production presentation has no provider leakage, free reward, or removed seal presentation', async () => {
   const [types, hud] = await Promise.all([
     source('../../src/presentation/types.js'),
     source('../../src/presentation/ui/domHud.js'),
   ]);
-  assert.match(types, /rewardedProvider/);
+  assert.doesNotMatch(types, /rewardedProvider/);
   assert.doesNotMatch(types, /sealBroken|sealLockedAtCap|seal-blocked|seal-broken/);
   assert.doesNotMatch(hud, /Печать удерживает предел|data-seal/);
-  assert.match(hud, /Получить ×2 \(тест\)/);
+  assert.doesNotMatch(hud, /Получить ×2|\(тест\)|test-provider/);
+  assert.match(hud, /hud\.rewardOffer/);
   assert.match(hud, /data-debuffs/);
-  assert.match(hud, /Общий decay/);
+  assert.match(hud, /debuff\.total/);
 });

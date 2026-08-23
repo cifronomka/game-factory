@@ -9,8 +9,12 @@ import {
   SERVANT_DECAY_FACTOR,
   SERVANT_TELEGRAPH_MS,
   DEMONESS_DECAY_FACTOR,
+  REWARDED_DURATION_MS,
   canOfferRewarded,
 } from '../core/index.js';
+import { deriveGoals, firstIncompleteGoal } from './goals.js';
+
+export const REWARDED_PLACEMENT_ID = 'heat-power-2x-60s';
 
 /** @param {import('../core/contracts.js').EncounterState} encounter */
 function encounterDuration(encounter) {
@@ -19,8 +23,42 @@ function encounterDuration(encounter) {
   return encounter.phase === 'telegraph' ? HEAT_WINDOW_TELEGRAPH_MS : HEAT_WINDOW_ACTIVE_MS;
 }
 
+/**
+ * Goals are visible during a run, before finishRun persists its final maxima.
+ * Keep the goal input on the V1 record contract while overlaying every live
+ * maximum that finishRun will eventually save.
+ * @param {import('../core/contracts.js').GameState} state
+ * @returns {import('../core/contracts.js').PersistentRecords}
+ */
+function effectiveGoalRecords(state) {
+  return {
+    schemaVersion: 1,
+    bestScore: Math.max(state.records.bestScore, state.bestScore, state.score),
+    highestStageReached: /** @type {import('../core/config.js').Stage} */ (
+      Math.max(state.records.highestStageReached, state.runHighestStage, state.stage)
+    ),
+    longestInfernoHoldMs: Math.max(
+      state.records.longestInfernoHoldMs,
+      state.runLongestInfernoHoldMs,
+      state.currentInfernoHoldMs,
+    ),
+    maxMultiplier: Math.max(state.records.maxMultiplier, state.maxMultiplier),
+    runsPlayed: state.records.runsPlayed,
+  };
+}
+
 /** @param {import('../core/contracts.js').GameState} state */
 export function toPresentationViewModel(state, settings, capabilities) {
+  const goals = deriveGoals(effectiveGoalRecords(state));
+  const rewardedSupported = capabilities.rewardedAds === true;
+  const rewardOfferVisible = rewardedSupported
+    && state.runHighestStage >= 3
+    && state.phase === 'PLAYING'
+    && state.encounters.length === 0
+    && state.boost === null
+    && state.sessionRewardCooldownMs === 0
+    && !state.rewardSheetOpen
+    && state.activeRewardRequestId === null;
   const encounters = state.encounters.map((encounter) => ({
     kind: encounter.kind,
     phase: encounter.phase === 'effect' ? 'active' : 'telegraph',
@@ -33,16 +71,16 @@ export function toPresentationViewModel(state, settings, capabilities) {
     .map((candidate) => candidate.kind === 'servant'
       ? {
           kind: /** @type {const} */ ('servant'),
-          sourceLabel: 'Пепельный слуга',
-          effectLabel: 'Пепельный выдох',
+          sourceKey: 'debuff.servant.source',
+          effectKey: 'debuff.servant.effect',
           decayFactor: SERVANT_DECAY_FACTOR,
           decayIncreasePercent: 80,
           remainingMs: candidate.msLeft,
         }
       : {
           kind: /** @type {const} */ ('demoness'),
-          sourceLabel: 'Демонесса угасания',
-          effectLabel: 'Холодное угасание',
+          sourceKey: 'debuff.warden.source',
+          effectKey: 'debuff.warden.effect',
           decayFactor: DEMONESS_DECAY_FACTOR,
           decayIncreasePercent: 50,
           remainingMs: candidate.msLeft,
@@ -63,9 +101,20 @@ export function toPresentationViewModel(state, settings, capabilities) {
     muted: settings.muted,
     quality: settings.quality,
     reducedMotion: settings.reducedMotion,
-    rewardedAvailable: capabilities.rewardedProvider !== 'unavailable' && canOfferRewarded(state),
-    rewardedSupported: capabilities.rewardedProvider !== 'unavailable',
-    rewardedProvider: capabilities.rewardedProvider,
+    rewardOffer: {
+      placementId: REWARDED_PLACEMENT_ID,
+      labelKey: 'hud.rewardOffer',
+      confirmTitleKey: 'reward.title',
+      confirmBodyKey: 'reward.body',
+      supported: rewardedSupported,
+      unlocked: state.runHighestStage >= 3,
+      visible: rewardOfferVisible,
+      available: rewardedSupported && canOfferRewarded(state),
+      durationMs: REWARDED_DURATION_MS,
+      cooldownRemainingMs: state.sessionRewardCooldownMs,
+    },
+    goals,
+    nextGoal: firstIncompleteGoal(goals),
     showTapHint: state.phase === 'READY',
   };
 }

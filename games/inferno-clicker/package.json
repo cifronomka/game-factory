@@ -1,6 +1,6 @@
 {
   "name": "inferno-clicker",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -8,17 +8,34 @@
   },
   "scripts": {
     "dev": "node scripts/serve.mjs --root . --port 4173",
-    "build": "node scripts/build.mjs",
+    "build": "node scripts/build.mjs --target=web",
+    "build:yandex": "node scripts/build.mjs --target=yandex",
+    "build:yandex:test": "node scripts/build.mjs --target=yandex --test-driver",
     "preview": "node scripts/serve.mjs --root dist --port 4174",
     "lint": "node scripts/lint.mjs",
     "typecheck": "node scripts/typecheck.mjs",
     "test": "node scripts/test.mjs",
     "test:e2e": "node scripts/e2e-smoke.mjs",
+    "test:e2e:yandex": "node scripts/e2e-yandex.mjs",
+    "test:e2e:yandex:production": "node scripts/e2e-yandex-production.mjs",
+    "soak:yandex": "node scripts/soak-yandex.mjs",
+    "environment:audit:yandex": "node scripts/environment-audit-yandex.mjs",
+    "submission:capture:yandex": "node scripts/capture-yandex-submission.mjs",
+    "visual:matrix:yandex": "node scripts/render-cycle09-yandex-visual-matrix.mjs",
+    "visual:runtime:yandex": "node scripts/capture-cycle09-runtime-matrix.mjs",
+    "compat:audit:yandex": "node scripts/compatibility-audit-yandex.mjs --root=dist-e2e",
+    "test:yandex": "node scripts/run-yandex-release-gates.mjs --skip-package",
     "assets:audit": "node scripts/assets-audit.mjs",
     "assets:build:cycle06": "node scripts/build-cycle06-character-assets.mjs",
     "assets:build:cycle07": "node scripts/build-cycle07-character-assets.mjs",
     "assets:assemble:cycle08": "node scripts/assemble-cycle08-character-sources.mjs",
     "assets:build:cycle08": "node scripts/build-cycle08-character-assets.mjs",
+    "assets:build:cycle09": "node scripts/build-cycle09-character-assets.mjs",
+    "assets:build:cycle09-flame": "node scripts/build-cycle09-outer-flame-v4-assets.mjs",
+    "assets:build:cycle09-flare": "node scripts/build-cycle09-stage-flare-assets.mjs",
+    "assets:build:yandex-background": "node scripts/build-yandex-background.mjs",
+    "assets:build:yandex-compat": "node scripts/build-yandex-compatibility-assets.mjs",
+    "assets:manifest:yandex": "node scripts/sync-yandex-asset-manifest.mjs",
     "assets:manifest:cycle08": "node scripts/sync-cycle08-character-manifest.mjs",
     "art:review:cycle08": "node scripts/render-cycle08-art-review.mjs",
     "fingerprint:audit:cycle08": "node scripts/cycle08-fingerprint-audit.mjs",
@@ -31,9 +48,17 @@
     "evidence:cycle08:generate": "node scripts/generate-cycle08-evidence.mjs",
     "release:gates:cycle08": "node scripts/run-cycle08-release-gates.mjs",
     "release:audit": "node scripts/release-audit.mjs",
-    "package": "node scripts/package.mjs"
+    "release:audit:yandex": "node scripts/release-audit-yandex.mjs",
+    "package": "node scripts/package.mjs",
+    "package:yandex": "node scripts/package-yandex.mjs",
+    "verify:draft:yandex": "node scripts/verify-yandex-draft.mjs",
+    "release:gates:yandex": "node scripts/run-yandex-release-gates.mjs"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "esbuild": "^0.25.9",
+    "playwright-core": "^1.55.0",
     "sharp": "^0.35.3"
   }
 }

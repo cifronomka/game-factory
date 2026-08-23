@@ -1,10 +1,14 @@
 // @ts-check
 
 import { OptionalBitmap } from './optionalBitmap.js';
+import { preferredRuntimeRasterUrl } from './rasterFormat.js';
 
 const CENTER_X = 540;
 const HEARTH_Y = 1225;
-export const INFERNAL_CHAMBER_URL = new URL('../../../assets/backgrounds/bg-infernal-chamber-production.webp', import.meta.url).href;
+export const INFERNAL_CHAMBER_URL = preferredRuntimeRasterUrl(
+  'assets/backgrounds/bg-fire-chamber-yandex-v3.webp',
+  'assets/backgrounds/bg-fire-chamber-yandex-v3.png',
+);
 
 /** @param {number} value */
 function clamp01(value) { return Math.max(0, Math.min(1, value)); }
@@ -43,6 +47,32 @@ export class EnvironmentScene {
   }
 
   async retryCriticalAssets() { return this.background.retry(); }
+
+  /** Decorated landscape side fill behind the bounded portrait play field. */
+  /** @param {CanvasRenderingContext2D} context @param {number} width @param {number} height */
+  drawSideFill(context, width, height) {
+    const glow = context.createRadialGradient(width / 2, height * 0.66, Math.min(width, height) * 0.08, width / 2, height * 0.56, Math.max(width, height) * 0.72);
+    glow.addColorStop(0, '#2d120e');
+    glow.addColorStop(0.36, '#160b0c');
+    glow.addColorStop(0.72, '#0b0709');
+    glow.addColorStop(1, '#050407');
+    context.fillStyle = glow;
+    context.fillRect(0, 0, width, height);
+    if (!this.background.isReady() || width <= height) return;
+    context.save();
+    context.globalAlpha = 0.24;
+    context.filter = 'blur(18px) brightness(.46) saturate(.72)';
+    this.background.drawCover(context, -24, -24, width + 48, height + 48);
+    context.restore();
+    const veil = context.createLinearGradient(0, 0, width, 0);
+    veil.addColorStop(0, 'rgba(3,2,4,.52)');
+    veil.addColorStop(0.32, 'rgba(3,2,4,.28)');
+    veil.addColorStop(0.5, 'rgba(3,2,4,.02)');
+    veil.addColorStop(0.68, 'rgba(3,2,4,.28)');
+    veil.addColorStop(1, 'rgba(3,2,4,.52)');
+    context.fillStyle = veil;
+    context.fillRect(0, 0, width, height);
+  }
 
   /** @param {CanvasRenderingContext2D} context @param {any} state */
   drawFar(context, state) {
@@ -88,10 +118,10 @@ export class EnvironmentScene {
   }
 
   /** @param {CanvasRenderingContext2D} context @param {any} state @param {number} timeSeconds @param {number=} infernoEntryProgress */
-  drawRitual(context, state, timeSeconds, infernoEntryProgress = 1) {
+  drawHearthFloor(context, state, timeSeconds, infernoEntryProgress = 1) {
     const pulse = state.reducedMotion ? 1 : 0.94 + Math.sin(timeSeconds * 1.6) * 0.06;
-    revealRegion(context, this.background, state.environment.ritual * 0.28 * pulse, () => context.ellipse(CENTER_X, HEARTH_Y + 45, 450, 310, 0, 0, Math.PI * 2), 'brightness(1.3) saturate(1.3)');
-    revealRegion(context, this.background, state.environment.runes * 0.24 * pulse, () => context.ellipse(CENTER_X, HEARTH_Y + 45, 370, 245, 0, 0, Math.PI * 2), 'brightness(1.48) saturate(1.45)');
+    revealRegion(context, this.background, state.environment.hearthFloor * 0.2 * pulse, () => context.ellipse(CENTER_X, HEARTH_Y + 45, 450, 310, 0, 0, Math.PI * 2), 'brightness(1.18) saturate(1.18)');
+    revealRegion(context, this.background, state.environment.innerStone * 0.14 * pulse, () => context.ellipse(CENTER_X, HEARTH_Y + 45, 370, 245, 0, 0, Math.PI * 2), 'brightness(1.22) saturate(1.22)');
     if (state.stage === 7 && infernoEntryProgress < 1) {
       const entry = clamp01(infernoEntryProgress);
       const waveAlpha = Math.sin(entry * Math.PI) * (state.reducedMotion ? 0.36 : 0.72);
@@ -104,19 +134,6 @@ export class EnvironmentScene {
       context.beginPath();
       context.ellipse(CENTER_X, HEARTH_Y + 45, radiusX, radiusY, 0, 0, Math.PI * 2);
       context.stroke();
-      context.lineWidth = 2.5;
-      for (let index = 0; index < 16; index += 1) {
-        const angle = index / 16 * Math.PI * 2;
-        const x = CENTER_X + Math.cos(angle) * radiusX;
-        const y = HEARTH_Y + 45 + Math.sin(angle) * radiusY;
-        const tangentX = -Math.sin(angle) * 12;
-        const tangentY = Math.cos(angle) * 8;
-        context.beginPath();
-        context.moveTo(x - tangentX, y - tangentY);
-        context.lineTo(x + tangentX, y + tangentY);
-        context.lineTo(x + Math.cos(angle) * 10, y + Math.sin(angle) * 7);
-        context.stroke();
-      }
       context.restore();
     }
   }

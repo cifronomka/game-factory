@@ -74,15 +74,23 @@ The browser pass must use the exact timestamp sequences from `human-input-profil
 
 The current production pointer path was replayed in the in-app Chromium browser with no core mutation helper and no reward. One sustained skilled-mouse run dispatched `727` accepted primary-pointer clicks over `112.542 s` in three bounded segments (`271/45.006 s`, `276/45.041 s`, `180/22.649 s`) and reached Stage 7. Observed average was `6.46 clicks/s`; console warnings/errors were `0`. This confirms that no-reward Inferno is practically reachable without a hidden permission gate and is directionally consistent with the deterministic skilled profile.
 
-A separate paired run used the visible confirmation sheet and the asynchronous Web test provider. The UI reported exactly one `×2` boost for 20 active seconds; content access was unchanged, while progression/hold became easier.
+A historical pre-Cycle-09 paired run used the former Web test provider and one 20-active-second boost. That observation is superseded for production rewarded behavior and is retained only as baseline history; Yandex 1.0.0 contains no Web/free test provider.
 
 The same browser run observed Servant and Demoness active together: source rows displayed `×1.80` and `×1.50`, total `×2.50`, and gameplay input remained accepted. A landscape overflow found during this observation was fixed in the HUD grid and must be rechecked on the clean exact build.
 
 Status: **PARTIAL PASS.** Mouse/pointer plausibility and no-reward reachability are observed. Exact timestamp replays under 390×844 touch emulation and the immutable clean-build raw logs remain Pass 2 evidence work; real-device claims are not made here.
 
+## Yandex Release Cycle 09 rewarded rebaseline
+
+The authoritative Cycle 09 fixture is `tests/fixtures/direct-rewarded-cycle09.json` (`canonicalDirectRewardedC09`). It preserves the no-reward V5 timings and models two voluntary `onRewarded` grants with a 60,000 ms active boost and a 90,000 ms active session cooldown. The first reward resolves at active time `65,000 ms`; the second request becomes cooldown-eligible at `155,000 ms` and resolves at the next safe instant, `160,250 ms`. Boost intervals are exactly `65,000–125,000 ms` and `160,250–220,250 ms`.
+
+At the `240,000 ms` checkpoint the fixture reaches stages 2–7 at `9,000 / 43,500 / 64,500 / 75,750 / 83,950 / 90,950 ms`, accepts `1,372` taps, records score `276,349`, heat `998.38`, current Inferno hold `148,910 ms`, and leaves `10,250 ms` of the second session cooldown. The same exact result is asserted at 60/30/15 FPS. Direct tap score remains unassisted; rewarded only doubles the heat contribution. No-reward still reaches every stage, so rewarded is acceleration rather than content permission.
+
+Cycle 09 preliminary automation status: unit fixture PASS at 60/30/15 FPS. Exact clean gate evidence is recorded separately by the final Cycle 09 automation run.
+
 ## Decision and regression risks
 
-No stage threshold, base tapPower, per-stage decay, event duration, or reward duration was changed. Only the required concurrent scheduling/stacking semantics changed and the fixtures were rebaselined to V5/V2.
+Historical Cycle 04 decision (superseded for Yandex rewarded): no stage threshold, base tapPower, per-stage decay or event duration changed during that earlier concurrent-scheduling rebaseline. Cycle 09 separately replaces the former test-only 20-second reward with the authoritative production 60-second boost / 90-active-second cooldown contract documented above; no stage remains gated by advertising.
 
 Regression risks to keep in the browser and full suite:
 

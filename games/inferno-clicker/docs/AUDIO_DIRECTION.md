@@ -1,5 +1,9 @@
 # Audio Direction — «Зажги»
 
+## Yandex Release Cycle 09
+
+Audio assets/mix остаются C08 baseline; новые sounds для rewarded/goals не требуются. Cycle 09 переоткрывает только lifecycle regression: до trusted gesture audible sources=0; menu/hidden/platform/rewarded достигают silence≤100 ms; `game_api_resume` не запускает audio, пока остаётся любая local pause reason; 60-s boost и 90-s cooldown используют active time, но не создают обязательный sound cue. RU/EN и muted gameplay полностью понятны без audio. Все эти проверки имеют статус `NOT RUN` до exact candidate evidence.
+
 ## Corrective Cycle 02
 
 Пользовательский review 2026-08-20 классифицировал прежний `Fire Loop by qubodup` как газовую горелку. Этот OGG/FLAC удалён. Новый candidate использует два полевых fire layers и три коротких fanning variants: игрок должен слышать дерево/угли и ощущать, что раздувает огонь опахалом, а не нажимает arcade-кнопку.

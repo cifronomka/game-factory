@@ -31,7 +31,7 @@
       "intervalMs": 250,
       "stopMs": 180000,
       "rewardAtMs": 68000,
-      "expected": { "stageReachedAtMs": { "2": 4250, "3": 18250, "4": 39250, "5": 70500, "6": 83250 }, "acceptedTaps": 720, "score": 73972, "heat": 729.047760649091, "maxHeat": 773.3307692285994, "currentInfernoHoldMs": 0, "runHighestStage": 6, "finalStage": 5 }
+      "expected": { "stageReachedAtMs": { "2": 4250, "3": 18250, "4": 39250, "5": 70500, "6": 83250, "7": 97250 }, "acceptedTaps": 720, "score": 119697, "heat": 801.0701675912078, "maxHeat": 999.1, "currentInfernoHoldMs": 0, "runHighestStage": 7, "finalStage": 6 }
     }
   ]
 }

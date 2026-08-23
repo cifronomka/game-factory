@@ -1,18 +1,10 @@
 // @ts-check
 
+import { createI18n } from '../app/i18n.js';
+
 /** @typedef {import('./types.js').PresentationViewModel} PresentationViewModel */
 /** @typedef {import('./types.js').StageId} StageId */
 /** @typedef {import('./types.js').QualityTier} QualityTier */
-
-export const STAGE_NAMES = Object.freeze({
-  1: 'Тьма',
-  2: 'Искра',
-  3: 'Пепельный слуга',
-  4: 'Алый порог',
-  5: 'Демонесса угасания',
-  6: 'Круг Инферно',
-  7: 'Инферно',
-});
 
 /** @param {number} value */
 function clamp01(value) {
@@ -58,6 +50,9 @@ function qualityCaps(quality, reducedMotion) {
  * contains no gameplay thresholds, timers, DOM, audio or Canvas dependencies.
  */
 export class SceneVisualStateMapper {
+  /** @param {import('../app/i18n.js').I18n} [i18n] */
+  constructor(i18n = createI18n('ru')) { this.i18n = i18n; }
+
   /** @param {PresentationViewModel} viewModel */
   map(viewModel) {
     const stageProgress = clamp01(viewModel.stageProgress);
@@ -74,7 +69,7 @@ export class SceneVisualStateMapper {
 
     return Object.freeze({
       stage: viewModel.stage,
-      stageName: STAGE_NAMES[viewModel.stage],
+      stageName: this.i18n.t(`stage.${viewModel.stage}`),
       stageProgress,
       reveal,
       lightRadius,
@@ -85,10 +80,10 @@ export class SceneVisualStateMapper {
       environment: Object.freeze({
         far: 1,
         midground: Math.max(0.08, reveal),
-        ritual: Math.max(0.08, reveal),
+        hearthFloor: Math.max(0.08, reveal),
         gate: opacityAfter(viewModel.stage, 4, stageProgress),
         chains: opacityAfter(viewModel.stage, 4, stageProgress),
-        runes: opacityAfter(viewModel.stage, 2, stageProgress),
+        innerStone: opacityAfter(viewModel.stage, 2, stageProgress),
         pylons: opacityAfter(viewModel.stage, 6, stageProgress),
         foreground: 0.32 + reveal * 0.68,
       }),

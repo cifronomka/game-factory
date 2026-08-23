@@ -2,24 +2,25 @@
 
 ## Назначение и gate
 
-Документ описывает воспроизводимую production-сборку и упаковку `inferno-clicker` для Yandex Games. Локальный candidate `0.1.0`, принятый в Cycle 07, сохраняется как исторический artifact/rollback baseline. Active Cycle 08 patch candidate ещё не собран, не проверен и не упакован; upload/public publish не разрешены.
+Документ описывает воспроизводимую production-сборку и упаковку `inferno-clicker` 1.0.0 для Yandex Games. Исторические 0.1.0/0.1.1 artifact/report/checksum сохраняются неизменяемыми rollback records. Active Yandex Cycle 09 candidate ещё не имеет финального Build ID/ZIP/draft evidence; upload на модерацию и public publish не разрешены.
 
-Release запрещён, пока каждый применимый пункт `ACCEPTANCE_CRITERIA.md` не имеет `PASS` с evidence, открытые Critical/High не равны нулю либо QA report не завершён. Код и assets внутри `dist/` вручную не исправляются: после любого изменения выполняется полная пересборка из source.
+Финальное продвижение запрещено, пока каждый применимый пункт `ACCEPTANCE_CRITERIA.md` не имеет `PASS` с evidence, открытые Critical/High не равны нулю либо QA report не завершён. Локальный `-rc.zip` допустим только при `PASS` локальных критериев, точных `BLOCKED_EXTERNAL` для недоступных Console/browser/real-device проверок и machine stop report с тремя подписями; такой RC имеет `promotable=false`. Код и assets внутри `dist/` вручную не исправляются: после любого изменения выполняется полная пересборка из source.
 
-Active gate is Corrective Cycle 08. It supersedes C07 only for Ash Servant/Demoness alpha cleanup, native Demoness clarity, draw-box scale and corresponding evidence. `CORRECTIVE_CYCLE_07.md`, its report and packaged artifact remain historical, but their PASS cannot close new C08 rows. Gameplay, audio, platform, flame/environment and Inferno host may carry forward only when exact frozen fingerprints and full neighboring regression match.
+Active gate is `YANDEX_RELEASE_CYCLE_09.md`. C08 может служить baseline только после identity/fingerprint check; его PASS не закрывает rewarded, localization, SDK/data, compatibility, content/visual, submission или draft rows.
 
 ## Версионирование и идентичность
 
-- Схема: Semantic Versioning `MAJOR.MINOR.PATCH`; `0.1.0` — immutable historical C07 baseline, active C08 patch candidate — `0.1.1`.
+- Схема: Semantic Versioning `MAJOR.MINOR.PATCH`; 0.1.0/0.1.1 — immutable historical artifacts, active public-ready candidate — `1.0.0`.
 - Git tag для опубликованной версии: `inferno-clicker-v<version>`.
 - Build ID: `<version>+<short-commit-sha>`; commit должен быть clean и идентифицирован полным SHA.
-- Release notes source: `games/inferno-clicker/releases/inferno-clicker-<version>-report.md`.
+- Submission working template: `releases/yandex-submission-1.0.0/release-report.md`; it is not release evidence.
+- `package:yandex` generates the exact local report `releases/inferno-clicker-1.0.0-rc-report.md` from audited package bytes. Only post-draft promotion may create `releases/inferno-clicker-1.0.0-report.md` for the unchanged SHA.
 - Release artifacts: ZIP, SHA-256 sidecar, manifest и report должны содержать одну версию/commit. Любое различие блокирует upload.
-- C08 candidate зафиксирован как `0.1.1`; он не переиспользует C07 Build ID/artifact filename, а packaging fail-closed отказывается перезаписывать существующий ZIP/checksum.
+- Cycle 09 Build ID использует `1.0.0+` и первые 12 hex exact commit (`NOT RUN — финальный commit ещё не выбран`) и не переиспользует historical filenames; packaging fail-closed отказывается перезаписывать любой существующий ZIP/checksum.
 
 ## Toolchain lock и production build
 
-Runtime зафиксирован в `.nvmrc`: Node.js 24. Production runtime не имеет внешних зависимостей; воспроизводимое authoring/build environment устанавливается `npm ci` по `package-lock.json`, включая `sharp@0.35.3`. Воспроизводимость задаётся exact Node/npm versions, lockfile hash, source commit и hashes build scripts. Release Agent записывает фактические tool versions в report и выполняет из clean checkout:
+Runtime зафиксирован в `.nvmrc`: Node.js 24. Production runtime не имеет внешних зависимостей; воспроизводимое authoring/build environment устанавливается `npm ci` по `package-lock.json`. Воспроизводимость задаётся exact Node/npm versions, lockfile hash, source commit и hashes build scripts. Историческая C08 команда ниже остаётся rollback-справкой и не является активным Yandex gate:
 
 ```text
 npm run lint
@@ -47,19 +48,25 @@ Build contract:
 
 Если итоговая архитектура утвердит другой package manager или названия scripts, Game Architect обязан атомарно обновить build contract здесь, в `TECHNICAL_ARCHITECTURE.md` и `AC:RLS-01` до начала implementation.
 
+## Active Cycle 09 build contract
+
+Процесс двухпроходный. Сначала clean diagnostic commit проходит полный gate/capture; его evidence используется независимым QA/Reviewer только для issue→fix→retest, Human-Eye verdict и подготовки AC, но не для packaging. Эти review/docs-файлы коммитятся отдельно. Затем второй clean exact commit заново выполняет единый `npm run release:gates:yandex` (lint, typecheck, full tests, deterministic asset builders/manifests, compatibility, visual matrices, mocked-SDK browser E2E, production build, environment audit, четыре ≥12-minute traces, `release:audit:yandex` и повторную сборку). После второго gate tracked-файлы больше не меняются: exact QA/Reviewer/Release sign-offs и machine stop report сохраняются в ignored evidence directory, только затем выполняется `npm run package:yandex`. Отдельные public interfaces: `build:yandex`, `test:yandex`, `release:audit:yandex`, `package:yandex`, `verify:draft:yandex`.
+
+Две независимые `build:yandex` одного commit/toolchain должны дать эквивалентный sorted manifest. Candidate ZIP создаётся один раз, получает SHA-256, распаковывается в новый temp directory и проходит HTTP smoke. Именно эти bytes загружаются в Yandex draft и после verification без rebuild копируются/переименовываются в `releases/inferno-clicker-1.0.0.zip`.
+
 ## Pre-release sequence
 
-1. Freeze scope и назначить SemVer/build ID на clean commit.
-2. Проверить актуальные официальные Yandex Games package, SDK, ads, leaderboard, localization и content requirements; записать дату и sources в `PLATFORM_REQUIREMENTS.md`.
-3. Выполнить clean install, lint, typecheck, automated tests, production build и E2E.
-4. Выполнить Cycle 08 audit каждого Servant/Demoness frame: exterior/internal-gap alpha masks, black/dark-red/neutral-gray composites, Demoness native source proof, exact `512×832` cells, runtime `420×700→504×840`, `+20%/+20%`, visible-height ratio `≥1.25`, roots/sockets and exact-scene-transform upscale. Повторить inherited C07 motion/steam, quality-controller, clip-residency and frozen gameplay/audio/platform fingerprint comparisons.
-5. Выполнить Gates 1–2 из `QA_PLAN.md`: continuous normal/0.25× motion, full viewport/DPR matrix, three-background exterior/internal composites and first observations before fix disclosure; оформить отдельный issue на каждый independent outer-fringe, internal-residue, erased-highlight, clarity, dimension or ratio defect.
-6. Developer исправляет каждый issue на новой exact build и связывает changed paths/tests; автор fix не закрывает issue.
-7. Независимый QA owner выполняет targeted full-motion retest и neighboring regression для каждого fix. Любой FAIL возвращает issue Developer; старый candidate считается отозванным.
-8. На финальной exact build выполнить independent unlabeled blind sign-off, full regression и 10-minute Stage-7/overlap trace; затем обновить acceptance statuses/evidence. Reviewer подтверждает отсутствие скрытой смены требований.
-9. Только когда QA-критерии имеют PASS и остаются лишь package criteria, выполнить `node scripts/package.mjs`, затем создать checksum и release report.
-10. Распаковать ZIP в новый temp-каталог, запустить через простой static HTTP server и повторить launch/input/audio/fallback smoke.
-11. Загрузить в Yandex test environment, выполнить ENV-Y1/ENV-Y2 smoke; production publish выполняется отдельно после platform acceptance.
+1. Freeze scope, SemVer 1.0.0 и clean exact source commit; повторно проверить SHA rollback 0.1.1.
+2. Зафиксировать актуальные официальные Yandex Games package, SDK, ads, leaderboard, localization и content requirements с датой/sources.
+3. Завершить implementation и deterministic tests для rewarded 60/90/repeat, goals, RU/EN, SDK lifecycle, cloud/leaderboard, compatibility и responsive input.
+4. Выпустить только versioned visual fixes; выполнить 64-frame black/gray/red DPR1/2/3, seven-stage normal/reduced/forced-low и transition-flare audits.
+5. Оформить каждый дефект в Cycle 09 issue ledger; Developer/Art выполняет fix, другой QA — targeted retest и neighboring regression.
+6. Снять submission media заново с exact source fingerprint, синхронизировать hashes и получить независимый Human-Eye sign-off каждого из 10 файлов.
+7. На первом clean diagnostic commit выполнить полный gate/capture, включая четыре реальные по времени ≥12-minute sessions desktop/mobile × rewarded/no-rewarded; независимый Reviewer проверяет exact hashes, QA закрывает ledger/AC, затем review/docs коммитятся. Этот проход никогда не упаковывается.
+8. На втором clean exact commit повторить полный `release:gates:yandex`. Непреодолимый compositor/browser/device blocker не ослабляет числовой порог и записывается `BLOCKED_EXTERNAL`; проверить immutable inventory, после чего QA, independent Reviewer и Release Agent подписывают exact Build ID вне tracked source. Critical=0, High=0, skipped=0.
+9. Создать один атомарно валидированный `inferno-clicker-1.0.0-rc.zip`; две временные упаковки обязаны дать одинаковые bytes, fresh extraction/inventory/hash/owned ephemeral HTTP smoke — PASS.
+10. При авторизованном доступе загрузить эти точные RC bytes в новый Yandex draft и выполнить Desktop/mobile RU/EN SDK/Game Ready, lifecycle, real rewarded, guest/authorized cloud и leaderboard checks.
+11. Только после совпадения draft-tested SHA без rebuild разрешено скопировать те же bytes в `inferno-clicker-1.0.0.zip`. Moderation/publication требуют отдельного разрешения пользователя.
 
 ## Очистка production output
 
@@ -67,7 +74,7 @@ Build contract:
 
 - `src/`, `tests/`, `docs/`, `visual-references/`, source art/audio masters и internal reports;
 - `.env`, `.env.*`, credentials, tokens, cookies, signing data и local platform configuration;
-- source maps (`*.map`); их включение потребует отдельного change review и одновременного изменения `AC:RLS-03` до сборки candidate;
+- source maps (`*.map`); их включение потребует отдельного change review и одновременного изменения `C09-RLS-02` до сборки candidate;
 - `node_modules/`, package-manager cache, coverage, screenshots, traces, temp files и logs;
 - editor/OS metadata (`.DS_Store`, `.idea/`, `.vscode/`), Git files и GitHub workflow files;
 - mock/fake SDK, test fixtures, debug overlays, development analytics endpoints и hot-reload client;
@@ -77,7 +84,7 @@ Automated audit scans filenames and file content for common secret patterns. Л�
 
 ## Packaging and ZIP structure
 
-Файл: `games/inferno-clicker/releases/inferno-clicker-<version>.zip`.
+До draft verification файл: `games/inferno-clicker/releases/inferno-clicker-1.0.0-rc.zip`. Финальный `inferno-clicker-1.0.0.zip` появляется только как byte-identical promotion после проверки SHA в черновике.
 
 Корень архива не имеет дополнительной папки-обёртки:
 
@@ -139,6 +146,26 @@ Cycle 07 checklist остаётся закрытым только для ист�
 
 Until every item is checked with C08 evidence, packaging, test-environment upload and publication are blocked.
 
+The preceding C08 checklist is historical after Cycle 09 begins; unchecked C08 rows are not silently promoted. Cycle 09 requires its own baseline identity and all checks below.
+
+## Active Cycle 09 checks before package/draft
+
+- [ ] `1.0.0` version and exact clean Build ID recorded; historical 0.1.0/0.1.1 files/hashes unchanged.
+- [ ] Product/game/monetization/platform/architecture/art/audio/asset/QA/acceptance contracts agree on stage-3, 60-s boost, 90-active-s cooldown, repeats, goals and RU+EN.
+- [ ] Production target loads SDK before app independent of hostname; test/fake rewarded paths and native-ESM runtime dependency absent.
+- [ ] SDK init/ready/gameplay/pause, local/cloud≤1 write/5 s, guest, `best-score` and rewarded terminal matrices PASS.
+- [ ] Desktop official matrix + zoom and mobile/tablet portrait/landscape/rotation/input compatibility PASS.
+- [ ] All 64 frames and seven-stage runtime pass black/gray/red DPR1/2/3 audit; content scrub and low-brightness review PASS.
+- [ ] Four meaningful ≥12-minute traces meet functional/performance thresholds; Critical=0, High=0, skipped=0.
+- [ ] RU/EN metadata final; icon, cover, 4 desktop and 4 mobile screenshots exist, hashes recorded, actual gameplay≥70%, provenance complete.
+- [ ] Reproducible `build:yandex`, fresh-unpack HTTP smoke, ZIP structure/size/security audit and SHA-256 PASS.
+- [ ] Exact ZIP uploaded to a new Yandex draft; debug-panel SDK/Game Ready, Desktop/mobile, RU/EN, real rewarded, cloud and leaderboard PASS.
+- [ ] QA→fix→independent retest→neighboring regression and QA/Reviewer/Release Agent sign-off complete on the same ZIP SHA.
+
+Until every checkbox is checked with Cycle 09 evidence, final ZIP promotion and release readiness are blocked. Submission to moderation/publication remains outside scope even after this checklist passes.
+
+Перед `package:yandex` строки `C09-RLS-01/02` имеют только `READY_FOR_PACKAGE`; это не PASS. Пакет создаётся во временном каталоге, проверяется двумя нормализованными ZIP-потоками, fresh extraction и owned-server smoke, после чего exact `package-results.json` единственный переводит эти две строки в post-package `PASS`. Остальные строки после gate не редактируются: любое изменение tracked-файла меняет exact Git identity и блокирует packaging.
+
 ## Release report contract
 
 Сохранить как `games/inferno-clicker/releases/inferno-clicker-<version>-report.md`:
@@ -153,6 +180,7 @@ Until every item is checked with C08 evidence, packaging, test-environment uploa
 - known limitations только если noncritical и явно approved Product + QA + Reviewer;
 - upload/publish status, platform submission identifier и rollback reference.
 - C08-specific before/after alpha evidence, native Demoness source/cell proof, exact draw-size and visible-bbox matrix, accepted C07 baseline hashes, and the C08 validator/signoff result.
+- Cycle 09-specific RU/EN dictionary/metadata hashes, reward/goals contracts, SDK/data/browser/content/visual/session evidence, submission asset hashes, Yandex draft ID/config/debug results and exact uploaded ZIP SHA.
 
 ## Rollback and post-upload smoke
 
@@ -163,9 +191,9 @@ Until every item is checked with C08 evidence, packaging, test-environment uploa
 
 ## Current candidate decision and risks
 
-- Release readiness: `NOT READY — CYCLE 08 NOT RUN`; no C08 candidate is authorized for packaging, upload or publication.
+- Release readiness: `NOT READY — YANDEX CYCLE 09 NOT RUN`; no 1.0.0 candidate is authorized for final promotion, moderation or publication.
 - Art/audio payload may threaten startup and stage-7 memory budgets; mitigation — manifest budgets, staged loading and PERF-01–PERF-09 gate.
 - Yandex APIs/policies may change before integration; mitigation — source/date revalidation immediately before adapter work and again before upload.
-- Reward callback race may duplicate a boost or leave audio paused; mitigation — idempotent lifecycle contract and `QA:R-01…R-07` / `AC:Y-09` / `AC:Y-10` / `AC:A-07` / `AC:A-08` tests.
-- New production ZIP/tag/upload разрешаются только после финального C08 gate; historical C07 artifact remains untouched as rollback evidence.
+- Reward callback race may duplicate a boost or leave audio paused; mitigation — idempotent lifecycle contract, `C09-QA-F-07/08`, `C09-G-02/03/04`, `C09-Y-02/06` и `C09-A-01` tests.
+- New final ZIP/tag разрешаются только после финального Cycle 09 gate; historical artifacts remain untouched as rollback evidence. Draft upload допускается только для exact pre-release candidate после local QA gate.
 - Additional authored frames can exceed decoded memory despite a small package; mitigation is independently disposable clip resources and `AC:PERF-08`, not keeping all atlases resident.

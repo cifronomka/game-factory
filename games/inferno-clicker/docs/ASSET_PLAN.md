@@ -1,6 +1,26 @@
 # Asset Plan — «Зажги»
 
-## Corrective Cycle 08 active production contract
+## Yandex Release Cycle 09 active delta
+
+Cycle 09 наследует только те C08 runtime assets, которые заново проходят character/scene audit. Rewarded offer, goals и nextGoal — DOM/CSS и имеют `N/A — bitmap asset не требуется`. Для compatibility каждый retained/new WebP получает PNG fallback; loader выбирает один codec и никогда не держит обе версии одного изображения.
+
+| ID | Planned path/behavior | Cycle 09 requirement | Статус |
+|---|---|---|---|
+| ENV-C09-CONTENT | `bg-fire-chamber-yandex-v3.{webp,png}` + Yandex manifest | удалить видимые руны, ritual/religious/esoteric marks; сохранить hearth/fire/chains/reveal composition | BUILT — visual QA NOT RUN |
+| CH-ASH-SERVANT-C09 | retained C08 либо affected clips as `ash-servant-*-v7.{webp,png,json}` | black/gray/red, DPR1/2/3: matte/fringe/island/internal residue=0; новый version только для реально затронутых clips | NOT RUN |
+| CH-EMBER-WARDEN-C09 | retained C08 либо affected clips as `demoness-*-v8.{webp,png,json}` | visible content name Ember Warden; 64-frame total audit; white/neutral/filter-amplified spots=0; C08 dimensions/sockets/motion preserved | NOT RUN |
+| UI-C09-REWARDED | DOM/CSS only | stage-3 offer и confirm; 48×48 targets; RU/EN; no bitmap/fake-ad | NOT RUN |
+| UI-C09-GOALS | DOM/CSS only | 8 stateful badges, nextGoal и short-landscape internal scroll | NOT RUN |
+| SUB-C09-CARD | `releases/yandex-submission-1.0.0/` manifest only | icon, cover, 4 desktop and 4 mobile captures produced after exact candidate | NOT RUN |
+
+Любой новый raster получает source/provenance/hash/dimensions/license, WebP/PNG parity и preload group. Старые files не перезаписываются; superseded bytes удаляются только из runtime manifest/dist, но остаются в Git history/rollback artifact.
+
+Cycle 09 state-derived residency model (`assets/assets-manifest-yandex-1.0.0.json`):
+63,171,968 B (60.25 MiB) worst case, below the 64 MiB hard limit. The runtime
+loader enforces at most current+one imminent Servant atlas; host parts start
+only after `FlameRig` completes the mid→high transition and releases mid.
+
+## Corrective Cycle 08 inherited production contract
 
 Cycle 08 наследует C07 flame, Inferno host, authored character motion, mouth/two-palm steam и все audio recordings/mix byte-identical. Новый character asset version bump сохраняет identity/key poses/timings, очищает внешний и внутренний white matte у Ash Servant и Demoness, а Demoness перерисовывается нативно чёткой и размещается на 20% крупнее. Конкретные filenames, counts and hashes становятся authoritative только после записи в manifest; принятые C07 character atlases сохраняются как исторический baseline и не перезаписываются.
 
@@ -23,12 +43,12 @@ Cycle 08 наследует C07 flame, Inferno host, authored character motion, 
 |---|---|---:|---|---|---|---|---|---|---|
 | BG-001 Infernal chamber | Постоянный background, архитектура и ritual anchor | 1–7 | `/assets/backgrounds/bg-infernal-chamber-production.webp`, RGB WebP 768×1365 | No | Региональный reveal и лёгкий parallax поверх bitmap | Yes | Только masks/light | No | READY |
 | FL-LOW-CORE | Живое внутреннее пламя | 1–2 | `/assets/flame/atlases/core-low-v2.webp` + JSON, 1024×1024 | Yes | 8 frames, 10 fps loop, pivot `(0.50,.965)` | Yes | No body synthesis | Yes | READY — startup critical |
-| FL-LOW-OUTER | Независимые янтарные языки | 1–2 | `/assets/flame/atlases/outer-low-v2.webp` + JSON, 1024×1024 | Yes | 8 frames, 10 fps loop, phase +2 | Yes | No body synthesis | Yes | READY — startup critical |
+| FL-LOW-OUTER | Независимые янтарные языки | 1–2 | `/assets/flame/atlases/outer-low-v4.webp` + JSON, 1024×1024 | Yes | 8 frames, 10 fps loop, phase +2 | Yes | No body synthesis | Yes | READY — v4 internal matte/sticker cleanup; final low-chroma/olive/detached/neutral/cool/sticker=0; startup critical |
 | FL-MID-CORE | Среднее ядро | 3–5 | `/assets/flame/atlases/core-mid-v2.webp` + JSON, 1600×1280 | Yes | 10 frames, 10 fps loop | Yes | No body synthesis | Yes | READY — preload S2 60% |
-| FL-MID-OUTER | Более широкие асимметричные языки | 3–5 | `/assets/flame/atlases/outer-mid-v2.webp` + JSON, 1600×1280 | Yes | 10 frames, 10 fps loop, phase +3 | Yes | No body synthesis | Yes | READY — preload S2 60% |
+| FL-MID-OUTER | Более широкие асимметричные языки | 3–5 | `/assets/flame/atlases/outer-mid-v4.webp` + JSON, 1600×1280 | Yes | 10 frames, 10 fps loop, phase +3 | Yes | No body synthesis | Yes | READY — v4 internal matte/sticker cleanup; final low-chroma/olive/detached/neutral/cool/sticker=0; preload S2 60% |
 | FL-HIGH-CORE | Высокое ветвящееся ядро/Inferno column | 6–7 | `/assets/flame/atlases/core-high-v2.webp` + JSON, 1536×1280 | Yes | 12 frames, 11 fps loop | Yes | No body synthesis | Yes | READY — preload S5 60% |
-| FL-HIGH-OUTER | Высокие внешние языки | 6–7 | `/assets/flame/atlases/outer-high-v2.webp` + JSON, 1536×1280 | Yes | 12 frames, 11 fps loop, phase +4 | Yes | No body synthesis | Yes | READY — preload S5 60% |
-| FX-STAGE-FLARE | Скрывает texture swap и подчёркивает каждый stage boundary | 1–7 | `/assets/flame/transitions/stage-flare-v2.webp` + JSON, 1024×1024 | Yes | 8 frames at 8 fps; forward upward, reverse + cool tint downward; family crossfade 1.05 s, entry S7 1.5 s | Yes | Runtime tint/light | Yes | READY — preload S1 60% |
+| FL-HIGH-OUTER | Высокие внешние языки | 6–7 | `/assets/flame/atlases/outer-high-v4.webp` + JSON, 1536×1280 | Yes | 12 frames, 11 fps loop, phase +4 | Yes | No body synthesis | Yes | READY — v4 internal matte/sticker cleanup; final low-chroma/olive/detached/neutral/cool/sticker=0; preload S5 60% |
+| FX-STAGE-FLARE | Скрывает texture swap и подчёркивает каждый stage boundary | 1–7 | `/assets/flame/transitions/stage-flare-v3.webp` + JSON, 1024×1024 | Yes | 8 frames at 8 fps; forward upward, reverse + cool tint downward; family crossfade 1.05 s, entry S7 1.5 s | Yes | Runtime tint/light | Yes | READY — deterministic C09 cleanup; v2 retained as source; black/gray/dark-red detached/neutral/cool=0; exact visible PNG/WebP parity; preload S1 60% |
 | CH-ASH-SERVANT | Historical pre-C08 lineage, including accepted C07 clip family | 3–7 | exact C07 paths/hashes recorded in C08 baseline evidence | Yes | Retained identity/key poses/motion and C08 before/after comparison only | Existing generated source | N/A — historical | Yes | SUPERSEDED BY C08 FOR ALPHA CLEANUP |
 | CH-DEMONESS | Historical pre-C08 lineage, including accepted C07 clip family | 4–7 | exact C07 paths/hashes recorded in C08 baseline evidence | Yes | Identity/pose/`420×700` runtime baseline only; not a source to upscale | Existing generated source | N/A — historical | Yes | SUPERSEDED BY C08 FOR REDRAW/SCALE |
 | CH-INFERNO-HOST | Cycle 05 historical baseline; entry reference only | 6–7 | `/assets/characters/character-inferno-host.webp` + JSON | Yes | Accepted entry/composition reference; post-entry crop motion superseded | Yes | N/A — historical | Spatial crop | SUPERSEDED BY C06 |
@@ -68,7 +88,7 @@ Accepted taps объединяются в окно 120 ms, новый fan voice 
 ## Loading and fallback
 
 - Startup critical: BG-001, low core и low outer — 818,566 compressed bytes.
-- Stage flare начинает грузиться при 60% Stage 1; mid + Servant — при 60% Stage 2; Demoness — при 60% Stage 3; high + host — при 60% Stage 5.
+- Stage flare начинает грузиться при 60% Stage 1; mid + Servant — при 60% Stage 2; Ember Warden — при 60% Stage 3; high — при 60% Stage 5. Оба host parts декодируются только после завершения mid→high transition и освобождения mid family.
 - Ошибка critical image даёт bounded retry/safe darkness. Optional late asset остаётся невидимым до успешной загрузки; старые static-card ассеты не являются fallback.
 - Audio создаёт graph и загружает media только после trusted gesture. Failed codec pair деградирует конкретный asset до silence без повторного fetch на каждый tap.
 - Large character animation is partitioned into independently disposable clip resources. Servant may pin active plus one imminent clip. Demoness pins exactly one full atlas; a single decoded frame is cached before the old atlas is released and remains visible until the requested atlas commits. Flame families retain at most the two families needed by a boundary transition.

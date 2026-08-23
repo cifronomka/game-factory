@@ -4,7 +4,7 @@ Browser-first HTML5 clicker для Yandex Games о разгоне маленьк
 
 ## Текущий статус
 
-**Candidate 0.1.1 — активный Corrective Cycle 08.** Headless core, layered Canvas 2D presentation, authored audio, Web/Yandex adapters, persistence, leaderboard и rewarded flow сохранены; Ash Servant/Demoness пересобраны с чистым alpha, а Demoness — в native `512×832` cells и runtime `504×840`. Исторический `0.1.0` остаётся rollback baseline; новый ZIP и публикация закрыты до полного C08 browser/device/regression gate.
+**Candidate 1.0.0 — активный Yandex Release Cycle 09, статус `NOT READY / NOT RUN`.** Проверенный C08 baseline адаптируется для Desktop, Android и iOS (`Any`, RU+EN, 12+): официальный SDK/lifecycle/cloud/leaderboard, повторяемый rewarded ×2 на 60 секунд со стадии 3, восемь целей, compatibility/layout/content/white-spot audit и submission pack. Исторические 0.1.0/0.1.1 artifacts неизменяемы; финальный ZIP и release PASS закрыты до полного QA→fix→regression и Yandex draft gate.
 
 ## Source of truth
 
@@ -14,6 +14,7 @@ Browser-first HTML5 clicker для Yandex Games о разгоне маленьк
 - `docs/ART_DIRECTION.md`, `AUDIO_DIRECTION.md`, `ASSET_PLAN.md` — production briefs.
 - `docs/MONETIZATION.md`, `PLATFORM_REQUIREMENTS.md` — rewarded и Yandex/Web contracts.
 - `docs/QA_PLAN.md`, `ACCEPTANCE_CRITERIA.md`, `RELEASE_PLAN.md` — verification и будущий stop condition.
+- `docs/YANDEX_RELEASE_CYCLE_09.md` — authoritative delta для Yandex release 1.0.0.
 - `docs/IMPLEMENTATION_PLAN.md` — порядок M1–M15, зависимости, parallel work и gates.
 
 Глобальные правила: корневые `AGENTS.md` и `FACTORY_WORKFLOW.md`.
@@ -21,12 +22,13 @@ Browser-first HTML5 clicker для Yandex Games о разгоне маленьк
 ## Принятые рамки
 
 - Название: «Зажги»; slug: `inferno-clicker`.
-- Primary: Yandex Games; future: VK Mini Apps, generic Web, Android/RuStore wrapper.
+- Primary: Yandex Games Desktop + Android/iOS, orientation Any, RU+EN, 12+; TV/VK/RuStore вне Cycle 09.
 - Input: primary touch tap и mouse click.
-- Семь стадий: Тьма → Искра → Пепельный слуга → Алый порог → Демонесса угасания → Круг Инферно → Инферно.
-- Контент: stylized dark fantasy / infernal occult casual, без gore, крови, натуралистичного хоррора и откровенного контента.
+- Семь стадий: Тьма → Искра → Пепельный слуга → Алый порог → Хранительница угасания → Огненное кольцо → Инферно.
+- Контент: stylized dark-fantasy fire arcade без gore, крови, натуралистичного хоррора, откровенного контента, рун и религиозной/ритуальной/эзотерической символики.
+- Rewarded: добровольное видео после stage 3, ×2 heat power на 60 active seconds, следующий success после 90 active seconds от reward; без рекламы вся игра проходима.
 - Game core не импортирует platform SDK.
 
 ## Следующий gate
 
-M11–M14: browser/device, visual/audio и Yandex regression на идентифицированной production build. После PASS всех применимых критериев M15 создаёт ZIP и release report; публикация требует отдельного разрешения. Любое изменение числового баланса или platform lifecycle сначала обновляет связанные specs и acceptance criteria.
+C09-M2–M5: feature/platform/compatibility/content implementation и ordered QA на одном exact build. C09-M6 создаёт/проверяет ZIP и новый Yandex draft; отправка на модерацию и публикация требуют отдельного разрешения. Любое изменение reward/balance/platform lifecycle сначала обновляет specs, fixtures и acceptance criteria.

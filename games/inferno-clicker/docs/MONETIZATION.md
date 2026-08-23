@@ -1,72 +1,60 @@
-# Monetization — «Зажги»
+# Monetization — «Зажги» / Ignite
 
-## Назначение
+## Active contract — Yandex Release Cycle 09
 
-Документ определяет единственный MVP provider-flow — добровольное «Усиление жара ×2». Rewarded никогда не открывает контент, stage или permission: все семь стадий доступны прямыми taps без рекламы. Modal не открывается автоматически.
+Единственная монетизация 1.0.0 — добровольный Yandex rewarded-placement `heat-power-2x-60s`. Interstitial, sticky banner, IAP и third-party ads: `N/A — не входят в Cycle 09`. Test/fake provider удаляется из production и пользовательского интерфейса.
 
-## Решение MVP
+Все семь стадий, restart, local records, goals и Best Score доступны без рекламы. Rewarded ничего не разблокирует и не является условием продолжения.
 
-- Rewarded: **да, один optional placement**.
-- Interstitial, sticky banner, покупки: **N/A для MVP** — короткая score-based сессия не имеет достаточно естественных пауз.
-- Пока настоящая реклама отсутствует, Web/dev предоставляет честно подписанный test provider. Он не имитирует рекламу, но возвращает тот же terminal success contract. Production Yandex позднее заменяет только provider adapter.
+## Placement
 
-## Rewarded placement
+| Поле | Зафиксированное значение |
+|---|---|
+| Internal ID | `heat-power-2x-60s` |
+| Eligibility | текущая попытка достигла `runHighestStage ≥3`; не зависит от persisted stage |
+| Opener RU | `Посмотреть рекламу — ×2 к силе жара на 60 секунд` |
+| Opener EN | `Watch an ad — ×2 heat power for 60 seconds` |
+| Награда | `tapPower ×2.0` на `60 000 ms` активного gameplay; assisted heat не даёт прямой tap-score |
+| Cooldown | `90 000 ms` активного gameplay от `onRewarded`, между попытками текущей app session; не persisted |
+| Частота | повтор разрешён после завершения boost и cooldown; максимум один pending request |
+| Close/error/timeout без предшествующего `onRewarded`/unavailable | reward=0, cooldown=0, progression mutation=0; новый запрос разрешён после cleanup |
+| `onRewarded`, затем отсутствующий `onClose` | earned reward сохраняется ровно один раз; terminal timeout только освобождает ad pause/request |
+| Provider | только `ysdk.adv.showRewardedVideo` в Yandex production |
 
-| Placement | Добровольный trigger | Точная награда | Ограничения | Close/error/unavailable | Проверка |
-|---|---|---|---|---|---|
-| internal `inferno-seal` для adapter compatibility; UI «Усиление жара ×2» | отдельная CTA при `runHighestStage ≥4` и active run ≥45 s; никогда не на основном tap target | `tapPower ×2.0` на 20 s active gameplay; дополнительный heat не даёт прямых tap-score points и ничего не разблокирует | 1 success/run; 90 s session cooldown после success; таймеры стоят на pause | reward/use/cooldown не расходуются; безопасный resume; progression не меняется | adapter lifecycle, duplicate/late, core timer/scoring и no-reward-to-Inferno tests |
+Яндекс не задаёт отдельный лимит частоты rewarded на дату snapshot 2026-08-23; 90 секунд — продуктовый guardrail. Вызов всегда следует за явным user gesture и никогда не происходит автоматически.
 
-Public leaderboard остаётся один — **Best Score** и принимает boosted/non-boosted runs. Assisted heat не даёт прямых tap-score points: `scoreTapPower` делит `tapPower` на rewarded factor. Более высокий score возможен только косвенно через более быстрый вход в высокие stages и удержание.
+## UX и lifecycle
 
-## Web/dev test provider
+1. После первого достижения stage 3 компактная DOM/CSS-плашка появляется только в safe `PLAYING`: нет encounter, pause/modal, active boost, cooldown или request. Presentation-only flame crossfade не меняет eligibility.
+2. Плашка не перекрывает flame target. Нажатие только открывает локализованный confirm sheet и добавляет pause reason `menu`.
+3. Confirm точно повторяет длительность и награду, заменяет `menu` на `ad`, останавливает gameplay/audio и вызывает Yandex SDK.
+4. Первый `onRewarded` request ID ставит queued boost и запускает 90-секундный cooldown. Boost начинает расходоваться только после valid resume.
+5. `onClose` завершает request. Если `onRewarded` не приходил, награды и cooldown нет. `onError` и timeout без предшествующего `onRewarded` обрабатываются тем же fail-safe cleanup; timeout после `onRewarded` не отнимает уже earned reward.
+6. Pause, hidden, background, system dialog и ad не расходуют boost/cooldown. Снятие одной pause reason не снимает остальные.
+7. При непрерывной игре boost заканчивается через 60 секунд, плашка остаётся скрыта ещё 30 секунд и затем может появиться снова в той же попытке.
 
-- Opener CTA и confirm: `Получить ×2 (тест)`; пояснение: `Тестовый ×2 к силе жара на 20 секунд. Реклама не показывается.`
-- Adapter не рисует fake-ad, countdown, close-кнопку или рекламный бренд. Он асинхронно завершает тот же idempotent request terminal outcome `rewarded`.
-- Test provider взаимоисключается с Yandex rewarded и исключается из production ad-completion metrics.
+## Anti-frustration и integrity
 
-## UX flow
+- Нет auto-open, urgency badge, ложной close-кнопки, наказания за отказ или рекламы поверх основного действия.
+- Cancel/error/unavailable не изменяют heat, score, stage, records, cooldown или возможность пройти игру.
+- Duplicate/late `onRewarded`, `onClose` и resume callbacks идемпотентны; одна request ID выдаёт максимум один boost.
+- Все значения leaderboard проходят один и тот же sanity check; rewarded и no-reward runs сосуществуют в `best-score`.
+- Production static audit должен доказать отсутствие `(тест)`, `rewardedProvider='test'`, fake-ad UI и бесплатного terminal success.
 
-1. Capability доступна, `runHighestStage ≥4`, elapsed active gameplay ≥45 s, cooldown завершён и successful use ещё не было.
-2. Неблокирующая CTA в safe `PLAYING` обещает только `×2 на 20 секунд` и открывает sheet.
-3. Явный click добавляет pause reason `menu`; Yandex sheet говорит `Посмотреть рекламу и получить ×2`, Web/dev sheet использует test wording.
-4. Отдельный confirm заменяет `menu` на pause reason `ad`; audio fades to silence ≤100 ms, затем запускается provider.
-5. Только terminal `rewarded` ставит queued 20-s boost; boost начинается после valid resume.
-6. После expiry `tapPower` возвращается к base. Stage thresholds, heat, progression permission и records не меняются.
+## Privacy-safe events
 
-## Anti-frustration rules
+Допустимые агрегированные события: `reward_offer_visible`, `reward_sheet_open`, `reward_confirmed`, `reward_started`, `rewarded`, `reward_closed`, `reward_error`, `boost_started`, `boost_completed`, `reward_offer_ready_again`. Параметры: locale, platform, run-age bucket, stage, heat bucket, result. Raw platform/user identifiers, точные tap traces и рекламный профиль не записываются.
 
-- Нет auto-open, red notification badges, ложной close-кнопки, placement поверх flame или наказания за отказ.
-- CTA скрывается во время encounter, stage transition, любого pause и active boost.
-- Heat, decay, encounter и boost timers заморожены на рекламе.
-- Double callback/повторный resume не выдаёт reward дважды.
-- Ошибка сети не запускает cooldown и не уменьшает heat/score; повторный добровольный запрос разрешён.
-- Все stages, tutorial, restart, save и leaderboard доступны при unavailable provider.
-- Frequency guardrail: один rewarded success на run.
+## Release guardrails
 
-## Platform compliance
+| Метрика | Порог |
+|---|---:|
+| Duplicate reward grants | `0` |
+| Progression difference после close/error/unavailable | `0` |
+| No-reward stage-7 reachability | `PASS` на 60/30/15 FPS fixtures |
+| Gameplay/audio movement во время ad | `0` |
+| Offer до stage 3 или во время unsafe state | `0` |
+| Следующий success раньше 90 active seconds | `0` |
+| Production test-provider strings/paths | `0` |
 
-- Yandex ad вызывается только официальным SDK и после user gesture.
-- Gameplay/audio paused на весь fullscreen lifecycle с учётом `game_api_pause/resume`.
-- CTA заранее сообщает точную временную reward; выдача только по confirmed rewarded callback.
-- Web/dev test provider не выдаёт себя за рекламу.
-- Перед release Platform Agent повторно проверяет актуальные требования Yandex.
-
-## Analytics events без персональных данных
-
-`boost_sheet_open`, `reward_confirmed`, `reward_started`, `rewarded`, `reward_closed`, `reward_error`, `boost_started`, `boost_completed`; параметры: run age bucket, stage, heat bucket, platform, provider=`test|yandex|other`, result. Raw identifiers и точные tap traces не отправляются.
-
-## Метрики и guardrails
-
-| Метрика | Planning target/guardrail | Решение при нарушении |
-|---|---:|---|
-| Optional sheet open among eligible runs | 15–60% | проверить понятность CTA; не добавлять auto-open и не блокировать progression |
-| Reward completion | ≥70% после старта настоящего показа | исследовать provider/error UX |
-| Reward duplicate grants | 0 | release blocker |
-| Progression difference after close/error/unavailable | 0 | release blocker |
-| `canonicalDirectNoRewardV5` достигает stage 7 | 100% at 60/30/15 FPS | release blocker |
-| Web/dev test success through production reward contract | 100%, exactly once/request | release blocker |
-| D1 retention degradation among ad-exposed cohort | не хуже control более чем на 3 pp после достаточной выборки | снизить prominence/frequency |
-
-## Post-MVP decision gate
-
-Interstitial можно рассматривать только после минимум двух завершённых runs и не ранее 180 s app session. Это не часть текущих требований и не реализуется без отдельного product/platform/QA change request.
+Нарушение любого порога блокирует release и запускает QA→fix→independent retest→neighboring regression.

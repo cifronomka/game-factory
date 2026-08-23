@@ -2,7 +2,7 @@
 
 import { createDefaultSave } from '../platforms/index.js';
 
-/** @param {import('../core/contracts.js').PersistentRecords} records @param {ReturnType<typeof createDefaultSave>} previous @param {{muted:boolean,reducedMotion:boolean}} settings @param {number} now */
+/** @param {import('../core/contracts.js').PersistentRecords} records @param {ReturnType<typeof createDefaultSave>} previous @param {{muted:boolean,reducedMotion:boolean,updatedAt:number}} settings @param {number} now */
 export function buildSave(records, previous, settings, now) {
   return {
     ...createDefaultSave(now),
@@ -14,7 +14,7 @@ export function buildSave(records, previous, settings, now) {
     maxMultiplier: records.maxMultiplier,
     runsPlayed: records.runsPlayed,
     tutorialFlags: { ...previous.tutorialFlags },
-    settings: { muted: settings.muted, reducedMotion: settings.reducedMotion, updatedAt: now },
+    settings: { muted: settings.muted, reducedMotion: settings.reducedMotion, updatedAt: settings.updatedAt },
     dailyRitual: { ...previous.dailyRitual },
     updatedAt: now,
   };

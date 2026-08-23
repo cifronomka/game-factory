@@ -9,8 +9,7 @@ export const BASE_TAP_POWER = 3;
 /** Emergency protection for impossible synthetic floods, not a balance cap. */
 export const MAX_TAPS_PER_FIXED_STEP = 256;
 export const FAIL_GRACE_MS = 2_000;
-export const REWARDED_DURATION_MS = 20_000;
-export const REWARDED_ELIGIBLE_RUN_MS = 45_000;
+export const REWARDED_DURATION_MS = 60_000;
 export const REWARDED_SESSION_COOLDOWN_MS = 90_000;
 export const SERVANT_DECAY_FACTOR = 1.8;
 export const DEMONESS_DECAY_FACTOR = 1.5;
@@ -21,7 +20,7 @@ export const ENEMY_DECAY_FACTOR_CAP = 2.5;
 /**
  * @typedef {object} StageConfig
  * @property {Stage} stage
- * @property {string} name
+ * @property {`stage.${Stage}`} nameKey
  * @property {number} lowerHeat
  * @property {number} upperHeat
  * @property {number} decayPerSecond
@@ -31,13 +30,13 @@ export const ENEMY_DECAY_FACTOR_CAP = 2.5;
 
 /** @type {readonly StageConfig[]} */
 export const STAGES = Object.freeze([
-  { stage: 1, name: 'Тьма', lowerHeat: 0, upperHeat: 80, decayPerSecond: 0.5, multiplier: 1, firstEntryBonus: 0 },
-  { stage: 2, name: 'Искра', lowerHeat: 80, upperHeat: 220, decayPerSecond: 2, multiplier: 1.25, firstEntryBonus: 500 },
-  { stage: 3, name: 'Пепельный слуга', lowerHeat: 220, upperHeat: 380, decayPerSecond: 4, multiplier: 1.5, firstEntryBonus: 1_500 },
-  { stage: 4, name: 'Алый порог', lowerHeat: 380, upperHeat: 560, decayPerSecond: 6.5, multiplier: 2, firstEntryBonus: 3_000 },
-  { stage: 5, name: 'Демонесса угасания', lowerHeat: 560, upperHeat: 730, decayPerSecond: 9, multiplier: 2.5, firstEntryBonus: 6_000 },
-  { stage: 6, name: 'Круг Инферно', lowerHeat: 730, upperHeat: 900, decayPerSecond: 13, multiplier: 3.25, firstEntryBonus: 10_000 },
-  { stage: 7, name: 'Инферно', lowerHeat: 900, upperHeat: 1_000, decayPerSecond: 18, multiplier: 5, firstEntryBonus: 20_000 },
+  { stage: 1, nameKey: 'stage.1', lowerHeat: 0, upperHeat: 80, decayPerSecond: 0.5, multiplier: 1, firstEntryBonus: 0 },
+  { stage: 2, nameKey: 'stage.2', lowerHeat: 80, upperHeat: 220, decayPerSecond: 2, multiplier: 1.25, firstEntryBonus: 500 },
+  { stage: 3, nameKey: 'stage.3', lowerHeat: 220, upperHeat: 380, decayPerSecond: 4, multiplier: 1.5, firstEntryBonus: 1_500 },
+  { stage: 4, nameKey: 'stage.4', lowerHeat: 380, upperHeat: 560, decayPerSecond: 6.5, multiplier: 2, firstEntryBonus: 3_000 },
+  { stage: 5, nameKey: 'stage.5', lowerHeat: 560, upperHeat: 730, decayPerSecond: 9, multiplier: 2.5, firstEntryBonus: 6_000 },
+  { stage: 6, nameKey: 'stage.6', lowerHeat: 730, upperHeat: 900, decayPerSecond: 13, multiplier: 3.25, firstEntryBonus: 10_000 },
+  { stage: 7, nameKey: 'stage.7', lowerHeat: 900, upperHeat: 1_000, decayPerSecond: 18, multiplier: 5, firstEntryBonus: 20_000 },
 ]);
 
 export const SERVANT_FIRST_MS = 8_000;

@@ -167,5 +167,5 @@ test('confirmed restart routes through abandoned RESULTS and carries sanitized r
   assert.equal(engine.state.phase, 'READY');
   assert.equal(engine.state.records.bestScore, 1_234);
   assert.equal(engine.state.runHighestStage, 1);
-  assert.equal(engine.state.rewardedUsedThisRun, false);
+  assert.equal('rewardedUsedThisRun' in engine.state, false);
 });
