@@ -260,7 +260,7 @@ const exactVisualReviewFiles = [
 invariant(new Set(exactVisualReviewFiles.map((item) => item.id)).size === exactVisualReviewFiles.length,
 'Exact visual review inventory contains duplicate IDs.');
 const visualHumanReview = JSON.parse(await readFile(join(gameRoot, 'releases/yandex-submission-1.0.0/visual-human-review.json'), 'utf8'));
-const earliestVisualReviewTime = Math.max(...[
+const latestCurrentVisualGenerationTime = Math.max(...[
   visualManifest.generatedAt, runtimeManifest.generatedAt, outerFlameEvidence.generatedAt, stageFlareEvidence.generatedAt,
 ].map((value) => Date.parse(value)));
 invariant(visualHumanReview.schemaVersion === 1
@@ -272,8 +272,10 @@ invariant(visualHumanReview.schemaVersion === 1
   && typeof visualHumanReview.reviewer?.id === 'string'
   && /^[A-Za-z0-9][A-Za-z0-9._@/+-]{1,127}$/u.test(visualHumanReview.reviewer.id)
   && visualHumanReview.reviewer.id !== 'root'
+  && validTimestamp(visualHumanReview.evidenceGeneratedAt)
   && validTimestamp(visualHumanReview.reviewer?.reviewedAt)
-  && Date.parse(visualHumanReview.reviewer.reviewedAt) >= earliestVisualReviewTime,
+  && Date.parse(visualHumanReview.reviewer.reviewedAt) >= Date.parse(visualHumanReview.evidenceGeneratedAt)
+  && Date.parse(visualHumanReview.evidenceGeneratedAt) <= latestCurrentVisualGenerationTime,
 'Cycle 09 visuals lack an independent exact-source Human-Eye review.');
 const reviewedVisualFiles = visualHumanReview.files?.map((item) => ({ id: item.id, sha256: item.sha256 })) ?? [];
 invariant(reviewedVisualFiles.length === exactVisualReviewFiles.length
