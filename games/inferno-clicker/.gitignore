@@ -9,5 +9,6 @@ dist/*
 dist-e2e/
 releases/*.zip
 releases/*.sha256
+releases/*-rc-report.md
 *.log
 .DS_Store
