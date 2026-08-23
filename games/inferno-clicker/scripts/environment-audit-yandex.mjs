@@ -363,7 +363,10 @@ async function promoteSnapshot(category, reportPath, reportBytes, artifacts) {
     await verifyExistingSnapshot(destination, snapshot);
   } catch (error) {
     if (error?.code !== 'ENOENT') throw error;
-    const stageRoot = await mkdtemp(join(dirname(destination), `.snapshot-stage-${reportSha}-`));
+    // Keep the transient path well below the legacy Windows MAX_PATH limit even
+    // when the exact-build evidence root is already deeply nested. The final
+    // destination remains content-addressed by the complete report SHA below.
+    const stageRoot = await mkdtemp(join(evidenceRoot, `.snapshot-stage-${reportSha.slice(0, 12)}-`));
     const stageDestination = join(stageRoot, reportSha);
     try {
       await mkdir(join(stageDestination, 'artifacts'), { recursive: true });
