@@ -3,7 +3,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { isAbsolute, join, sep } from 'node:path';
 import { parseAsync } from '@babel/core';
 import sharp from 'sharp';
-import { gameRoot, walk } from './lib.mjs';
+import { gameRoot, verifyBuildPayload, walk } from './lib.mjs';
 
 const dist = join(gameRoot, 'dist');
 const manifestBytes = await readFile(join(dist, 'build-manifest.json'));
@@ -26,6 +26,7 @@ invariant(manifest.syntaxTarget === 'chrome49/firefox52/safari9/edge15' && manif
 invariant(manifest.testDriver === false, 'Release build must compile out the test driver.');
 invariant(manifest.clean === true && /^1\.0\.0\+[a-f0-9]{12}$/u.test(manifest.buildId), `Release requires a clean exact build, got ${manifest.buildId}.`);
 invariant(manifest.unpackedBytes < 90 * 1024 * 1024, 'Unpacked Yandex build exceeds 90 MiB.');
+await verifyBuildPayload(dist, manifest);
 
 const actualFiles = await walk(dist, () => true);
 const releasePath = (path) => path.slice(dist.length + 1).split(sep).join('/');

@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { access, chmod, cp, lstat, mkdir, mkdtemp, readFile, rename, rm, utimes, writeFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
-import { buildIdentity, gameRoot, startVerifiedStaticServer, walk } from './lib.mjs';
+import { buildIdentity, gameRoot, startVerifiedStaticServer, verifyBuildPayload, walk } from './lib.mjs';
 
 const releaseDir = join(gameRoot, 'releases');
 const manifestBytes = await readFile(join(gameRoot, 'dist/build-manifest.json'));
@@ -20,6 +20,7 @@ invariant(currentIdentity.clean === true
   && currentIdentity.commitSha === manifest.commitSha
   && currentIdentity.sourceFingerprint === manifest.sourceFingerprint,
 'Current clean Git identity differs from the exact gated candidate.');
+await verifyBuildPayload(join(gameRoot, 'dist'), manifest);
 
 invariant(['PASS', 'PASS_WITH_EXTERNAL_BLOCKERS'].includes(gate.status)
   && gate.cycle === '09'
@@ -186,6 +187,10 @@ const expectedIssueSeverities = {
   'C09-REL-006': 'Medium',
   'C09-REL-007': 'Medium',
   'C09-REL-008': 'Medium',
+  'C09-REL-009': 'Medium',
+  'C09-REL-010': 'High',
+  'C09-REL-011': 'Medium',
+  'C09-REL-012': 'Medium',
   'C09-SUB-001': 'High',
   'C09-VIS-001': 'High',
   'C09-VIS-002': 'High',
@@ -368,6 +373,7 @@ try {
   if (extract.status !== 0) throw new Error(extract.stderr || extract.stdout || 'ZIP extraction failed.');
   const extractedManifestBytes = await readFile(join(extractionRoot, 'build-manifest.json'));
   invariant(sha256(extractedManifestBytes) === manifestSha256, 'Extracted build manifest differs from the gated manifest.');
+  await verifyBuildPayload(extractionRoot, JSON.parse(extractedManifestBytes.toString('utf8')));
   const actualFiles = await walk(extractionRoot, () => true);
   const actualRelative = actualFiles.map((path) => relative(extractionRoot, path).split(sep).join('/')).sort();
   invariant(JSON.stringify(actualRelative) === JSON.stringify(expectedRelative), 'Extracted ZIP file inventory differs from the build manifest.');

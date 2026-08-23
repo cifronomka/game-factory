@@ -1,19 +1,23 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import {
+  mkdir,
   link,
   lstat,
   mkdtemp,
   open,
   readFile,
   readdir,
+  realpath,
+  rename,
   rm,
   stat,
+  symlink,
   unlink,
 } from 'node:fs/promises';
 import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { tmpdir } from 'node:os';
-import { buildIdentity, gameRoot, startVerifiedStaticServer } from './lib.mjs';
+import { buildIdentity, gameRoot, startVerifiedStaticServer, verifyBuildPayload } from './lib.mjs';
 import { mergeInfernoSaves, parseInfernoSave } from '../src/platforms/types/save.js';
 
 const archiveName = 'inferno-clicker-1.0.0-rc.zip';
@@ -76,12 +80,14 @@ const expectedAcceptanceIds = [
 const expectedIssueIds = [
   'C09-DOC-001', 'C09-REL-001', 'C09-REL-002', 'C09-REL-003',
   'C09-REL-004', 'C09-REL-005', 'C09-REL-006', 'C09-REL-007',
-  'C09-REL-008', 'C09-SUB-001', 'C09-VIS-001', 'C09-VIS-002',
+  'C09-REL-008', 'C09-REL-009', 'C09-REL-010', 'C09-REL-011',
+  'C09-REL-012', 'C09-SUB-001', 'C09-VIS-001', 'C09-VIS-002',
 ].sort();
 const expectedIssueSeverities = Object.freeze({
   'C09-DOC-001': 'Medium', 'C09-REL-001': 'High', 'C09-REL-002': 'High', 'C09-REL-003': 'Medium',
   'C09-REL-004': 'Medium', 'C09-REL-005': 'Medium', 'C09-REL-006': 'Medium', 'C09-REL-007': 'Medium',
-  'C09-REL-008': 'Medium', 'C09-SUB-001': 'High', 'C09-VIS-001': 'High', 'C09-VIS-002': 'High',
+  'C09-REL-008': 'Medium', 'C09-REL-009': 'Medium', 'C09-REL-010': 'High', 'C09-REL-011': 'Medium',
+  'C09-REL-012': 'Medium', 'C09-SUB-001': 'High', 'C09-VIS-001': 'High', 'C09-VIS-002': 'High',
 });
 const externallyBlockableIds = new Set([
   'C09-V-01', 'C09-PERF-01', 'C09-Q-03',
@@ -217,21 +223,45 @@ function validateSafeDescriptor(descriptor, label, expectedKeys) {
   invariant(shaPattern.test(descriptor.sha256 ?? ''), `${label}.sha256 is invalid.`);
 }
 
-async function readBoundFile(descriptor, evidenceDirectory, label, registry, expectedKeys) {
+async function readBoundFile(descriptor, evidenceDirectory, label, registry, expectedKeys, snapshotMetadata) {
   validateSafeDescriptor(descriptor, label, expectedKeys);
-  const path = resolve(evidenceDirectory, descriptor.path);
-  const registryRoot = registry.root ?? evidenceDirectory;
+  const descriptorRoot = resolve(evidenceDirectory);
+  const path = resolve(descriptorRoot, descriptor.path);
+  const registryRoot = resolve(registry.root ?? descriptorRoot);
   const relation = relative(registryRoot, path).split(sep).join('/');
-  invariant(!relation.startsWith('../') && relation !== '..' && !isAbsolute(relation), `${label} escapes the evidence directory.`);
+  invariant(relation.length > 0 && !relation.startsWith('../') && relation !== '..' && !isAbsolute(relation),
+    `${label} escapes the logical evidence directory.`);
+  const descriptorRootReal = await realpath(descriptorRoot);
+  const registryRootReal = registry.realRoot ?? await realpath(registryRoot);
+  const descriptorRootRelation = relative(registryRootReal, descriptorRootReal).split(sep).join('/');
+  invariant(descriptorRootRelation === ''
+    || (!descriptorRootRelation.startsWith('../') && descriptorRootRelation !== '..' && !isAbsolute(descriptorRootRelation)),
+  `${label} descriptor root escapes the physical evidence directory.`);
   const info = await lstat(path);
   invariant(info.isFile() && !info.isSymbolicLink(), `${label} is not a regular non-link file.`);
-  const bytes = await readFile(path);
+  const pathReal = await realpath(path);
+  const physicalRelation = relative(registryRootReal, pathReal).split(sep).join('/');
+  invariant(physicalRelation.length > 0
+    && !physicalRelation.startsWith('../') && physicalRelation !== '..' && !isAbsolute(physicalRelation),
+  `${label} escapes the physical evidence directory through a symlinked parent.`);
+  const bytes = await readFile(pathReal);
   invariant(bytes.length === descriptor.bytes && sha256(bytes) === descriptor.sha256, `${label} bytes/hash mismatch.`);
   invariant(!registry.paths.has(relation), `${label} reuses artifact path ${relation}.`);
+  const caseFoldedRelation = relation.toLocaleLowerCase('en-US');
+  invariant(!registry.caseFoldedPaths.has(caseFoldedRelation), `${label} reuses a case-folded artifact path ${relation}.`);
   invariant(!registry.hashes.has(descriptor.sha256), `${label} reuses artifact SHA-256 ${descriptor.sha256}.`);
   registry.paths.add(relation);
+  registry.caseFoldedPaths.add(caseFoldedRelation);
   registry.hashes.add(descriptor.sha256);
-  return { path, relation, bytes };
+  registry.files.set(relation, {
+    bytes,
+    bytesLength: bytes.length,
+    id: snapshotMetadata?.id ?? label,
+    role: snapshotMetadata?.role ?? 'attachment',
+    sha256: descriptor.sha256,
+    sourcePath: relation,
+  });
+  return { path, realPath: pathReal, relation, bytes };
 }
 
 function validateTrace(trace, expectedKind, label, context, options = {}) {
@@ -692,7 +722,10 @@ async function validateTitlesTrace(trace, tracePath, context, registry) {
     const locale = descriptor.id === 'title-ru' ? 'ru' : 'en';
     const expectedKeys = ['bytes', 'capturedAt', 'height', 'id', 'path', 'sha256', 'width'];
     exactKeys(descriptor, expectedKeys, `title screenshot ${locale}`);
-    const file = await readBoundFile(descriptor, dirname(tracePath), `title screenshot ${locale}`, registry, expectedKeys);
+    const file = await readBoundFile(descriptor, dirname(tracePath), `title screenshot ${locale}`, registry, expectedKeys, {
+      id: descriptor.id,
+      role: 'attachment',
+    });
     const dimensions = pngDimensions(file.bytes, `title screenshot ${locale}`);
     invariant(descriptor.width === dimensions.width && descriptor.height === dimensions.height,
       `Title screenshot ${locale} dimensions must be declared and equal its PNG IHDR.`);
@@ -794,6 +827,7 @@ async function auditArchive(manifest, manifestBytes, archiveBytes) {
       maxBuffer: 32 * 1024 * 1024,
     });
     invariant(extract.status === 0, `Unable to extract RC ZIP: ${extract.stderr || extract.stdout || 'tar failed'}`);
+    await verifyBuildPayload(extractionRoot, manifest);
     const extractedFiles = await walkExtracted(extractionRoot);
     const actualRelative = extractedFiles.map((path) => relative(extractionRoot, path).split(sep).join('/')).sort();
     invariant(JSON.stringify(actualRelative) === JSON.stringify(expectedRelative), 'Fresh extraction inventory differs from the ZIP/build manifest.');
@@ -950,7 +984,7 @@ function validatePostPackageAcceptance(rows) {
 function validateIssueLedger(bytes, stopIssues) {
   const text = bytes.toString('utf8');
   const lines = text.split(/\r?\n/u).filter((line) => line.startsWith('| C09-'));
-  invariant(lines.length === expectedIssueIds.length, 'Issue ledger must contain exactly 12 Cycle 09 issue rows.');
+  invariant(lines.length === expectedIssueIds.length, `Issue ledger must contain exactly ${expectedIssueIds.length} Cycle 09 issue rows.`);
   const rows = lines.map((line) => {
     const match = line.match(/^\| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \|$/u);
     invariant(match && match.slice(1).every((cell) => cell.length > 0 && cell === cell.trim()),
@@ -966,7 +1000,7 @@ function validateIssueLedger(bytes, stopIssues) {
   }).sort((left, right) => left.id.localeCompare(right.id));
   invariant(sameValue(rows.map((item) => item.id), expectedIssueIds)
     && rows.every((item) => item.status === 'CLOSED' && item.severity === expectedIssueSeverities[item.id]),
-  'Issue ledger IDs/statuses differ from the exact 12 CLOSED issues.');
+  `Issue ledger IDs/statuses differ from the exact ${expectedIssueIds.length} CLOSED issues.`);
   const counts = Object.fromEntries(['Critical', 'High', 'Medium', 'Low']
     .map((severity) => [`${severity.toLowerCase()}Open`, rows.filter((item) => item.severity === severity && item.status !== 'CLOSED').length]));
   counts.totalOpen = Object.values(counts).reduce((sum, value) => sum + value, 0);
@@ -1019,7 +1053,7 @@ function validateSignoffs(signoffs, hashes, identity, gateCompletedAt, packagedA
   }
 }
 
-async function atomicAppendOnlyWrite(outputPath, bytes) {
+async function atomicAppendOnlyWrite(outputPath, bytes, label = 'draft verification') {
   const tempPath = join(dirname(outputPath), `.${basename(outputPath)}.${process.pid}.${randomBytes(12).toString('hex')}.tmp`);
   let handle;
   let linked = false;
@@ -1033,7 +1067,7 @@ async function atomicAppendOnlyWrite(outputPath, bytes) {
       await link(tempPath, outputPath);
       linked = true;
     } catch (error) {
-      if (error?.code === 'EEXIST') throw new Error(`Refusing to overwrite append-only draft verification: ${outputPath}`);
+      if (error?.code === 'EEXIST') throw new Error(`Refusing to overwrite append-only ${label}: ${outputPath}`);
       throw error;
     }
     if (process.platform !== 'win32') {
@@ -1051,6 +1085,287 @@ async function atomicAppendOnlyWrite(outputPath, bytes) {
   }
 }
 
+async function assertPathMissing(path, label) {
+  try {
+    await lstat(path);
+  } catch (error) {
+    if (error?.code === 'ENOENT') return;
+    throw error;
+  }
+  throw new Error(`Refusing to overwrite or reuse ${label}: ${path}`);
+}
+
+async function writeNewSyncedFile(path, bytes) {
+  await mkdir(dirname(path), { recursive: true });
+  const handle = await open(path, 'wx', 0o600);
+  try {
+    await handle.writeFile(bytes);
+    await handle.sync();
+  } finally {
+    await handle.close();
+  }
+}
+
+async function createConsoleEvidenceSnapshot(reportDir, registry, binding) {
+  invariant(registry.files instanceof Map
+    && registry.files.size === registry.paths.size
+    && registry.files.size > 1,
+  'Console evidence registry is incomplete and cannot be snapshotted.');
+  const registered = [...registry.files.values()].sort((left, right) => (
+    left.sourcePath < right.sourcePath ? -1 : left.sourcePath > right.sourcePath ? 1 : 0
+  ));
+  const files = registered.map((record) => ({
+    bytes: record.bytesLength,
+    id: record.id,
+    path: record.role === 'root-evidence'
+      ? 'payload/__root_console_evidence__.json'
+      : `payload/${record.sourcePath}`,
+    role: record.role,
+    sha256: record.sha256,
+    sourcePath: record.sourcePath,
+  })).sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0));
+  const paths = new Set();
+  const caseFoldedPaths = new Set();
+  const digests = new Set();
+  for (const file of files) {
+    invariant(safeRelativePattern.test(file.path) && safeRelativePattern.test(file.sourcePath),
+      `Snapshot file path is unsafe: ${file.path}`);
+    const caseFoldedPath = file.path.toLocaleLowerCase('en-US');
+    invariant(!paths.has(file.path) && !caseFoldedPaths.has(caseFoldedPath),
+      `Snapshot contains a duplicate or case-colliding path: ${file.path}`);
+    invariant(!digests.has(file.sha256), `Snapshot contains duplicate evidence bytes: ${file.sha256}`);
+    paths.add(file.path);
+    caseFoldedPaths.add(caseFoldedPath);
+    digests.add(file.sha256);
+  }
+  invariant(files.filter((file) => file.role === 'root-evidence').length === 1,
+    'Snapshot must contain exactly one root Console evidence document.');
+  const addressPayload = {
+    schemaVersion: 1,
+    kind: 'yandex-console-evidence-snapshot',
+    cycle: '09',
+    binding,
+    files,
+  };
+  const snapshotId = sha256(Buffer.from(JSON.stringify(canonical(addressPayload)), 'utf8'));
+  const manifest = {
+    ...addressPayload,
+    snapshotId,
+    contentAddress: {
+      algorithm: 'sha256',
+      canonicalization: 'recursive-key-sort/json-stringify/utf8',
+      payloadSha256: snapshotId,
+    },
+  };
+  const manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+  const manifestSha256 = sha256(manifestBytes);
+  const parsedManifest = parseJson(manifestBytes, 'Console evidence snapshot manifest');
+  const {
+    contentAddress: parsedContentAddress,
+    snapshotId: parsedSnapshotId,
+    ...parsedAddressPayload
+  } = parsedManifest;
+  invariant(parsedSnapshotId === snapshotId
+    && parsedContentAddress?.algorithm === 'sha256'
+    && parsedContentAddress?.canonicalization === 'recursive-key-sort/json-stringify/utf8'
+    && parsedContentAddress?.payloadSha256 === snapshotId
+    && sha256(Buffer.from(JSON.stringify(canonical(parsedAddressPayload)), 'utf8')) === snapshotId,
+  'Console evidence snapshot content-address contract is not reproducible.');
+  const snapshotRoot = join(reportDir, 'console-evidence-snapshots');
+  await mkdir(snapshotRoot, { recursive: true });
+  const snapshotRootInfo = await lstat(snapshotRoot);
+  invariant(snapshotRootInfo.isDirectory() && !snapshotRootInfo.isSymbolicLink(),
+    'Console evidence snapshot root must be a real directory.');
+  const reportDirReal = await realpath(reportDir);
+  const snapshotRootReal = await realpath(snapshotRoot);
+  const snapshotRootRelation = relative(reportDirReal, snapshotRootReal).split(sep).join('/');
+  invariant(snapshotRootRelation === 'console-evidence-snapshots',
+    'Console evidence snapshot root escapes or aliases the exact release report directory.');
+  const snapshotDirectory = join(snapshotRoot, snapshotId);
+  const reservationPath = join(snapshotRoot, `${snapshotId}.reserved`);
+  const publicationMarkerPath = join(snapshotRoot, `${snapshotId}.published`);
+  await assertPathMissing(snapshotDirectory, 'content-addressed Console evidence snapshot');
+  await assertPathMissing(reservationPath, 'Console evidence snapshot reservation');
+  await assertPathMissing(publicationMarkerPath, 'Console evidence snapshot publication marker');
+
+  const stagingDirectory = await mkdtemp(join(snapshotRoot, `.staging-${snapshotId}-`));
+  let reservationHandle;
+  let promoted = false;
+  try {
+    const recordBySourcePath = new Map(registered.map((record) => [record.sourcePath, record]));
+    for (const file of files) {
+      const record = recordBySourcePath.get(file.sourcePath);
+      invariant(record && record.bytes.length === file.bytes && sha256(record.bytes) === file.sha256,
+        `Snapshot source bytes changed before staging: ${file.sourcePath}`);
+      await writeNewSyncedFile(join(stagingDirectory, ...file.path.split('/')), record.bytes);
+    }
+    await writeNewSyncedFile(join(stagingDirectory, 'snapshot-manifest.json'), manifestBytes);
+
+    const reservationBytes = Buffer.from(`${JSON.stringify({
+      schemaVersion: 1,
+      kind: 'yandex-console-evidence-snapshot-reservation',
+      snapshotId,
+      manifestSha256,
+    }, null, 2)}\n`, 'utf8');
+    reservationHandle = await open(reservationPath, 'wx', 0o400);
+    await reservationHandle.writeFile(reservationBytes);
+    await reservationHandle.sync();
+    await reservationHandle.close();
+    reservationHandle = undefined;
+    await assertPathMissing(snapshotDirectory, 'content-addressed Console evidence snapshot');
+    await rename(stagingDirectory, snapshotDirectory);
+    promoted = true;
+
+    const expectedByPath = new Map(files.map((file) => [file.path, file]));
+    expectedByPath.set('snapshot-manifest.json', {
+      bytes: manifestBytes.length,
+      path: 'snapshot-manifest.json',
+      sha256: manifestSha256,
+    });
+    const publishedFiles = await walkExtracted(snapshotDirectory);
+    const publishedPaths = publishedFiles
+      .map((path) => relative(snapshotDirectory, path).split(sep).join('/'))
+      .sort();
+    invariant(sameValue(publishedPaths, [...expectedByPath.keys()].sort()),
+      'Published Console evidence snapshot inventory differs from its manifest.');
+    for (const path of publishedFiles) {
+      const relation = relative(snapshotDirectory, path).split(sep).join('/');
+      const expected = expectedByPath.get(relation);
+      const bytes = await readFile(path);
+      invariant(expected && bytes.length === expected.bytes && sha256(bytes) === expected.sha256,
+        `Published Console evidence snapshot bytes changed: ${relation}`);
+    }
+    const markerBytes = Buffer.from(`${JSON.stringify({
+      schemaVersion: 1,
+      kind: 'yandex-console-evidence-snapshot-publication',
+      snapshotId,
+      manifestSha256,
+      reservationSha256: sha256(reservationBytes),
+    }, null, 2)}\n`, 'utf8');
+    await atomicAppendOnlyWrite(publicationMarkerPath, markerBytes, 'Console evidence snapshot publication marker');
+    if (process.platform !== 'win32') {
+      const directoryHandle = await open(snapshotRoot, 'r');
+      try { await directoryHandle.sync(); } finally { await directoryHandle.close(); }
+    }
+    return {
+      directory: snapshotDirectory,
+      fileCount: files.length,
+      manifestBytes: manifestBytes.length,
+      manifestPath: join(snapshotDirectory, 'snapshot-manifest.json'),
+      manifestSha256,
+      publicationMarker: {
+        bytes: markerBytes.length,
+        path: publicationMarkerPath,
+        sha256: sha256(markerBytes),
+      },
+      reservation: {
+        bytes: reservationBytes.length,
+        path: reservationPath,
+        sha256: sha256(reservationBytes),
+      },
+      snapshotId,
+    };
+  } catch (error) {
+    try { await reservationHandle?.close(); } catch { /* preserve the original failure */ }
+    if (!promoted) await rm(stagingDirectory, { recursive: true, force: true });
+    throw error;
+  }
+}
+
+async function expectSelfTestFailure(action, pattern, label) {
+  try {
+    await action();
+  } catch (error) {
+    invariant(pattern.test(error instanceof Error ? error.message : String(error)),
+      `${label} failed for the wrong reason: ${error instanceof Error ? error.message : String(error)}`);
+    return;
+  }
+  throw new Error(`${label} unexpectedly passed.`);
+}
+
+async function runSelfTests() {
+  const sandbox = await mkdtemp(join(tmpdir(), 'inferno-yandex-verify-self-test-'));
+  const sandboxRelation = relative(resolve(tmpdir()), resolve(sandbox)).split(sep).join('/');
+  invariant(sandboxRelation.startsWith('inferno-yandex-verify-self-test-')
+    && !sandboxRelation.includes('/'),
+  'Self-test sandbox is outside the operating-system temporary directory.');
+  try {
+    const evidenceRoot = join(sandbox, 'evidence');
+    const outsideRoot = join(sandbox, 'outside');
+    const reportDir = join(sandbox, 'report');
+    await Promise.all([
+      mkdir(evidenceRoot, { recursive: true }),
+      mkdir(outsideRoot, { recursive: true }),
+      mkdir(reportDir, { recursive: true }),
+    ]);
+    const outsideBytes = Buffer.from('{"outside":true}\n', 'utf8');
+    await writeNewSyncedFile(join(outsideRoot, 'trace.json'), outsideBytes);
+    await symlink(outsideRoot, join(evidenceRoot, 'escape'), process.platform === 'win32' ? 'junction' : 'dir');
+    const emptyRegistry = {
+      root: evidenceRoot,
+      realRoot: await realpath(evidenceRoot),
+      paths: new Set(),
+      caseFoldedPaths: new Set(),
+      hashes: new Set(),
+      files: new Map(),
+    };
+    await expectSelfTestFailure(() => readBoundFile({
+      bytes: outsideBytes.length,
+      path: 'escape/trace.json',
+      sha256: sha256(outsideBytes),
+    }, evidenceRoot, 'self-test escaped artifact', emptyRegistry, ['bytes', 'path', 'sha256']),
+    /escapes the physical evidence directory through a symlinked parent/u,
+    'Symlinked-parent containment check');
+
+    const rootBytes = Buffer.from('{"root":true}\n', 'utf8');
+    const traceBytes = Buffer.from('{"trace":true}\n', 'utf8');
+    await writeNewSyncedFile(join(evidenceRoot, 'root.json'), rootBytes);
+    await writeNewSyncedFile(join(evidenceRoot, 'trace.json'), traceBytes);
+    const rootDigest = sha256(rootBytes);
+    const registry = {
+      root: evidenceRoot,
+      realRoot: await realpath(evidenceRoot),
+      paths: new Set(['root.json']),
+      caseFoldedPaths: new Set(['root.json']),
+      hashes: new Set([rootDigest]),
+      files: new Map([['root.json', {
+        bytes: rootBytes,
+        bytesLength: rootBytes.length,
+        id: 'console-evidence',
+        role: 'root-evidence',
+        sha256: rootDigest,
+        sourcePath: 'root.json',
+      }]]),
+    };
+    await readBoundFile({
+      bytes: traceBytes.length,
+      path: 'trace.json',
+      sha256: sha256(traceBytes),
+    }, evidenceRoot, 'self-test trace', registry, ['bytes', 'path', 'sha256'], {
+      id: 'trace',
+      role: 'trace',
+    });
+    const binding = {
+      archive: { bytes: 1, name: archiveName, sha256: 'a'.repeat(64) },
+      build: { buildId: 'self-test', buildManifestSha256: 'b'.repeat(64) },
+      console: { attemptId: 'self-test-attempt', draftId: 'self-test-draft', evidenceSha256: rootDigest },
+    };
+    const snapshot = await createConsoleEvidenceSnapshot(reportDir, registry, binding);
+    const snapshotManifest = parseJson(await readFile(snapshot.manifestPath), 'self-test snapshot manifest');
+    invariant(snapshotManifest.snapshotId === snapshot.snapshotId
+      && snapshot.manifestSha256 === sha256(await readFile(snapshot.manifestPath))
+      && snapshotManifest.files.length === registry.files.size,
+    'Content-addressed snapshot self-test binding is invalid.');
+    await expectSelfTestFailure(() => createConsoleEvidenceSnapshot(reportDir, registry, binding),
+      /Refusing to overwrite or reuse content-addressed Console evidence snapshot/u,
+      'Snapshot reuse check');
+    console.log('verify:draft:yandex self-test PASS (symlink containment, atomic snapshot, reuse refusal)');
+  } finally {
+    await rm(sandbox, { recursive: true, force: true });
+  }
+}
+
+async function main() {
 const cliEvidence = parseArguments(process.argv.slice(2));
 const environmentEvidence = process.env.INFERNO_YANDEX_CONSOLE_EVIDENCE;
 if (cliEvidence && environmentEvidence) {
@@ -1060,19 +1375,29 @@ if (cliEvidence && environmentEvidence) {
 const suppliedEvidence = cliEvidence || environmentEvidence;
 invariant(suppliedEvidence, 'Supply Console evidence with --evidence=<path> or INFERNO_YANDEX_CONSOLE_EVIDENCE.');
 const evidencePath = isAbsolute(suppliedEvidence) ? suppliedEvidence : resolve(gameRoot, suppliedEvidence);
+const evidenceDirectory = dirname(evidencePath);
 const evidenceInfo = await lstat(evidencePath);
 invariant(evidenceInfo.isFile() && !evidenceInfo.isSymbolicLink(), 'Console evidence must be a regular non-link file.');
+const evidenceDirectoryReal = await realpath(evidenceDirectory);
+const evidencePathReal = await realpath(evidencePath);
+const evidenceDirectoryInfo = await stat(evidenceDirectoryReal);
+invariant(evidenceDirectoryInfo.isDirectory(), 'Console evidence root does not resolve to a directory.');
+const evidencePhysicalRelation = relative(evidenceDirectoryReal, evidencePathReal).split(sep).join('/');
+invariant(evidencePhysicalRelation.length > 0
+  && !evidencePhysicalRelation.startsWith('../') && evidencePhysicalRelation !== '..' && !isAbsolute(evidencePhysicalRelation),
+'Console evidence root document escapes its physical evidence directory.');
 
 const [manifestBytes, archiveBytes, checksumBytes, evidenceBytes, acceptanceBytes, issueLedgerBytes, submissionManifestBytes] = await Promise.all([
   readFile(manifestPath),
   readFile(archivePath),
   readFile(checksumPath),
-  readFile(evidencePath),
+  readFile(evidencePathReal),
   readFile(acceptancePath),
   readFile(issueLedgerPath),
   readFile(submissionManifestPath),
 ]);
 const manifest = parseJson(manifestBytes, 'dist/build-manifest.json');
+await verifyBuildPayload(join(gameRoot, 'dist'), manifest);
 const archiveInfo = await lstat(archivePath);
 invariant(archiveInfo.isFile() && !archiveInfo.isSymbolicLink(), `${archiveName} is not a regular non-link file.`);
 const archiveSha256 = sha256(archiveBytes);
@@ -1306,8 +1631,27 @@ invariant(Array.isArray(evidence.artifacts)
   && JSON.stringify(evidence.artifacts.map((item) => item.id).sort()) === JSON.stringify(requiredArtifactIds),
 'Console evidence must contain the exact ten typed artifact IDs.');
 
-const evidenceDirectory = dirname(evidencePath);
-const registry = { root: evidenceDirectory, paths: new Set(), hashes: new Set() };
+const rootEvidenceRelation = relative(resolve(evidenceDirectory), resolve(evidencePath)).split(sep).join('/');
+invariant(rootEvidenceRelation.length > 0
+  && !rootEvidenceRelation.startsWith('../') && rootEvidenceRelation !== '..' && !isAbsolute(rootEvidenceRelation)
+  && safeRelativePattern.test(rootEvidenceRelation),
+'Console evidence root filename must be a safe relative snapshot path.');
+const rootEvidenceSha256 = sha256(evidenceBytes);
+const registry = {
+  root: resolve(evidenceDirectory),
+  realRoot: evidenceDirectoryReal,
+  paths: new Set([rootEvidenceRelation]),
+  caseFoldedPaths: new Set([rootEvidenceRelation.toLocaleLowerCase('en-US')]),
+  hashes: new Set([rootEvidenceSha256]),
+  files: new Map([[rootEvidenceRelation, {
+    bytes: evidenceBytes,
+    bytesLength: evidenceBytes.length,
+    id: 'console-evidence',
+    role: 'root-evidence',
+    sha256: rootEvidenceSha256,
+    sourcePath: rootEvidenceRelation,
+  }]]),
+};
 const context = {
   draftId,
   attemptId,
@@ -1323,7 +1667,7 @@ for (const descriptor of evidence.artifacts) {
   exactKeys(descriptor, ['bytes', 'id', 'path', 'sha256'], `Console artifact ${descriptor?.id ?? '?'}`);
   invariant(requiredArtifactIds.includes(descriptor.id), `Unsupported Console artifact id ${descriptor.id}.`);
   const file = await readBoundFile(descriptor, evidenceDirectory, `Console artifact ${descriptor.id}`, registry,
-    ['bytes', 'id', 'path', 'sha256']);
+    ['bytes', 'id', 'path', 'sha256'], { id: descriptor.id, role: 'trace' });
   const trace = parseJson(file.bytes, `Console artifact ${descriptor.id}`);
   validateTrace(trace, artifactKinds[descriptor.id], `Console artifact ${descriptor.id}`, context, {
     minimumEvents: 2,
@@ -1345,8 +1689,33 @@ validateGuestSaveTrace(traces.get('guest-save').trace);
 const mergedSave = validateAuthorizedSaveTrace(traces.get('authorized-save').trace);
 const leaderboardScore = validateLeaderboardTrace(traces.get('leaderboard').trace, mergedSave.bestScore);
 const titleEvidence = await validateTitlesTrace(traces.get('titles').trace, traces.get('titles').path, context, registry);
+invariant(registry.files.size === 1 + traces.size + titleEvidence.screenshots.length,
+  'Console evidence registry does not equal root JSON + exact typed traces + exact referenced attachments.');
 
 const outputPath = join(reportDir, 'draft-verification.json');
+await assertPathMissing(outputPath, 'append-only draft verification');
+const evidenceSnapshot = await createConsoleEvidenceSnapshot(reportDir, registry, {
+  archive,
+  build: {
+    buildId: manifest.buildId,
+    buildManifestSha256: hashes.manifest,
+    commitSha: manifest.commitSha,
+    sourceFingerprint: manifest.sourceFingerprint,
+    target: manifest.target,
+    testDriver: manifest.testDriver,
+  },
+  console: {
+    attemptId,
+    completedAt: evidence.completedAt,
+    draftId,
+    evidenceSha256: rootEvidenceSha256,
+    operatorId,
+  },
+  package: {
+    bytes: packageReportBytes.length,
+    packageResultsSha256: hashes.package,
+  },
+});
 const output = {
   schemaVersion: 2,
   kind: 'yandex-draft-verification',
@@ -1388,7 +1757,7 @@ const output = {
   consoleEvidence: {
     path: relative(gameRoot, evidencePath).split(sep).join('/'),
     bytes: evidenceBytes.length,
-    sha256: sha256(evidenceBytes),
+    sha256: rootEvidenceSha256,
     startedAt: evidence.startedAt,
     completedAt: evidence.completedAt,
     durationMs: evidence.durationMs,
@@ -1397,6 +1766,28 @@ const output = {
     operatorId,
     artifactCount: traces.size,
     physicalEvidenceFiles: registry.paths.size,
+    snapshot: {
+      appendOnly: true,
+      contentAddressed: true,
+      fileCount: evidenceSnapshot.fileCount,
+      manifest: {
+        bytes: evidenceSnapshot.manifestBytes,
+        path: relative(gameRoot, evidenceSnapshot.manifestPath).split(sep).join('/'),
+        sha256: evidenceSnapshot.manifestSha256,
+      },
+      path: relative(gameRoot, evidenceSnapshot.directory).split(sep).join('/'),
+      publicationMarker: {
+        bytes: evidenceSnapshot.publicationMarker.bytes,
+        path: relative(gameRoot, evidenceSnapshot.publicationMarker.path).split(sep).join('/'),
+        sha256: evidenceSnapshot.publicationMarker.sha256,
+      },
+      reservation: {
+        bytes: evidenceSnapshot.reservation.bytes,
+        path: relative(gameRoot, evidenceSnapshot.reservation.path).split(sep).join('/'),
+        sha256: evidenceSnapshot.reservation.sha256,
+      },
+      snapshotId: evidenceSnapshot.snapshotId,
+    },
   },
   configuration: consoleConfiguration,
   checks: Object.fromEntries(requiredChecks.map((check) => [check, true])),
@@ -1416,3 +1807,12 @@ const output = {
 
 await atomicAppendOnlyWrite(outputPath, Buffer.from(`${JSON.stringify(output, null, 2)}\n`, 'utf8'));
 console.log(`verify:draft:yandex PASS: ${outputPath}`);
+}
+
+const cliArguments = process.argv.slice(2);
+if (cliArguments.includes('--self-test')) {
+  invariant(cliArguments.length === 1, '--self-test cannot be combined with other arguments.');
+  await runSelfTests();
+} else {
+  await main();
+}
