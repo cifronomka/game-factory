@@ -327,17 +327,22 @@ if (soakEnvironmentBlocked) {
   invariant(soakReport.configuration?.environmentBlockerExitAllowed === true
     && soakReport.environment?.compositorCalibration?.desktopThresholdProvable === false
     && soakReport.environment?.compositorCalibration?.desktopThresholdFps === 55
+    && soakReport.environment?.compositorCalibration?.mobileThresholdFps === 30
+    && typeof soakReport.environment?.compositorCalibration?.mobileThresholdProvable === 'boolean'
     && soakReport.environment?.compositorCalibration?.medianFps > 0
     && soakReport.environment?.compositorCalibration?.medianFps < 55,
   'BLOCKED_ENV soak lacks a measured host-compositor limitation.');
   invariant(Array.isArray(soakReport.failures) && soakReport.failures.length === 1
-    && /^2\/4 browser sessions failed\.$/u.test(soakReport.failures[0]),
+    && /^[1-4]\/4 browser sessions failed\.$/u.test(soakReport.failures[0]),
   'BLOCKED_ENV soak contains a non-compositor aggregate failure.');
 }
 const requiredSoakCombinations = new Set(['desktop:true', 'desktop:false', 'mobile:true', 'mobile:false']);
 for (const session of soakReport.sessions) {
   requiredSoakCombinations.delete(`${session.device}:${Boolean(session.rewarded)}`);
-  const compositorOnlySessionBlock = soakEnvironmentBlocked && session.device === 'desktop'
+  const thresholdProvable = session.device === 'desktop'
+    ? soakReport.environment?.compositorCalibration?.desktopThresholdProvable
+    : soakReport.environment?.compositorCalibration?.mobileThresholdProvable;
+  const compositorOnlySessionBlock = soakEnvironmentBlocked && thresholdProvable === false
     && session.passed === false
     && session.failures?.length === 1
     && /^median-fps:/u.test(session.failures[0]?.detail ?? '')

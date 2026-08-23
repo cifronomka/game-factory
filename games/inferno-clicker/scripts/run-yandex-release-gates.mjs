@@ -91,7 +91,7 @@ try {
   if (!['PASS', 'BLOCKED_ENV'].includes(soak.status) || soak.releaseEligible !== true) throw new Error('Release soak has no valid terminal evidence.');
   if (!['PASS', 'BLOCKED_EXTERNAL'].includes(environment.status)) throw new Error('Environment audit has an invalid status.');
   const externalBlockers = [...(environment.missingRequiredEnvironments || [])];
-  if (soak.status === 'BLOCKED_ENV') externalBlockers.push('Host compositor calibration cannot prove desktop median FPS >=55.');
+  if (soak.status === 'BLOCKED_ENV') externalBlockers.push('Host compositor calibration cannot prove one or more required FPS thresholds.');
 
   const inventoryFiles = await walk(outputDir, () => true);
   const inventory = {

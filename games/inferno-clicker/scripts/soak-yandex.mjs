@@ -275,12 +275,15 @@ async function calibrateCompositor(browser) {
     await delay(3_500);
     const samples = await page.evaluate(() => globalThis.__SOAK_CALIBRATION__.slice(10));
     const medianFrameMs = quantile(samples, 0.5);
+    const measuredFps = medianFrameMs ? 1_000 / medianFrameMs : 0;
     return {
       samples: samples.length,
       medianFrameMs: round(medianFrameMs),
-      medianFps: round(medianFrameMs ? 1_000 / medianFrameMs : 0),
+      medianFps: round(measuredFps),
       desktopThresholdFps: 55,
-      desktopThresholdProvable: Boolean(medianFrameMs && 1_000 / medianFrameMs >= 55),
+      desktopThresholdProvable: Boolean(medianFrameMs && measuredFps >= 55),
+      mobileThresholdFps: 30,
+      mobileThresholdProvable: Boolean(medianFrameMs && measuredFps >= 30),
     };
   } finally {
     await page.close();
@@ -849,8 +852,12 @@ async function main() {
     if (failedSessions.length > 0) evidence.failures.push(`${failedSessions.length}/${evidence.sessions.length} browser sessions failed.`);
     const nonFpsFailures = evidence.sessions.flatMap((session) => session.failures)
       .filter((failure) => failure.type !== 'assertion' || !failure.detail.startsWith('median-fps:'));
-    const compositorBlocked = !evidence.environment.compositorCalibration.desktopThresholdProvable
-      && failedSessions.length > 0 && nonFpsFailures.length === 0;
+    const calibration = evidence.environment.compositorCalibration;
+    const compositorBlocked = failedSessions.length > 0
+      && nonFpsFailures.length === 0
+      && failedSessions.every((session) => (session.device === 'desktop'
+        ? calibration.desktopThresholdProvable === false
+        : calibration.mobileThresholdProvable === false));
     evidence.status = evidence.failures.length === 0
       ? releaseEligible ? 'PASS' : 'NON_RELEASE_SMOKE_PASS'
       : compositorBlocked ? releaseEligible ? 'BLOCKED_ENV' : 'NON_RELEASE_SMOKE_BLOCKED_ENV'

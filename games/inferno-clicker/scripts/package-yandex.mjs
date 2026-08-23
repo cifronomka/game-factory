@@ -111,7 +111,7 @@ const blockerPolicies = [
   { pattern: /^iOS physical device or real-device cloud exact-build run$/u, criteria: commonDeviceCriteria },
   { pattern: /^authorized Yandex Games Console exact-RC draft\/debug trace$/u, criteria: consoleCriteria },
   {
-    pattern: /^Host compositor calibration cannot prove desktop median FPS >=55\.$/u,
+    pattern: /^Host compositor calibration cannot prove one or more required FPS thresholds\.$/u,
     criteria: ['C09-PERF-01', 'C09-Q-03', 'C09-RLS-04'],
   },
 ];
