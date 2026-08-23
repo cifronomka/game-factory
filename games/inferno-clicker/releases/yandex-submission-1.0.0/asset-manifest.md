@@ -6,14 +6,14 @@ Icon/cover must be original card artwork, not gameplay screenshots. Shared RU/EN
 |---|---|---|---|---|---|
 | ICON | `media/icon-512.png` | 512×512 PNG | isolated ember/flame emblem, no text, no screenshot, no religious/esoteric mark | PASS | `38ea20080d30c2821524196a9b36884ee8a11f2fe2e4cc6ac5a9205f536fd52d` |
 | COVER | `media/cover-800x470.png` | 800×470 PNG | authored fire progression composition, no UI/screenshot/text | PASS | `3450033d4bf7d859a3c66a5e3a284eff3c2a3a2e4b084a8b0c68e7eccb25b79f` |
-| DESK-01 | `media/desktop-01-1920x1080.png` | 1920×1080 PNG, 16:9 | early-stage real gameplay, visible tap objective | PASS | `89898054d92fe58ff8a7f30b9900ef565bde983f8d3da104f0dbaba38411d1ce` |
-| DESK-02 | `media/desktop-02-1920x1080.png` | 1920×1080 PNG, 16:9 | mid-stage real gameplay with Ash Servant telegraph | PASS | `b163d9e78e67070ecf41a42d0ee56f2e9bde21188c67f8676efde0bc32a6ac3e` |
-| DESK-03 | `media/desktop-03-1920x1080.png` | 1920×1080 PNG, 16:9 | Ember Warden and high-fire real gameplay | PASS | `85e7f52a3a799b173d84a0ba4275a14664cf8a6fa99c29a9cf59433667a2aef0` |
-| DESK-04 | `media/desktop-04-1920x1080.png` | 1920×1080 PNG, 16:9 | Inferno real gameplay with score/goal context | PASS | `c025cf8dee99b25d7512a179cb2cb68895dbcf01f9bb46d7468e1cfaf8762ca6` |
-| MOB-01 | `media/mobile-01-1080x1920.png` | 1080×1920 PNG, 9:16 | early-stage portrait real gameplay | PASS | `d6f8378e760f733a3572c991f22cd6ebb048448cefa8056fc7dca63c9f189446` |
-| MOB-02 | `media/mobile-02-1080x1920.png` | 1080×1920 PNG, 9:16 | mid-stage portrait real gameplay and warning | PASS | `76e2316844673c8fa4354b782d9cfe3901ae71e14a56a1218c575f355d1c3ad7` |
-| MOB-03 | `media/mobile-03-1080x1920.png` | 1080×1920 PNG, 9:16 | stage-3 rewarded offer in valid real gameplay | PASS | `fcf960684f283c33f84ac1c7d79544906ae4a5d8314e9d14e1c1ea826efa707f` |
-| MOB-04 | `media/mobile-04-1080x1920.png` | 1080×1920 PNG, 9:16 | Inferno/result-goal real gameplay state | PASS | `86fdb7d840c51f3faebc4ac96e2592cd5299a33eb002b7298906fcfe8e7f3595` |
+| DESK-01 | `media/desktop-01-1920x1080.png` | 1920×1080 PNG, 16:9 | early-stage real gameplay, visible tap objective | PASS | `f5e493c6a05391d35dc35fa12cbbef0cde37cd80aa013d4a88dee48f7a79679f` |
+| DESK-02 | `media/desktop-02-1920x1080.png` | 1920×1080 PNG, 16:9 | mid-stage real gameplay with Ash Servant telegraph | PASS | `bf588560082db8e4fbb07c1ba10356607cc3824d7372a58a325ad32bebe10990` |
+| DESK-03 | `media/desktop-03-1920x1080.png` | 1920×1080 PNG, 16:9 | Ember Warden and high-fire real gameplay | PASS | `73799ada03f2c5a304914a0b2242d99ed9aadaf2085c4f630d4c54985fbac67c` |
+| DESK-04 | `media/desktop-04-1920x1080.png` | 1920×1080 PNG, 16:9 | Inferno real gameplay with score/goal context | PASS | `5003bac2ef9b2c680ab2abdcc290b373e124735a4b1238d3c059e8191e4695c9` |
+| MOB-01 | `media/mobile-01-1080x1920.png` | 1080×1920 PNG, 9:16 | early-stage portrait real gameplay | PASS | `2540907ed5abc38e98599b90c67b6bb22b7c75d61e476bfe0fffc8d6038ac697` |
+| MOB-02 | `media/mobile-02-1080x1920.png` | 1080×1920 PNG, 9:16 | mid-stage portrait real gameplay and warning | PASS | `0b7d514ecdef92665cd17a109382fd2ca80ab02ea23aeb6a6187b6c098660ef2` |
+| MOB-03 | `media/mobile-03-1080x1920.png` | 1080×1920 PNG, 9:16 | stage-3 rewarded offer in valid real gameplay | PASS | `c6da8208900f7aba80bdecaf210de5b6b1f424ed21f149b2c49f484495c3240e` |
+| MOB-04 | `media/mobile-04-1080x1920.png` | 1080×1920 PNG, 9:16 | Inferno/result-goal real gameplay state | PASS | `6f9aae70384a61f4185b50e01b6f847c4bec371a801aa04adba63f1b55b8281d` |
 
 For every screenshot: game content area≥70%, black field only if part of actual game composition, no crop/distortion, no broken/white spots, no prohibited symbols, no platform/system/debug overlay. Long side is within the documented 1280–2560 range. Maskable icon, showcase cover and promo video are `N/A — optional and not required for Cycle 09`.
 

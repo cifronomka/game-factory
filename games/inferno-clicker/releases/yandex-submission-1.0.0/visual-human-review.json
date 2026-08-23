@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "kind": "cycle09-visual-human-review",
+  "status": "PASS",
+  "cycle": "09",
+  "sourceFingerprint": "e8a39705e34aff44f64e8139268331efd93771e46510dfdd6465a2dfacaf5365",
+  "evidenceGeneratedAt": "2026-08-23T16:34:39.441Z",
+  "reviewer": {
+    "id": "cycle09_visual_reviewer",
+    "independent": true,
+    "reviewedAt": "2026-08-23T16:44:57.733Z"
+  },
+  "files": [
+    {
+      "id": "character/characters-black-dpr1.png",
+      "sha256": "a67f14babc67b7b6c45acbe082a18aaf50dd545f060d58daf9096c7ea78f6ef5",
+      "verdict": "PASS",
+      "observation": "All 64 frames are clean on black at DPR 1; no matte, islands, crop, or prohibited content."
+    },
+    {
+      "id": "character/characters-black-dpr2.png",
+      "sha256": "998d2b16789fb4259917f531ab59ec4483641a25d9da796956e7aca71b431292",
+      "verdict": "PASS",
+      "observation": "All 64 frames are clean on black at DPR 2; no matte, islands, crop, or prohibited content."
+    },
+    {
+      "id": "character/characters-black-dpr3.png",
+      "sha256": "6b6d23435cc997422439e53fa721a1d766d91ffb45699d0522c18b069133cb6f",
+      "verdict": "PASS",
+      "observation": "All 64 frames are clean on black at DPR 3; no matte, islands, crop, or prohibited content."
+    },
+    {
+      "id": "character/characters-dark-red-dpr1.png",
+      "sha256": "a33d3372a11980509c318a37ccde1097bce07da2a33e295d837b9ed7e3f7c7b1",
+      "verdict": "PASS",
+      "observation": "All 64 frames are clean on dark red at DPR 1; no residue, distortion, or prohibited content."
+    },
+    {
+      "id": "character/characters-dark-red-dpr2.png",
+      "sha256": "c63907e5ef556ba8bd3164d318ad9d3f39d65af112337e2d64a825db99a0e4c1",
+      "verdict": "PASS",
+      "observation": "All 64 frames are clean on dark red at DPR 2; no residue, distortion, or prohibited content."
+    },
+    {
+      "id": "character/characters-dark-red-dpr3.png",
+      "sha256": "de12f81de30d674e3ec7d8f804d12397c0ddbcae62cff699ccc033257b8d0765",
+      "verdict": "PASS",
+      "observation": "All 64 frames are clean on dark red at DPR 3; no residue, distortion, or prohibited content."
+    },
+    {
+      "id": "character/characters-neutral-gray-dpr1.png",
+      "sha256": "a12e5d0ceb5370ac183f549d6e06e056e876754553df736d7a90c4982384bb51",
+      "verdict": "PASS",
+      "observation": "Neutral-gray contrast at DPR 1 exposes no matte, detached alpha, crop, or prohibited content in 64 frames."
+    },
+    {
+      "id": "character/characters-neutral-gray-dpr2.png",
+      "sha256": "8cd213070182f6aca6707da19ef41d1f947ecb5c572ee3c9f86bd0ccfadf4842",
+      "verdict": "PASS",
+      "observation": "Neutral-gray contrast at DPR 2 exposes no matte, detached alpha, crop, or prohibited content in 64 frames."
+    },
+    {
+      "id": "character/characters-neutral-gray-dpr3.png",
+      "sha256": "67c2b43c58d95c278173089ec814be6d5ee5cdf4252cc16ba790e70a3b742697",
+      "verdict": "PASS",
+      "observation": "Neutral-gray contrast at DPR 3 exposes no matte, detached alpha, crop, or prohibited content in 64 frames."
+    },
+    {
+      "id": "flare/stage-flare-v3",
+      "sha256": "ace0503e98960df3dabd98bd327aad9810ee6baa3f6d1e7fa34d2de122c67b27",
+      "verdict": "PASS",
+      "observation": "All eight flare frames are clean across black, neutral gray, and dark red; bright connected cores are intentional."
+    },
+    {
+      "id": "outer/high",
+      "sha256": "415e9c8172d0a53513facbacae353ce8d84cb4f4cdce0cd660a722f47f563c4e",
+      "verdict": "PASS",
+      "observation": "All 12 high-flame frames are clean across black, gray, and red; no matte, residue, or accidental islands."
+    },
+    {
+      "id": "outer/low",
+      "sha256": "7d8ce1bab1a27e3b2ebc1eda7903d50215cb534cb9b4f310d4499fcc7b6f1186",
+      "verdict": "PASS",
+      "observation": "All eight low-flame frames are clean across black, gray, and red; no matte, residue, or accidental islands."
+    },
+    {
+      "id": "outer/mid",
+      "sha256": "d67f63bb06ac8da33a8a6cdef155d71388f81a5bb09dbe4975dae9d59d4ab139",
+      "verdict": "PASS",
+      "observation": "All 10 mid-flame frames are clean across black, gray, and red; no matte, residue, or accidental islands."
+    },
+    {
+      "id": "runtime/runtime-seven-stages-forced-low-dpr1.png",
+      "sha256": "6859505177c471b1c5d06885f9c20593c4ddc09f37c4b2b399281b625d8f791b",
+      "verdict": "PASS",
+      "observation": "Seven forced-low DPR 1 scenes are intact; no crop, filter islands, legacy names, or prohibited symbols."
+    },
+    {
+      "id": "runtime/runtime-seven-stages-forced-low-dpr2.png",
+      "sha256": "bfe362da0eb5a7ec83449e680a7709466a81b2b5939b6c31b2b95a2577468c9d",
+      "verdict": "PASS",
+      "observation": "Seven forced-low DPR 2 scenes are intact; no crop, filter islands, legacy names, or prohibited symbols."
+    },
+    {
+      "id": "runtime/runtime-seven-stages-forced-low-dpr3.png",
+      "sha256": "91386dd1eb4d20f1ded23a4e15eb339984a4043fc131b1b19b6c57f5799fce96",
+      "verdict": "PASS",
+      "observation": "Seven forced-low DPR 3 scenes are intact; no crop, filter islands, legacy names, or prohibited symbols."
+    },
+    {
+      "id": "runtime/runtime-seven-stages-normal-dpr1.png",
+      "sha256": "36e146d434b0a0d7bfbeba8ac76a45800afc9e2cc33739b2999bcc3b9a44da28",
+      "verdict": "PASS",
+      "observation": "Seven normal DPR 1 scenes are intact; flame highlights are connected with no crop, residue, legacy names, or symbols."
+    },
+    {
+      "id": "runtime/runtime-seven-stages-normal-dpr2.png",
+      "sha256": "41f6c2b8b06fa39803b4f5b9d4b25ab20ba1c9fb3651a82d5414a7d3420067ef",
+      "verdict": "PASS",
+      "observation": "Seven normal DPR 2 scenes are intact; flame highlights are connected with no crop, residue, legacy names, or symbols."
+    },
+    {
+      "id": "runtime/runtime-seven-stages-normal-dpr3.png",
+      "sha256": "dc8f64d9aa228cd6a3e2dc59d70f4b0f8a10178e437fff2811909ae39dda3ff8",
+      "verdict": "PASS",
+      "observation": "Seven normal DPR 3 scenes are intact; flame highlights are connected with no crop, residue, legacy names, or symbols."
+    },
+    {
+      "id": "runtime/runtime-seven-stages-reduced-dpr1.png",
+      "sha256": "1921a64b760934502d8c03f12bbd12b6e441e1f2aca52a5f96ca0ef910f9ce45",
+      "verdict": "PASS",
+      "observation": "Seven reduced DPR 1 scenes are intact; no crop, matte, detached artifacts, legacy names, or prohibited symbols."
+    },
+    {
+      "id": "runtime/runtime-seven-stages-reduced-dpr2.png",
+      "sha256": "407c44ea94c2b6cd3eaad2cf49df11a6785070248a25015b9398c64956ffb134",
+      "verdict": "PASS",
+      "observation": "Seven reduced DPR 2 scenes are intact; no crop, matte, detached artifacts, legacy names, or prohibited symbols."
+    },
+    {
+      "id": "runtime/runtime-seven-stages-reduced-dpr3.png",
+      "sha256": "6f67356c5c2956c637048303959f0f0bb74b3bfa5a978a3b48beeb39d6f1df97",
+      "verdict": "PASS",
+      "observation": "Seven reduced DPR 3 scenes are intact; no crop, matte, detached artifacts, legacy names, or prohibited symbols."
+    }
+  ],
+  "coverage": {
+    "characterFrames": 64,
+    "characterComposites": 576,
+    "runtimeScenes": 63,
+    "whiteOrNeutralSpots": 0,
+    "detachedAlpha": 0,
+    "matteOrStickerResidue": 0,
+    "ritualReligiousEsotericSymbols": 0
+  }
+}
