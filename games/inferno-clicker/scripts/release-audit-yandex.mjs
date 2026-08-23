@@ -4,6 +4,10 @@ import { isAbsolute, join, sep } from 'node:path';
 import { parseAsync } from '@babel/core';
 import sharp from 'sharp';
 import { gameRoot, verifyBuildPayload, walk } from './lib.mjs';
+import {
+  RUNTIME_VISUAL_FINGERPRINT_ALGORITHM,
+  runtimeSheetPerceptualHashes,
+} from './runtime-visual-fingerprint.mjs';
 
 const dist = join(gameRoot, 'dist');
 const manifestBytes = await readFile(join(dist, 'build-manifest.json'));
@@ -196,6 +200,12 @@ for (const item of runtimeManifest.files) {
   const metadata = await sharp(bytes, { failOn: 'error' }).metadata();
   invariant(bytes.length === item.bytes && sha256(bytes) === item.sha256, `Runtime matrix mismatch: ${item.filename}`);
   invariant(metadata.width === item.width && metadata.height === item.height, `Runtime matrix dimensions mismatch: ${item.filename}`);
+  invariant(item.perceptualAlgorithm === RUNTIME_VISUAL_FINGERPRINT_ALGORITHM
+    && Array.isArray(item.stagePerceptualHashes)
+    && item.stagePerceptualHashes.length === 7
+    && item.stagePerceptualHashes.every((hash) => /^[a-f0-9]{64}$/u.test(hash))
+    && JSON.stringify(await runtimeSheetPerceptualHashes(bytes, item.dpr)) === JSON.stringify(item.stagePerceptualHashes),
+  `Runtime perceptual fingerprint mismatch: ${item.filename}`);
 }
 const outerFlameEvidence = JSON.parse(await readFile(join(evidenceRoot, 'visual/outer-flame-v4/outer-flame-v4-audit.json'), 'utf8'));
 invariant(outerFlameEvidence.sourceFingerprint === manifest.sourceFingerprint
@@ -259,7 +269,12 @@ invariant(stageFlareReviewBytes.length === stageFlareEvidence.review?.bytes
 'Stage-flare black/gray/red Human-Eye matrix is missing, stale or malformed.');
 const exactVisualReviewFiles = [
   ...visualManifest.files.map((item) => ({ id: `character/${item.filename}`, sha256: item.sha256 })),
-  ...runtimeManifest.files.map((item) => ({ id: `runtime/${item.filename}`, sha256: item.sha256 })),
+  ...runtimeManifest.files.map((item) => ({
+    id: `runtime/${item.filename}`,
+    sha256: item.sha256,
+    perceptualAlgorithm: item.perceptualAlgorithm,
+    stagePerceptualHashes: item.stagePerceptualHashes,
+  })),
   ...outerFlameEvidence.families.map((item) => ({ id: `outer/${item.family}`, sha256: item.review.sha256 })),
   { id: 'flare/stage-flare-v3', sha256: stageFlareEvidence.review.sha256 },
 ].sort((left, right) => left.id.localeCompare(right.id));
@@ -283,12 +298,21 @@ invariant(visualHumanReview.schemaVersion === 1
   && Date.parse(visualHumanReview.reviewer.reviewedAt) >= Date.parse(visualHumanReview.evidenceGeneratedAt)
   && Date.parse(visualHumanReview.evidenceGeneratedAt) <= latestCurrentVisualGenerationTime,
 'Cycle 09 visuals lack an independent exact-source Human-Eye review.');
-const reviewedVisualFiles = visualHumanReview.files?.map((item) => ({ id: item.id, sha256: item.sha256 })) ?? [];
+const reviewedVisualFiles = visualHumanReview.files ?? [];
+const reviewedVisualById = new Map(reviewedVisualFiles.map((item) => [item.id, item]));
 invariant(reviewedVisualFiles.length === exactVisualReviewFiles.length
-  && new Set(reviewedVisualFiles.map((item) => item.id)).size === exactVisualReviewFiles.length
-  && JSON.stringify([...reviewedVisualFiles].sort((left, right) => left.id.localeCompare(right.id))) === JSON.stringify(exactVisualReviewFiles)
-  && visualHumanReview.files.every((item) => item.verdict === 'PASS' && typeof item.observation === 'string' && item.observation.length >= 12),
-'Cycle 09 Human-Eye review is not bound to every exact character/runtime/outer/flare sheet hash.');
+  && reviewedVisualById.size === exactVisualReviewFiles.length
+  && exactVisualReviewFiles.every((current) => {
+    const reviewed = reviewedVisualById.get(current.id);
+    if (!reviewed || reviewed.verdict !== 'PASS'
+      || typeof reviewed.observation !== 'string' || reviewed.observation.length < 12) return false;
+    if (!current.id.startsWith('runtime/')) return reviewed.sha256 === current.sha256;
+    return reviewed.perceptualAlgorithm === current.perceptualAlgorithm
+      && Array.isArray(reviewed.stagePerceptualHashes)
+      && JSON.stringify(reviewed.stagePerceptualHashes) === JSON.stringify(current.stagePerceptualHashes)
+      && /^[a-f0-9]{64}$/u.test(reviewed.sha256 ?? '');
+  }),
+'Cycle 09 Human-Eye review is not bound to exact static hashes and perceptually stable runtime sheets.');
 invariant(visualHumanReview.coverage?.characterFrames === 64
   && visualHumanReview.coverage?.characterComposites === 576
   && visualHumanReview.coverage?.runtimeScenes === 63

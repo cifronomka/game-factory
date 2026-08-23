@@ -4,6 +4,10 @@ import { isAbsolute, join } from 'node:path';
 import { chromium } from 'playwright-core';
 import sharp from 'sharp';
 import { gameRoot, startVerifiedStaticServer } from './lib.mjs';
+import {
+  RUNTIME_VISUAL_FINGERPRINT_ALGORITHM,
+  runtimeSheetPerceptualHashes,
+} from './runtime-visual-fingerprint.mjs';
 
 const requestedEvidence = process.env.INFERNO_CYCLE09_EVIDENCE_DIR;
 const evidenceRoot = requestedEvidence
@@ -95,7 +99,11 @@ try {
   const buildManifest = JSON.parse(buildManifestBytes.toString('utf8'));
   if (buildManifest.target !== 'yandex' || buildManifest.testDriver !== true) throw new Error('Runtime evidence requires the instrumented Yandex build.');
 
-  browser = await chromium.launch({ executablePath, headless: true, args: ['--disable-gpu-sandbox'] });
+  browser = await chromium.launch({
+    executablePath,
+    headless: true,
+    args: ['--disable-gpu', '--disable-gpu-sandbox'],
+  });
   for (const mode of runtimeModes) {
     for (const dpr of [1, 2, 3]) {
       const context = await browser.newContext({
@@ -233,7 +241,18 @@ try {
         .png({ compressionLevel: 9, adaptiveFiltering: true })
         .toBuffer();
       await writeFile(join(stagedRoot, filename), bytes);
-      files.push({ filename, width, height, bytes: bytes.length, sha256: sha256(bytes), mode: mode.id, dpr, stages: 7 });
+      files.push({
+        filename,
+        width,
+        height,
+        bytes: bytes.length,
+        sha256: sha256(bytes),
+        mode: mode.id,
+        dpr,
+        stages: 7,
+        perceptualAlgorithm: RUNTIME_VISUAL_FINGERPRINT_ALGORITHM,
+        stagePerceptualHashes: await runtimeSheetPerceptualHashes(bytes, dpr),
+      });
       await context.close();
     }
   }
