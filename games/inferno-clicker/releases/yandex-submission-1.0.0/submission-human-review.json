@@ -2,26 +2,60 @@
   "schemaVersion": 1,
   "kind": "submission-human-review",
   "status": "PASS",
+  "scope": "local submission media only",
+  "consoleUploadStatus": "NOT_RUN",
   "cycle": "09",
-  "sourceFingerprint": "8ddb2e2897e16a18a8c53a7397f5387cc8e42073e91e64e4f8a995c89a9f77d7",
-  "mediaManifestSha256": "bce0099bb0be1f8ea2419318d5f9b4aca393bf779006738c225b3612f2e518f3",
+  "sourceFingerprint": "b4bcfce6de5a6eeec211df47d181385297be38dda1e1a6c2c3f0ebfc30f54409",
+  "mediaManifestSha256": "cc1880daeff1ee4fb807d0b21839d9bd078363fb2f573d68d7feb131a3666bff",
   "reviewer": {
-    "id": "submission_media_reviewer",
+    "id": "submission_media_reviewer_localized_card_refresh",
     "independent": true,
-    "reviewedAt": "2026-08-23T18:09:25.384Z"
+    "reviewedAt": "2026-08-24T22:26:58.578Z"
   },
   "files": [
     {
       "filename": "icon-512.png",
-      "sha256": "38ea20080d30c2821524196a9b36884ee8a11f2fe2e4cc6ac5a9205f536fd52d",
+      "sha256": "224e287d57cb72fbd51cdff861ded5986604b5f9a25a1b3495dc0613222f065a",
       "verdict": "PASS",
-      "observation": "Standalone text-free flame-and-embers emblem on dark cracked ground; it is not a gameplay screenshot and contains no religious or esoteric symbol, crop defect, or white/matte artifact."
+      "locale": "ru",
+      "aliasOf": "icon-512-ru.png",
+      "observation": "Exact RU alias. Rich square card art clearly reads ЗАЖГИ in the accepted deep ember-red fill rather than the superseded gold treatment, above the Ash Servant, central Inferno fire form, and Ember Warden. The title and character silhouettes survive the 512×512 crop; no UI, platform mark, unrelated glyph, prohibited symbol, crop defect, or white/matte artifact is visible."
     },
     {
       "filename": "cover-800x470.png",
-      "sha256": "3450033d4bf7d859a3c66a5e3a284eff3c2a3a2e4b084a8b0c68e7eccb25b79f",
+      "sha256": "e4425c885c7f4d1ce4692078b6eb85b2f24aff5b917165bd7227c1fd9c5454d5",
       "verdict": "PASS",
-      "observation": "Standalone text-free authored fire composition with no gameplay UI; the subject is cleanly framed and contains no religious or esoteric symbol, crop defect, or white/matte artifact."
+      "locale": "ru",
+      "aliasOf": "cover-800x470-ru.png",
+      "observation": "Exact RU alias. Wide card art clearly reads ЗАЖГИ in the accepted deep ember-red fill rather than the superseded gold treatment and cleanly frames the Ash Servant at left, Inferno at center, and Ember Warden at right. It contains no gameplay/platform UI, unrelated glyph, prohibited symbol, crop defect, or white/matte artifact."
+    },
+    {
+      "filename": "icon-512-ru.png",
+      "sha256": "224e287d57cb72fbd51cdff861ded5986604b5f9a25a1b3495dc0613222f065a",
+      "verdict": "PASS",
+      "locale": "ru",
+      "observation": "Rich square card art clearly reads ЗАЖГИ in the accepted deep ember-red fill rather than the superseded gold treatment, above the Ash Servant, central Inferno fire form, and Ember Warden. The title and character silhouettes survive the 512×512 crop; no UI, platform mark, unrelated glyph, prohibited symbol, crop defect, or white/matte artifact is visible."
+    },
+    {
+      "filename": "icon-512-en.png",
+      "sha256": "d5106f33d472b56f3618738b27607dc220338a17a85aed4c1ba44aa84d7b0996",
+      "verdict": "PASS",
+      "locale": "en",
+      "observation": "Rich square card art clearly reads IGNITE in the accepted deep ember-red fill rather than the superseded gold treatment, above the Ash Servant, central Inferno fire form, and Ember Warden. The title and character silhouettes survive the 512×512 crop; no UI, platform mark, unrelated glyph, prohibited symbol, crop defect, or white/matte artifact is visible."
+    },
+    {
+      "filename": "cover-800x470-ru.png",
+      "sha256": "e4425c885c7f4d1ce4692078b6eb85b2f24aff5b917165bd7227c1fd9c5454d5",
+      "verdict": "PASS",
+      "locale": "ru",
+      "observation": "Wide card art clearly reads ЗАЖГИ in the accepted deep ember-red fill rather than the superseded gold treatment and cleanly frames the Ash Servant at left, Inferno at center, and Ember Warden at right. It contains no gameplay/platform UI, unrelated glyph, prohibited symbol, crop defect, or white/matte artifact."
+    },
+    {
+      "filename": "cover-800x470-en.png",
+      "sha256": "e17433ffaf07ff55d7ddab86c1eac6b43d6856105199741a79fe03388fd104cb",
+      "verdict": "PASS",
+      "locale": "en",
+      "observation": "Wide card art clearly reads IGNITE in the accepted deep ember-red fill rather than the superseded gold treatment and cleanly frames the Ash Servant at left, Inferno at center, and Ember Warden at right. It contains no gameplay/platform UI, unrelated glyph, prohibited symbol, crop defect, or white/matte artifact."
     },
     {
       "filename": "desktop-01-1920x1080.png",

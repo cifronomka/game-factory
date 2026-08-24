@@ -2,11 +2,12 @@
   "schemaVersion": 1,
   "version": "1.0.0",
   "generatedAt": "2026-08-23T17:59:33.285Z",
+  "updatedAt": "2026-08-24T22:26:58.578Z",
   "captureBuild": {
     "manifest": "dist-e2e/build-manifest.json",
     "buildId": "1.0.0+2477a2634e9a",
     "commitSha": "2477a2634e9aea8a6cc666f33d63457126077cba",
-    "sourceFingerprint": "8ddb2e2897e16a18a8c53a7397f5387cc8e42073e91e64e4f8a995c89a9f77d7",
+    "sourceFingerprint": "b4bcfce6de5a6eeec211df47d181385297be38dda1e1a6c2c3f0ebfc30f54409",
     "target": "yandex",
     "testDriver": true,
     "manifestSha256": "c83f3ef44cceca098f8cf4cf277606ea0a76b47e3456b0324666f1343b63f197"
@@ -109,17 +110,99 @@
       "filename": "icon-512.png",
       "width": 512,
       "height": 512,
-      "bytes": 393749,
-      "sha256": "38ea20080d30c2821524196a9b36884ee8a11f2fe2e4cc6ac5a9205f536fd52d",
-      "source": "original ImageGen icon"
+      "bytes": 568165,
+      "sha256": "224e287d57cb72fbd51cdff861ded5986604b5f9a25a1b3495dc0613222f065a",
+      "locale": "ru",
+      "aliasOf": "icon-512-ru.png",
+      "source": {
+        "filename": "visual-references/yandex-release-09/submission-icon-rich-title-red-v3-ru-source.png",
+        "width": 1254,
+        "height": 1254,
+        "bytes": 2650716,
+        "sha256": "2d7b29fdce6be58d1df249fdfb5cc967582b069fc14caa01910e5b98f8418ea5"
+      },
+      "promptIntent": "Rich square store icon with the Ash Servant, central Inferno fire form, Ember Warden, and readable localized title ЗАЖГИ in a deep ember-red fill, explicitly not gold; no UI, platform mark, watermark, religious, ritual, or esoteric symbol."
     },
     {
       "filename": "cover-800x470.png",
       "width": 800,
       "height": 470,
-      "bytes": 680427,
-      "sha256": "3450033d4bf7d859a3c66a5e3a284eff3c2a3a2e4b084a8b0c68e7eccb25b79f",
-      "source": "original ImageGen cover"
+      "bytes": 828367,
+      "sha256": "e4425c885c7f4d1ce4692078b6eb85b2f24aff5b917165bd7227c1fd9c5454d5",
+      "locale": "ru",
+      "aliasOf": "cover-800x470-ru.png",
+      "source": {
+        "filename": "visual-references/yandex-release-09/submission-cover-characters-title-red-v3-ru-source.png",
+        "width": 1635,
+        "height": 962,
+        "bytes": 2605271,
+        "sha256": "73118f116a8d376f03d8f1590e334dc45eca5c4fb42998372860f4ce39971a3a"
+      },
+      "promptIntent": "Rich wide store cover with the Ash Servant left, central Inferno fire form, Ember Warden right, and readable localized title ЗАЖГИ in a deep ember-red fill, explicitly not gold; no gameplay UI, platform chrome, watermark, religious, ritual, or esoteric symbol."
+    },
+    {
+      "filename": "icon-512-ru.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 568165,
+      "sha256": "224e287d57cb72fbd51cdff861ded5986604b5f9a25a1b3495dc0613222f065a",
+      "locale": "ru",
+      "source": {
+        "filename": "visual-references/yandex-release-09/submission-icon-rich-title-red-v3-ru-source.png",
+        "width": 1254,
+        "height": 1254,
+        "bytes": 2650716,
+        "sha256": "2d7b29fdce6be58d1df249fdfb5cc967582b069fc14caa01910e5b98f8418ea5"
+      },
+      "promptIntent": "Rich square store icon with the Ash Servant, central Inferno fire form, Ember Warden, and readable localized title ЗАЖГИ in a deep ember-red fill, explicitly not gold; no UI, platform mark, watermark, religious, ritual, or esoteric symbol."
+    },
+    {
+      "filename": "icon-512-en.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 542576,
+      "sha256": "d5106f33d472b56f3618738b27607dc220338a17a85aed4c1ba44aa84d7b0996",
+      "locale": "en",
+      "source": {
+        "filename": "visual-references/yandex-release-09/submission-icon-rich-title-red-v3-en-source.png",
+        "width": 1254,
+        "height": 1254,
+        "bytes": 2510258,
+        "sha256": "e5f490febeba714d1e150dff614bd2cae4177c8c3e74898360b126ee3ec1e3ed"
+      },
+      "promptIntent": "Rich square store icon with the Ash Servant, central Inferno fire form, Ember Warden, and readable localized title IGNITE in a deep ember-red fill, explicitly not gold; no UI, platform mark, watermark, religious, ritual, or esoteric symbol."
+    },
+    {
+      "filename": "cover-800x470-ru.png",
+      "width": 800,
+      "height": 470,
+      "bytes": 828367,
+      "sha256": "e4425c885c7f4d1ce4692078b6eb85b2f24aff5b917165bd7227c1fd9c5454d5",
+      "locale": "ru",
+      "source": {
+        "filename": "visual-references/yandex-release-09/submission-cover-characters-title-red-v3-ru-source.png",
+        "width": 1635,
+        "height": 962,
+        "bytes": 2605271,
+        "sha256": "73118f116a8d376f03d8f1590e334dc45eca5c4fb42998372860f4ce39971a3a"
+      },
+      "promptIntent": "Rich wide store cover with the Ash Servant left, central Inferno fire form, Ember Warden right, and readable localized title ЗАЖГИ in a deep ember-red fill, explicitly not gold; no gameplay UI, platform chrome, watermark, religious, ritual, or esoteric symbol."
+    },
+    {
+      "filename": "cover-800x470-en.png",
+      "width": 800,
+      "height": 470,
+      "bytes": 825592,
+      "sha256": "e17433ffaf07ff55d7ddab86c1eac6b43d6856105199741a79fe03388fd104cb",
+      "locale": "en",
+      "source": {
+        "filename": "visual-references/yandex-release-09/submission-cover-characters-title-red-v3-en-source.png",
+        "width": 1634,
+        "height": 963,
+        "bytes": 2608901,
+        "sha256": "cfa0b1fc4991eeeb13938971be3431b1f5264cfe67fc305df5016361abc27583"
+      },
+      "promptIntent": "Rich wide store cover with the Ash Servant left, central Inferno fire form, Ember Warden right, and readable localized title IGNITE in a deep ember-red fill, explicitly not gold; no gameplay UI, platform chrome, watermark, religious, ritual, or esoteric symbol."
     },
     {
       "filename": "desktop-01-1920x1080.png",

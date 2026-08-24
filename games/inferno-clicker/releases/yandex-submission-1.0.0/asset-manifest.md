@@ -1,11 +1,22 @@
 # Submission media manifest
 
-Icon/cover must be original card artwork, not gameplay screenshots. Shared RU/EN media contains no overlaid words, so one set is used for both languages. System/browser/Yandex UI and debug panel must not appear. Final files require SHA-256 and independent visual sign-off.
+Icon/cover are localized original card artwork, not gameplay screenshots. The
+only lettering is the matching game title: `ЗАЖГИ` for RU and `IGNITE` for EN.
+The accepted v3 title fill is deep ember red, not the superseded gold/orange
+metallic treatment.
+Generic `icon-512.png` and `cover-800x470.png` are exact byte-for-byte RU
+aliases available if the Console exposes only one shared file. System/browser/
+Yandex UI and debug panels must not appear. `PASS` below records local file and
+visual review only; Console upload remains `NOT RUN` in `console-checklist.md`.
 
 | ID | Required filename | Pixels/format | Intended content | Status | SHA-256 |
 |---|---|---|---|---|---|
-| ICON | `media/icon-512.png` | 512×512 PNG | isolated ember/flame emblem, no text, no screenshot, no religious/esoteric mark | PASS | `38ea20080d30c2821524196a9b36884ee8a11f2fe2e4cc6ac5a9205f536fd52d` |
-| COVER | `media/cover-800x470.png` | 800×470 PNG | authored fire progression composition, no UI/screenshot/text | PASS | `3450033d4bf7d859a3c66a5e3a284eff3c2a3a2e4b084a8b0c68e7eccb25b79f` |
+| ICON-RU | `media/icon-512-ru.png` | 512×512 PNG, 568,165 B | rich three-character fire composition with deep-red title `ЗАЖГИ`; no UI/platform/prohibited mark | PASS | `224e287d57cb72fbd51cdff861ded5986604b5f9a25a1b3495dc0613222f065a` |
+| ICON-EN | `media/icon-512-en.png` | 512×512 PNG, 542,576 B | rich three-character fire composition with deep-red title `IGNITE`; no UI/platform/prohibited mark | PASS | `d5106f33d472b56f3618738b27607dc220338a17a85aed4c1ba44aa84d7b0996` |
+| ICON-DEFAULT | `media/icon-512.png` | 512×512 PNG, 568,165 B | exact byte-for-byte alias of ICON-RU | PASS | `224e287d57cb72fbd51cdff861ded5986604b5f9a25a1b3495dc0613222f065a` |
+| COVER-RU | `media/cover-800x470-ru.png` | 800×470 PNG, 828,367 B | rich Ash Servant / Inferno / Ember Warden card with deep-red title `ЗАЖГИ`; no gameplay UI | PASS | `e4425c885c7f4d1ce4692078b6eb85b2f24aff5b917165bd7227c1fd9c5454d5` |
+| COVER-EN | `media/cover-800x470-en.png` | 800×470 PNG, 825,592 B | rich Ash Servant / Inferno / Ember Warden card with deep-red title `IGNITE`; no gameplay UI | PASS | `e17433ffaf07ff55d7ddab86c1eac6b43d6856105199741a79fe03388fd104cb` |
+| COVER-DEFAULT | `media/cover-800x470.png` | 800×470 PNG, 828,367 B | exact byte-for-byte alias of COVER-RU | PASS | `e4425c885c7f4d1ce4692078b6eb85b2f24aff5b917165bd7227c1fd9c5454d5` |
 | DESK-01 | `media/desktop-01-1920x1080.png` | 1920×1080 PNG, 16:9 | early-stage real gameplay, visible tap objective | PASS | `2634bb03939b0c97d01486f9424f69d368b296f06501ed6f5c37fb95f4ba11f2` |
 | DESK-02 | `media/desktop-02-1920x1080.png` | 1920×1080 PNG, 16:9 | mid-stage real gameplay with Ash Servant telegraph | PASS | `ad535bd5558c3410004b5fe1cc0169f17535e090a60912c2aa3f814ac866f2a7` |
 | DESK-03 | `media/desktop-03-1920x1080.png` | 1920×1080 PNG, 16:9 | Ember Warden and high-fire real gameplay | PASS | `5ce1cc719ca8a155fa94498dee00c25ecda10a24463ddf2f09a835f645a17bda` |
@@ -16,6 +27,15 @@ Icon/cover must be original card artwork, not gameplay screenshots. Shared RU/EN
 | MOB-04 | `media/mobile-04-1080x1920.png` | 1080×1920 PNG, 9:16 | Inferno/result-goal real gameplay state | PASS | `871c628628e0a4f67252981b77cac3fa20dbc06b390ea96889b23a488803d16b` |
 
 For every screenshot: game content area≥70%, black field only if part of actual game composition, no crop/distortion, no broken/white spots, no prohibited symbols, no platform/system/debug overlay. Long side is within the documented 1280–2560 range. Maskable icon, showcase cover and promo video are `N/A — optional and not required for Cycle 09`.
+
+## Localized card-art provenance
+
+| Delivery variants | Versioned ImageGen source | Source dimensions/bytes | Source SHA-256 | Prompt intent |
+|---|---|---|---|---|
+| `icon-512-ru.png`, `icon-512.png` | `visual-references/yandex-release-09/submission-icon-rich-title-red-v3-ru-source.png` | 1254×1254, 2,650,716 B | `2d7b29fdce6be58d1df249fdfb5cc967582b069fc14caa01910e5b98f8418ea5` | square small-size card with the three fire characters and readable `ЗАЖГИ` in deep ember red, explicitly not gold; no UI, platform mark, watermark, religious, ritual or esoteric symbol |
+| `icon-512-en.png` | `visual-references/yandex-release-09/submission-icon-rich-title-red-v3-en-source.png` | 1254×1254, 2,510,258 B | `e5f490febeba714d1e150dff614bd2cae4177c8c3e74898360b126ee3ec1e3ed` | same composition with readable deep-red `IGNITE` and the same exclusions |
+| `cover-800x470-ru.png`, `cover-800x470.png` | `visual-references/yandex-release-09/submission-cover-characters-title-red-v3-ru-source.png` | 1635×962, 2,605,271 B | `73118f116a8d376f03d8f1590e334dc45eca5c4fb42998372860f4ce39971a3a` | wide card: Ash Servant left, Inferno center, Ember Warden right, readable `ЗАЖГИ` in deep ember red, explicitly not gold; no gameplay/platform UI or prohibited symbol |
+| `cover-800x470-en.png` | `visual-references/yandex-release-09/submission-cover-characters-title-red-v3-en-source.png` | 1634×963, 2,608,901 B | `cfa0b1fc4991eeeb13938971be3431b1f5264cfe67fc305df5016361abc27583` | same composition with readable deep-red `IGNITE` and the same exclusions |
 
 Machine-readable dimensions, byte sizes and hashes are in
 `media/submission-media-manifest.json`. Icon and cover sources are retained in
