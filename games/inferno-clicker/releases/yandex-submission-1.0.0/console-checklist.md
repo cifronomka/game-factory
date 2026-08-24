@@ -35,6 +35,8 @@ evidence is collected. Nothing here authorizes moderation or publication.
 | EN cover | `cover-800x470-en.png` — 800×470, 825,592 B, deep-red (not gold) title `IGNITE`, SHA-256 `e17433ffaf07ff55d7ddab86c1eac6b43d6856105199741a79fe03388fd104cb` | PASS — file ID `12625250` |
 | Shared card-media fallback | If the Console exposes only one shared icon/cover field, use `icon-512.png` and `cover-800x470.png`; both are exact RU aliases. | N/A — localized RU/EN fields were available |
 | Screenshots | `desktop-01..04-1920x1080.png`, `mobile-01..04-1080x1920.png` | NOT RUN |
+| Horizontal gameplay video (RU + EN) | Upload the same text-free `gameplay-video-horizontal-v1-1920x1080.mp4` to the horizontal gameplay-video field for each locale: 1920×1080, 24,958,383 B, 22.486667 s, H.264 + stereo AAC 48 kHz (audio RMS `0.024112471258485778`, peak `0.2985572814941406`), SHA-256 `08ff5285a9a46c28f74cf3b1562505f21c61fe1968f7f19450dc406ec1c9e144`. Local artifact/audio: PASS. | NOT RUN — Console upload/save/reload verification |
+| Vertical gameplay video (RU + EN) | Upload the same text-free `gameplay-video-vertical-v1-1080x1920.mp4` to the vertical gameplay-video field for each locale: 1080×1920, 25,093,830 B, 22.5155 s, H.264 + stereo AAC 48 kHz (audio RMS `0.025064576492090245`, peak `0.38216733932495117`), SHA-256 `20d38ecae8aefebc9fee6b8858ebc843606764c1e73b57a4ee08ea4d3292c190`. Local artifact/audio: PASS. | NOT RUN — Console upload/save/reload verification |
 | Countries | Platform default distribution appropriate for RU+EN; no extra exclusion requested | NOT RUN |
 | Moderation submit | N/A — separate user authorization required | N/A — outside Cycle 09 |
 | Public release | N/A — separate user authorization required | N/A — outside Cycle 09 |
@@ -52,5 +54,8 @@ evidence is collected. Nothing here authorizes moderation or publication.
 - Exact localized card-media files from the four hash-bound rows above were
   uploaded, saved and persisted after reload in draft `574315`: `PASS` (RU icon
   `12625231`, RU cover `12625237`, EN icon `12625244`, EN cover `12625250`).
+- Exact horizontal and vertical gameplay videos were uploaded to both RU and EN
+  promotion fields, saved and persisted after reload: `NOT RUN`. Do not mark
+  this PASS until the Console file IDs and the two hashes above are captured.
 
 После сбора скриншотов/видео/логов оформить `yandex-console-draft` JSON по контракту `scripts/verify-yandex-draft.mjs`: exact RC bytes/build/package SHA, оба названия и `availabilityChecked/available=true`, структурированные rewarded success/close/error + 60/90 active-time/pause/audio, нулевые console/network counters и десять hash-bound artifacts. Затем выполнить `npm run verify:draft:yandex -- --evidence=<console-evidence.json>`. Команда append-only проверяет черновик без rebuild, rename, модерации или публикации.

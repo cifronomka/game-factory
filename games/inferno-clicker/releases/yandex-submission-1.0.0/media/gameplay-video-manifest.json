@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "kind": "yandex-gameplay-video",
+  "version": "1.0.0",
+  "generatedAt": "2026-08-24T23:01:31.815Z",
+  "yandexConstraints": {
+    "maximumDurationSeconds": 28,
+    "maximumBytes": 104857600,
+    "format": "MP4",
+    "horizontalAspectRatio": "16:9",
+    "verticalAspectRatio": "9:16",
+    "minimumHeight": 400,
+    "gameplayDurationShareMinimum": 0.7
+  },
+  "editorial": {
+    "durationSeconds": 22.5,
+    "locale": "text-free/shared-ru-en",
+    "gameplayDurationShare": 0.946,
+    "browserOrPlatformUiVisible": false,
+    "debugOverlayVisible": false,
+    "seamlessLoop": true,
+    "timeline": [
+      {
+        "atSeconds": 0,
+        "beat": "Inferno cold open and loop anchor"
+      },
+      {
+        "atSeconds": 0.98,
+        "beat": "Crossfade and restart"
+      },
+      {
+        "atSeconds": 1.8,
+        "beat": "Stage 2 transition"
+      },
+      {
+        "atSeconds": 2.45,
+        "beat": "Stage 3 transition and Ash Servant reveal"
+      },
+      {
+        "atSeconds": 3.45,
+        "beat": "Ash Servant inhale and blow"
+      },
+      {
+        "atSeconds": 7.02,
+        "beat": "Crossfade, restart and Stage 4 silhouette"
+      },
+      {
+        "atSeconds": 8.45,
+        "beat": "Stage 5 Ember Warden reveal"
+      },
+      {
+        "atSeconds": 9.55,
+        "beat": "Ember Warden cast and steam impact"
+      },
+      {
+        "atSeconds": 15.62,
+        "beat": "Crossfade, restart and Stage 6 Fire Ring"
+      },
+      {
+        "atSeconds": 17.25,
+        "beat": "Stage 7 Inferno transition"
+      },
+      {
+        "atSeconds": 22.5,
+        "beat": "Sustained Inferno loop out"
+      }
+    ]
+  },
+  "captureBuild": {
+    "manifest": "dist-e2e/build-manifest.json",
+    "buildId": "1.0.0+working.60d69ef5a069",
+    "commitSha": "9c7f264e52f0cc92b9deee39e6be56b50cfc1ad2",
+    "sourceFingerprint": "60d69ef5a069201c9826e9241f1196cb4152dd438527be64012bc3d5ae898bcb",
+    "target": "yandex",
+    "testDriver": true,
+    "manifestSha256": "6b3475fdf9dd8d5fbf589c85a4f10184562d8be82b8efacb6219c830da3d679d"
+  },
+  "files": [
+    {
+      "id": "horizontal",
+      "filename": "gameplay-video-horizontal-v1-1920x1080.mp4",
+      "width": 1920,
+      "height": 1080,
+      "aspectRatio": "16:9",
+      "bytes": 24958383,
+      "sha256": "08ff5285a9a46c28f74cf3b1562505f21c61fe1968f7f19450dc406ec1c9e144",
+      "durationSeconds": 22.486667,
+      "mimeType": "video/mp4;codecs=avc1.420028,mp4a.40.2",
+      "codecs": [
+        "H.264",
+        "AAC"
+      ],
+      "audioTrack": true,
+      "audio": {
+        "channels": 2,
+        "sampleRate": 48000,
+        "duration": 22.357,
+        "rms": 0.024112471258485778,
+        "peak": 0.2985572814941406
+      },
+      "videoTrack": true,
+      "frameRate": 30,
+      "consoleErrors": 0,
+      "consoleWarnings": 0,
+      "pageErrors": 0,
+      "requestFailures": 0,
+      "httpErrors": 0,
+      "expectedResidencyAborts": [],
+      "expectedRecordedBlobAborts": 7,
+      "contactSheet": {
+        "filename": "gameplay-video-horizontal-v1-contact-sheet.png",
+        "width": 1920,
+        "height": 540,
+        "bytes": 1654650,
+        "sha256": "e696639ae0168658bac8fc99bf2a2442acc1ce5c96df9418e9d13c9c19fdd90a"
+      }
+    },
+    {
+      "id": "vertical",
+      "filename": "gameplay-video-vertical-v1-1080x1920.mp4",
+      "width": 1080,
+      "height": 1920,
+      "aspectRatio": "9:16",
+      "bytes": 25093830,
+      "sha256": "20d38ecae8aefebc9fee6b8858ebc843606764c1e73b57a4ee08ea4d3292c190",
+      "durationSeconds": 22.5155,
+      "mimeType": "video/mp4;codecs=avc1.420028,mp4a.40.2",
+      "codecs": [
+        "H.264",
+        "AAC"
+      ],
+      "audioTrack": true,
+      "audio": {
+        "channels": 2,
+        "sampleRate": 48000,
+        "duration": 22.39966666666667,
+        "rms": 0.025064576492090245,
+        "peak": 0.38216733932495117
+      },
+      "videoTrack": true,
+      "frameRate": 30,
+      "consoleErrors": 0,
+      "consoleWarnings": 0,
+      "pageErrors": 0,
+      "requestFailures": 0,
+      "httpErrors": 0,
+      "expectedResidencyAborts": [],
+      "expectedRecordedBlobAborts": 7,
+      "contactSheet": {
+        "filename": "gameplay-video-vertical-v1-contact-sheet.png",
+        "width": 1080,
+        "height": 960,
+        "bytes": 1896274,
+        "sha256": "5889b69bb3e10ccc175c5c65efeff6b3e619ac5ca7cd0700373a6018521b92c9"
+      }
+    }
+  ],
+  "consoleUploadStatus": "NOT_RUN"
+}

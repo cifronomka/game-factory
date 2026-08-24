@@ -27,8 +27,10 @@ visual review. The four localized files were uploaded and saved in Yandex draft
 | MOB-02 | `media/mobile-02-1080x1920.png` | 1080×1920 PNG, 9:16 | mid-stage portrait real gameplay and warning | PASS | `6de30e7c4fcd14129e13f20b591b7511e00e6af2736c764bb01eca50e230cb48` |
 | MOB-03 | `media/mobile-03-1080x1920.png` | 1080×1920 PNG, 9:16 | stage-3 rewarded offer in valid real gameplay | PASS | `8e4d4f05d589ad1c33f30e22b2d04b3c2a91ac4fd20cc6458b206f8691e69bfd` |
 | MOB-04 | `media/mobile-04-1080x1920.png` | 1080×1920 PNG, 9:16 | Inferno/result-goal real gameplay state | PASS | `871c628628e0a4f67252981b77cac3fa20dbc06b390ea96889b23a488803d16b` |
+| VIDEO-H | `media/gameplay-video-horizontal-v1-1920x1080.mp4` | 1920×1080 MP4, 16:9, 24,958,383 B, 22.486667 s, 30 fps, H.264 + stereo AAC 48 kHz | text-free RU/EN gameplay montage: stage transitions, character reveals, blow/cast actions and Inferno loop; 94.6% real gameplay | PASS — local artifact/audio; Console upload NOT RUN | `08ff5285a9a46c28f74cf3b1562505f21c61fe1968f7f19450dc406ec1c9e144` |
+| VIDEO-V | `media/gameplay-video-vertical-v1-1080x1920.mp4` | 1080×1920 MP4, 9:16, 25,093,830 B, 22.5155 s, 30 fps, H.264 + stereo AAC 48 kHz | portrait rendering of the same text-free RU/EN gameplay montage; 94.6% real gameplay | PASS — local artifact/audio; Console upload NOT RUN | `20d38ecae8aefebc9fee6b8858ebc843606764c1e73b57a4ee08ea4d3292c190` |
 
-For every screenshot: game content area≥70%, black field only if part of actual game composition, no crop/distortion, no broken/white spots, no prohibited symbols, no platform/system/debug overlay. Long side is within the documented 1280–2560 range. Maskable icon, showcase cover and promo video are `N/A — optional and not required for Cycle 09`.
+For every screenshot: game content area≥70%, black field only if part of actual game composition, no crop/distortion, no broken/white spots, no prohibited symbols, no platform/system/debug overlay. Long side is within the documented 1280–2560 range. Maskable icon and showcase cover are `N/A — optional and not required for Cycle 09`. The optional horizontal and vertical gameplay-video candidates now pass local format, geometry, duration, size and gameplay-share checks; their upload to draft `574315` remains `NOT RUN`.
 
 ## Localized card-art provenance
 
@@ -40,8 +42,12 @@ For every screenshot: game content area≥70%, black field only if part of actua
 | `cover-800x470-en.png` | `visual-references/yandex-release-09/submission-cover-characters-title-red-v3-en-source.png` | 1634×963, 2,608,901 B | `cfa0b1fc4991eeeb13938971be3431b1f5264cfe67fc305df5016361abc27583` | same composition with readable deep-red `IGNITE` and the same exclusions |
 
 Machine-readable dimensions, byte sizes and hashes are in
-`media/submission-media-manifest.json`. Icon and cover sources are retained in
+`media/submission-media-manifest.json`; gameplay-video metadata is in
+`media/gameplay-video-manifest.json`. Icon and cover sources are retained in
 `visual-references/yandex-release-09/`; gameplay captures come from the
 test-driver build of the exact same Yandex source fingerprint with SDK transport
 mocked and no visible debug overlay. The final release bundle compiles that
 state-mutating test driver out and the release audit verifies its absence.
+
+Gameplay-video editorial intent, exact media metadata, contact-sheet evidence
+and the no-moderation upload boundary are documented in `GAMEPLAY_VIDEO.md`.

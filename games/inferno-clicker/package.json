@@ -21,6 +21,7 @@
     "soak:yandex": "node scripts/soak-yandex.mjs",
     "environment:audit:yandex": "node scripts/environment-audit-yandex.mjs",
     "submission:capture:yandex": "node scripts/capture-yandex-submission.mjs",
+    "submission:video:yandex": "node scripts/capture-yandex-gameplay-video.mjs",
     "visual:matrix:yandex": "node scripts/render-cycle09-yandex-visual-matrix.mjs",
     "visual:runtime:yandex": "node scripts/capture-cycle09-runtime-matrix.mjs",
     "compat:audit:yandex": "node scripts/compatibility-audit-yandex.mjs --root=dist-e2e",
