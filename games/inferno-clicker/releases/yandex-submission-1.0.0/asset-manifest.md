@@ -7,7 +7,9 @@ metallic treatment.
 Generic `icon-512.png` and `cover-800x470.png` are exact byte-for-byte RU
 aliases available if the Console exposes only one shared file. System/browser/
 Yandex UI and debug panels must not appear. `PASS` below records local file and
-visual review only; Console upload remains `NOT RUN` in `console-checklist.md`.
+visual review. The four localized files were uploaded and saved in Yandex draft
+`574315` on 2026-08-25; exact Console file IDs are recorded in
+`console-checklist.md`.
 
 | ID | Required filename | Pixels/format | Intended content | Status | SHA-256 |
 |---|---|---|---|---|---|

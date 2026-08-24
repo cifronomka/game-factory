@@ -3,7 +3,19 @@
   "kind": "submission-human-review",
   "status": "PASS",
   "scope": "local submission media only",
-  "consoleUploadStatus": "NOT_RUN",
+  "consoleUploadStatus": "PASS",
+  "consoleUploadEvidence": {
+    "draftId": "574315",
+    "savedAt": "2026-08-25T01:40:20+03:00",
+    "persistedAfterReload": true,
+    "moderationSubmitted": false,
+    "files": {
+      "icon-512-ru.png": "12625231",
+      "cover-800x470-ru.png": "12625237",
+      "icon-512-en.png": "12625244",
+      "cover-800x470-en.png": "12625250"
+    }
+  },
   "cycle": "09",
   "sourceFingerprint": "b4bcfce6de5a6eeec211df47d181385297be38dda1e1a6c2c3f0ebfc30f54409",
   "mediaManifestSha256": "cc1880daeff1ee4fb807d0b21839d9bd078363fb2f573d68d7feb131a3666bff",
