@@ -3,12 +3,12 @@
   "kind": "cycle09-visual-human-review",
   "status": "PASS",
   "cycle": "09",
-  "sourceFingerprint": "8ddb2e2897e16a18a8c53a7397f5387cc8e42073e91e64e4f8a995c89a9f77d7",
-  "evidenceGeneratedAt": "2026-08-23T18:03:56.565Z",
+  "sourceFingerprint": "7c6c6d8c1e3815786ec5fafda669ea8c3f4bba795c179092674f7c50c4113504",
+  "evidenceGeneratedAt": "2026-08-25T20:37:03.975Z",
   "reviewer": {
-    "id": "cycle09_visual_perceptual_reviewer",
+    "id": "cycle09_visual_exact_review_1034f965d394",
     "independent": true,
-    "reviewedAt": "2026-08-23T18:47:00.4988890Z"
+    "reviewedAt": "2026-08-25T21:02:49.9349270Z"
   },
   "files": [
     {
@@ -139,7 +139,7 @@
     },
     {
       "id": "runtime/runtime-seven-stages-normal-dpr1.png",
-      "sha256": "bd35b0179957d2cfaef710a1f97af46960cf263ef0c389c7e10f2e6c812ef701",
+      "sha256": "d815d37eab847d04682c92fd106a2f8367e7865207299ca485cb16f9db2bae16",
       "verdict": "PASS",
       "observation": "Seven normal DPR 1 scenes are intact; flame highlights are connected with no crop, residue, legacy names, or symbols.",
       "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",
@@ -187,7 +187,7 @@
     },
     {
       "id": "runtime/runtime-seven-stages-reduced-dpr1.png",
-      "sha256": "4e547027da89f9a43c06d11eda7709551ba754998de91ce47d05b97116b666cc",
+      "sha256": "5eaf879aa48853362d546255838acfdab208609e7b1c48e34204efa9f996b94b",
       "verdict": "PASS",
       "observation": "Seven reduced DPR 1 scenes are intact; no crop, matte, detached artifacts, legacy names, or prohibited symbols.",
       "perceptualAlgorithm": "stage-dhash-horizontal-16x16-lanczos3-grayscale-v1",

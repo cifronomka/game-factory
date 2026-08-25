@@ -1,16 +1,15 @@
 {
   "schemaVersion": 1,
   "version": "1.0.0",
-  "generatedAt": "2026-08-23T17:59:33.285Z",
-  "updatedAt": "2026-08-24T22:26:58.578Z",
+  "generatedAt": "2026-08-25T21:04:52.859Z",
   "captureBuild": {
     "manifest": "dist-e2e/build-manifest.json",
-    "buildId": "1.0.0+2477a2634e9a",
-    "commitSha": "2477a2634e9aea8a6cc666f33d63457126077cba",
-    "sourceFingerprint": "b4bcfce6de5a6eeec211df47d181385297be38dda1e1a6c2c3f0ebfc30f54409",
+    "buildId": "1.0.0+working.7c6c6d8c1e38",
+    "commitSha": "1034f965d394e73c1693e04123dc0f534137788d",
+    "sourceFingerprint": "7c6c6d8c1e3815786ec5fafda669ea8c3f4bba795c179092674f7c50c4113504",
     "target": "yandex",
     "testDriver": true,
-    "manifestSha256": "c83f3ef44cceca098f8cf4cf277606ea0a76b47e3456b0324666f1343b63f197"
+    "manifestSha256": "82d33f127a7367ccac7c3283b1676bf755e65db84e5ec5d6b9a7a290c67e5453"
   },
   "gameplayShareRequiredMinimum": 0.7,
   "gameplayShareMinimum": 1,
@@ -22,7 +21,13 @@
     "requestFailures": 0,
     "httpErrors": 0
   },
-  "expectedResidencyAborts": [],
+  "expectedResidencyAborts": [
+    {
+      "path": "/assets/characters/ash-servant/ash-servant-blow-v7.webp",
+      "errorText": "net::ERR_ABORTED",
+      "reason": "test-driver clip transition released the non-current decoded atlas"
+    }
+  ],
   "captureAssertions": [
     {
       "filename": "desktop-01-1920x1080.png",
@@ -112,16 +117,7 @@
       "height": 512,
       "bytes": 568165,
       "sha256": "224e287d57cb72fbd51cdff861ded5986604b5f9a25a1b3495dc0613222f065a",
-      "locale": "ru",
-      "aliasOf": "icon-512-ru.png",
-      "source": {
-        "filename": "visual-references/yandex-release-09/submission-icon-rich-title-red-v3-ru-source.png",
-        "width": 1254,
-        "height": 1254,
-        "bytes": 2650716,
-        "sha256": "2d7b29fdce6be58d1df249fdfb5cc967582b069fc14caa01910e5b98f8418ea5"
-      },
-      "promptIntent": "Rich square store icon with the Ash Servant, central Inferno fire form, Ember Warden, and readable localized title ЗАЖГИ in a deep ember-red fill, explicitly not gold; no UI, platform mark, watermark, religious, ritual, or esoteric symbol."
+      "source": "original ImageGen icon"
     },
     {
       "filename": "cover-800x470.png",
@@ -129,143 +125,70 @@
       "height": 470,
       "bytes": 828367,
       "sha256": "e4425c885c7f4d1ce4692078b6eb85b2f24aff5b917165bd7227c1fd9c5454d5",
-      "locale": "ru",
-      "aliasOf": "cover-800x470-ru.png",
-      "source": {
-        "filename": "visual-references/yandex-release-09/submission-cover-characters-title-red-v3-ru-source.png",
-        "width": 1635,
-        "height": 962,
-        "bytes": 2605271,
-        "sha256": "73118f116a8d376f03d8f1590e334dc45eca5c4fb42998372860f4ce39971a3a"
-      },
-      "promptIntent": "Rich wide store cover with the Ash Servant left, central Inferno fire form, Ember Warden right, and readable localized title ЗАЖГИ in a deep ember-red fill, explicitly not gold; no gameplay UI, platform chrome, watermark, religious, ritual, or esoteric symbol."
-    },
-    {
-      "filename": "icon-512-ru.png",
-      "width": 512,
-      "height": 512,
-      "bytes": 568165,
-      "sha256": "224e287d57cb72fbd51cdff861ded5986604b5f9a25a1b3495dc0613222f065a",
-      "locale": "ru",
-      "source": {
-        "filename": "visual-references/yandex-release-09/submission-icon-rich-title-red-v3-ru-source.png",
-        "width": 1254,
-        "height": 1254,
-        "bytes": 2650716,
-        "sha256": "2d7b29fdce6be58d1df249fdfb5cc967582b069fc14caa01910e5b98f8418ea5"
-      },
-      "promptIntent": "Rich square store icon with the Ash Servant, central Inferno fire form, Ember Warden, and readable localized title ЗАЖГИ in a deep ember-red fill, explicitly not gold; no UI, platform mark, watermark, religious, ritual, or esoteric symbol."
-    },
-    {
-      "filename": "icon-512-en.png",
-      "width": 512,
-      "height": 512,
-      "bytes": 542576,
-      "sha256": "d5106f33d472b56f3618738b27607dc220338a17a85aed4c1ba44aa84d7b0996",
-      "locale": "en",
-      "source": {
-        "filename": "visual-references/yandex-release-09/submission-icon-rich-title-red-v3-en-source.png",
-        "width": 1254,
-        "height": 1254,
-        "bytes": 2510258,
-        "sha256": "e5f490febeba714d1e150dff614bd2cae4177c8c3e74898360b126ee3ec1e3ed"
-      },
-      "promptIntent": "Rich square store icon with the Ash Servant, central Inferno fire form, Ember Warden, and readable localized title IGNITE in a deep ember-red fill, explicitly not gold; no UI, platform mark, watermark, religious, ritual, or esoteric symbol."
-    },
-    {
-      "filename": "cover-800x470-ru.png",
-      "width": 800,
-      "height": 470,
-      "bytes": 828367,
-      "sha256": "e4425c885c7f4d1ce4692078b6eb85b2f24aff5b917165bd7227c1fd9c5454d5",
-      "locale": "ru",
-      "source": {
-        "filename": "visual-references/yandex-release-09/submission-cover-characters-title-red-v3-ru-source.png",
-        "width": 1635,
-        "height": 962,
-        "bytes": 2605271,
-        "sha256": "73118f116a8d376f03d8f1590e334dc45eca5c4fb42998372860f4ce39971a3a"
-      },
-      "promptIntent": "Rich wide store cover with the Ash Servant left, central Inferno fire form, Ember Warden right, and readable localized title ЗАЖГИ in a deep ember-red fill, explicitly not gold; no gameplay UI, platform chrome, watermark, religious, ritual, or esoteric symbol."
-    },
-    {
-      "filename": "cover-800x470-en.png",
-      "width": 800,
-      "height": 470,
-      "bytes": 825592,
-      "sha256": "e17433ffaf07ff55d7ddab86c1eac6b43d6856105199741a79fe03388fd104cb",
-      "locale": "en",
-      "source": {
-        "filename": "visual-references/yandex-release-09/submission-cover-characters-title-red-v3-en-source.png",
-        "width": 1634,
-        "height": 963,
-        "bytes": 2608901,
-        "sha256": "cfa0b1fc4991eeeb13938971be3431b1f5264cfe67fc305df5016361abc27583"
-      },
-      "promptIntent": "Rich wide store cover with the Ash Servant left, central Inferno fire form, Ember Warden right, and readable localized title IGNITE in a deep ember-red fill, explicitly not gold; no gameplay UI, platform chrome, watermark, religious, ritual, or esoteric symbol."
+      "source": "original ImageGen cover"
     },
     {
       "filename": "desktop-01-1920x1080.png",
       "width": 1920,
       "height": 1080,
-      "bytes": 714589,
-      "sha256": "2634bb03939b0c97d01486f9424f69d368b296f06501ed6f5c37fb95f4ba11f2",
+      "bytes": 714359,
+      "sha256": "a40844ddd00499945814c52437d104c58559bc7e6293d1d1cc7eda491b7558ca",
       "source": "exact release gameplay"
     },
     {
       "filename": "desktop-02-1920x1080.png",
       "width": 1920,
       "height": 1080,
-      "bytes": 1491316,
-      "sha256": "ad535bd5558c3410004b5fe1cc0169f17535e090a60912c2aa3f814ac866f2a7",
+      "bytes": 1527415,
+      "sha256": "2b84779ca48b94dede7b956307be907476bd06119b1f02913cc4e768ffaa084a",
       "source": "exact release gameplay"
     },
     {
       "filename": "desktop-03-1920x1080.png",
       "width": 1920,
       "height": 1080,
-      "bytes": 2016998,
-      "sha256": "5ce1cc719ca8a155fa94498dee00c25ecda10a24463ddf2f09a835f645a17bda",
+      "bytes": 1997678,
+      "sha256": "bce59cecf83536222812c04d7e1c34b9be9c72fd45d7cc94699065137deb4d71",
       "source": "exact release gameplay"
     },
     {
       "filename": "desktop-04-1920x1080.png",
       "width": 1920,
       "height": 1080,
-      "bytes": 2113561,
-      "sha256": "98986fb07dcf254eb626e5c893e8dbbd6eb9a2deebd9cd522db136d0be88b197",
+      "bytes": 2117351,
+      "sha256": "a00bc1ea191d484a4458771c0fd30f386198197d508b0c36bf8e052aaf57e215",
       "source": "exact release gameplay"
     },
     {
       "filename": "mobile-01-1080x1920.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 503169,
-      "sha256": "6a33447d9f17a9ddac158af1e291c282f6eda042ec0db036d49fbbd89509ac3b",
+      "bytes": 503253,
+      "sha256": "f4acfc257bd11d04ffba2f374800a15a279986bbbf3f6c6cb049a578a1332259",
       "source": "exact release gameplay"
     },
     {
       "filename": "mobile-02-1080x1920.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 1317076,
-      "sha256": "6de30e7c4fcd14129e13f20b591b7511e00e6af2736c764bb01eca50e230cb48",
+      "bytes": 1318006,
+      "sha256": "d9c433fd3109d82cb5e99e606f24083124ba336d36815da93580f8fed4ad0df2",
       "source": "exact release gameplay"
     },
     {
       "filename": "mobile-03-1080x1920.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 1440719,
-      "sha256": "8e4d4f05d589ad1c33f30e22b2d04b3c2a91ac4fd20cc6458b206f8691e69bfd",
+      "bytes": 1438543,
+      "sha256": "c033d963bfcd31b4c80216386bc24ad60fd42f0336a5ea1a7fc5deb2a18edf36",
       "source": "exact release gameplay"
     },
     {
       "filename": "mobile-04-1080x1920.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 1820491,
-      "sha256": "871c628628e0a4f67252981b77cac3fa20dbc06b390ea96889b23a488803d16b",
+      "bytes": 1815345,
+      "sha256": "e1a0b850ab26521fa3d27c81febd09dea285775cb155e58d038914ebc1c543e8",
       "source": "exact release gameplay"
     }
   ]

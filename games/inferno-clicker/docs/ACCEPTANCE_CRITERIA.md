@@ -139,56 +139,56 @@
 
 | ID | Бинарное условие | Evidence | Статус |
 |---|---|---|---|
-| C09-F-01 | Production target всегда `yandex`; `/sdk.js` загружается до app независимо от hostname; SDK failure даёт playable local-only без test/free rewarded provider | Static bundle audit + SDK success/failure browser E2E | NOT RUN |
-| C09-F-02 | `PlatformCapabilities` содержит locale/authorized и отдельные remote booleans; `PresentationViewModel` содержит rewardOffer/goals/nextGoal и не содержит provider identity | Contract/type/runtime tests | NOT RUN |
-| C09-F-03 | Mouse, Pointer Events и touch/mouse fallback: один physical contact→один tap; right-click/contextmenu/drag/select/page gesture не активируют core | Browser input matrix | NOT RUN |
-| C09-F-04 | Ровно 8 goals вычисляются из V1 records в утверждённом порядке; nextGoal — первый incomplete/null; reload и local/cloud merge не откатывают completion | Goals/unit/persistence/browser trace | NOT RUN |
-| C09-F-05 | RU/EN title, HUD, stages, goals, dialogs, errors, instructions и ARIA полны; ru/be/kk/uk/uz→RU, other/unknown→EN | Dictionary completeness + mocked environment E2E | NOT RUN |
-| C09-F-06 | No-reward direct input достигает stages 1–7, records/goals/restart работают без SDK/network/auth/ads | 60/30/15 FPS fixture + full browser cycle | NOT RUN |
+| C09-F-01 | Production target всегда `yandex`; `/sdk.js` загружается до app независимо от hostname; SDK failure даёт playable local-only без test/free rewarded provider | Static bundle audit + SDK success/failure browser E2E | PASS |
+| C09-F-02 | `PlatformCapabilities` содержит locale/authorized и отдельные remote booleans; `PresentationViewModel` содержит rewardOffer/goals/nextGoal и не содержит provider identity | Contract/type/runtime tests | PASS |
+| C09-F-03 | Mouse, Pointer Events и touch/mouse fallback: один physical contact→один tap; right-click/contextmenu/drag/select/page gesture не активируют core | Browser input matrix | PASS |
+| C09-F-04 | Ровно 8 goals вычисляются из V1 records в утверждённом порядке; nextGoal — первый incomplete/null; reload и local/cloud merge не откатывают completion | Goals/unit/persistence/browser trace | PASS |
+| C09-F-05 | RU/EN title, HUD, stages, goals, dialogs, errors, instructions и ARIA полны; ru/be/kk/uk/uz→RU, other/unknown→EN | Dictionary completeness + mocked environment E2E | PASS |
+| C09-F-06 | No-reward direct input достигает stages 1–7, records/goals/restart работают без SDK/network/auth/ads | 60/30/15 FPS fixture + full browser cycle | PASS |
 
 | ID | Бинарное условие | Evidence | Статус |
 |---|---|---|---|
-| C09-G-01 | Offer становится eligible при `runHighestStage≥3` текущей попытки, не раньше; видим только в safe PLAYING; auto-open/start count=0 | State matrix + browser geometry | NOT RUN |
-| C09-G-02 | Первый `onRewarded` request ID даёт ровно один `tapPower×2` boost на 60 000 ms active gameplay; assisted heat не даёт direct tap-score | Deterministic reward trace | NOT RUN |
-| C09-G-03 | Cooldown 90 000 ms active time от reward, переносится между runs session и не persisted; repeated reward разрешён только после boost/cooldown | Active-clock/restart/reload trace | NOT RUN |
-| C09-G-04 | Close без reward/error/timeout без prior `onRewarded`/unavailable/duplicate/late дают reward/cooldown/heat/score/progression mutation=0; earned reward после prior `onRewarded` сохраняется ровно один раз; следующий добровольный request безопасен | Provider terminal matrix | NOT RUN |
-| C09-G-05 | Новый rewarded C09 fixture rebaseline утверждён и совпадает на 60/30/15 FPS; no-reward V5 timings остаются неизменными | Balance report + deterministic fixtures | NOT RUN |
+| C09-G-01 | Offer становится eligible при `runHighestStage≥3` текущей попытки, не раньше; видим только в safe PLAYING; auto-open/start count=0 | State matrix + browser geometry | PASS |
+| C09-G-02 | Первый `onRewarded` request ID даёт ровно один `tapPower×2` boost на 60 000 ms active gameplay; assisted heat не даёт direct tap-score | Deterministic reward trace | PASS |
+| C09-G-03 | Cooldown 90 000 ms active time от reward, переносится между runs session и не persisted; repeated reward разрешён только после boost/cooldown | Active-clock/restart/reload trace | PASS |
+| C09-G-04 | Close без reward/error/timeout без prior `onRewarded`/unavailable/duplicate/late дают reward/cooldown/heat/score/progression mutation=0; earned reward после prior `onRewarded` сохраняется ровно один раз; следующий добровольный request безопасен | Provider terminal matrix | PASS |
+| C09-G-05 | Новый rewarded C09 fixture rebaseline утверждён и совпадает на 60/30/15 FPS; no-reward V5 timings остаются неизменными | Balance report + deterministic fixtures | PASS |
 
 ### 9.2 Visual/content/audio/performance
 
 | ID | Бинарное условие | Evidence | Статус |
 |---|---|---|---|
-| C09-V-01 | Official desktop matrix, zoom 80/100/125%, mobile/tablet portrait+landscape и rotation: crop/distortion/page scroll=0; active field≤2:1; targets доступны | Screenshot/geometry matrix | NOT RUN |
-| C09-V-02 | 64 character frames × black/gray/red × DPR1/2/3 и stages 1–7 normal/reduced/forced-low: white/neutral matte, fringe, islands, internal residue, detached alpha, filter-amplified spots=0 | Automated alpha/composite audit + independent Human-Eye review | NOT RUN |
-| C09-V-03 | Visible RU/EN text/art contains rune/ritual/religious/esoteric references=0; exact visible names Ember Warden/Хранительница угасания и Fire Ring/Огненное кольцо используются | Content inventory + screenshots + Reviewer sign-off | NOT RUN |
-| C09-V-04 | Reward/goals UI — DOM/CSS, не bitmap/fake-ad; short landscape dialogs fit, only goals list internally scrolls; 48×48/96×96 targets PASS | DOM/static + viewport matrix | NOT RUN |
-| C09-A-01 | Before gesture audible=0; menu/hidden/platform/rewarded silence≤100 ms; stale/duplicate resume=0; muted gameplay полностью понятен | Audio graph + lifecycle browser trace | NOT RUN |
-| C09-PERF-01 | Четыре meaningful traces ≥12 min desktop/mobile × reward/no-reward: median FPS≥55/30, frames>50 ms≤1%, heap≤150 MB, input p95≤100 ms | Exact-candidate performance traces | NOT RUN |
-| C09-PERF-02 | Decoded textures≤64 MiB; loader выбирает один WebP/PNG format; unpacked ZIP<90 MB; unexpected refetch/growth/leak=0 | Asset/package/residency audit | NOT RUN |
+| C09-V-01 | Official desktop matrix, zoom 80/100/125%, mobile/tablet portrait+landscape и rotation: crop/distortion/page scroll=0; active field≤2:1; targets доступны | Screenshot/geometry matrix | BLOCKED_EXTERNAL — Android physical device or real-device cloud exact-build run; Apple Safari executed Cycle 09 production run evidence; Mozilla Firefox executed Cycle 09 production run evidence; Opera executed Cycle 09 production run evidence; Yandex Browser executed Cycle 09 production run evidence; iOS physical device or real-device cloud exact-build run |
+| C09-V-02 | 64 character frames × black/gray/red × DPR1/2/3 и stages 1–7 normal/reduced/forced-low: white/neutral matte, fringe, islands, internal residue, detached alpha, filter-amplified spots=0 | Automated alpha/composite audit + independent Human-Eye review | PASS |
+| C09-V-03 | Visible RU/EN text/art contains rune/ritual/religious/esoteric references=0; exact visible names Ember Warden/Хранительница угасания и Fire Ring/Огненное кольцо используются | Content inventory + screenshots + Reviewer sign-off | PASS |
+| C09-V-04 | Reward/goals UI — DOM/CSS, не bitmap/fake-ad; short landscape dialogs fit, only goals list internally scrolls; 48×48/96×96 targets PASS | DOM/static + viewport matrix | PASS |
+| C09-A-01 | Before gesture audible=0; menu/hidden/platform/rewarded silence≤100 ms; stale/duplicate resume=0; muted gameplay полностью понятен | Audio graph + lifecycle browser trace | PASS |
+| C09-PERF-01 | Четыре meaningful traces ≥12 min desktop/mobile × reward/no-reward: median FPS≥55/30, frames>50 ms≤1%, heap≤150 MB, input p95≤100 ms | Exact-candidate performance traces | BLOCKED_EXTERNAL — Android physical device or real-device cloud exact-build run; Host compositor calibration cannot prove one or more required FPS thresholds.; iOS physical device or real-device cloud exact-build run |
+| C09-PERF-02 | Decoded textures≤64 MiB; loader выбирает один WebP/PNG format; unpacked ZIP<90 MB; unexpected refetch/growth/leak=0 | Asset/package/residency audit | PASS |
 
 ### 9.3 Yandex SDK/data/draft
 
 | ID | Бинарное условие | Evidence | Статус |
 |---|---|---|---|
-| C09-Y-01 | `YaGames.init` once; early pause subscription; `LoadingAPI.ready` once only after interactive state; debug panel Game Ready green | Mocked SDK E2E + Yandex draft debug evidence | NOT RUN |
-| C09-Y-02 | GameplayAPI and reason-set точно отражают playing/menu/results/hidden/platform/ad; timers/audio freeze, catch-up=0 | Lifecycle matrix + draft trace | NOT RUN |
-| C09-Y-03 | Local save immediate; cloud maxima latest-wins; `Player.setData`≤1/5 s; result/lifecycle flush; active run/boost/cooldown never restored | Fake-clock adapter suite + authorized draft reload | NOT RUN |
-| C09-Y-04 | Guest/denied/error remains full local game, forced login=0, unhandled errors=0 | Guest/error draft trace | NOT RUN |
-| C09-Y-05 | `bestscore` numeric DESC exists; `isAvailableMethod` guards read/write; only improved integer submit once; lower/duplicate/unavailable safe | Console config + adapter/draft trace | NOT RUN |
-| C09-Y-06 | Real rewarded success/close/error path in Yandex draft obeys exact 60/90/onRewarded contract and ad pause/audio rules | Draft ad recordings + state log | NOT RUN |
-| C09-Y-07 | Console config exactly Desktop+Android+iOS, Any, 12+, RU+EN, Arcade/Casual, cloud saves+rewarded only; TV/IAP/sticky/interstitial off | Console screenshots/export | NOT RUN |
-| C09-Y-08 | Submission metadata RU/EN final; icon+cover not screenshots; ≥4 desktop 16:9 and ≥4 mobile 9:16 actual-gameplay≥70%; rights/provenance complete | Submission manifest + visual audit | NOT RUN |
+| C09-Y-01 | `YaGames.init` once; early pause subscription; `LoadingAPI.ready` once only after interactive state; debug panel Game Ready green | Mocked SDK E2E + Yandex draft debug evidence | BLOCKED_EXTERNAL — authorized Yandex Games Console exact-RC draft/debug trace |
+| C09-Y-02 | GameplayAPI and reason-set точно отражают playing/menu/results/hidden/platform/ad; timers/audio freeze, catch-up=0 | Lifecycle matrix + draft trace | BLOCKED_EXTERNAL — authorized Yandex Games Console exact-RC draft/debug trace |
+| C09-Y-03 | Local save immediate; cloud maxima latest-wins; `Player.setData`≤1/5 s; result/lifecycle flush; active run/boost/cooldown never restored | Fake-clock adapter suite + authorized draft reload | BLOCKED_EXTERNAL — authorized Yandex Games Console exact-RC draft/debug trace |
+| C09-Y-04 | Guest/denied/error remains full local game, forced login=0, unhandled errors=0 | Guest/error draft trace | BLOCKED_EXTERNAL — authorized Yandex Games Console exact-RC draft/debug trace |
+| C09-Y-05 | `bestscore` numeric DESC exists; `isAvailableMethod` guards read/write; only improved integer submit once; lower/duplicate/unavailable safe | Console config + adapter/draft trace | BLOCKED_EXTERNAL — authorized Yandex Games Console exact-RC draft/debug trace |
+| C09-Y-06 | Real rewarded success/close/error path in Yandex draft obeys exact 60/90/onRewarded contract and ad pause/audio rules | Draft ad recordings + state log | BLOCKED_EXTERNAL — authorized Yandex Games Console exact-RC draft/debug trace |
+| C09-Y-07 | Console config exactly Desktop+Android+iOS, Any, 12+, RU+EN, Arcade/Casual, cloud saves+rewarded only; TV/IAP/sticky/interstitial off | Console screenshots/export | BLOCKED_EXTERNAL — authorized Yandex Games Console exact-RC draft/debug trace |
+| C09-Y-08 | Submission metadata RU/EN final; icon+cover not screenshots; ≥4 desktop 16:9 and ≥4 mobile 9:16 actual-gameplay≥70%; rights/provenance complete | Submission manifest + visual audit | PASS |
 
 ### 9.4 QA/release
 
 | ID | Бинарное условие | Evidence | Статус |
 |---|---|---|---|
-| C09-Q-01 | Clean automation, mocked SDK browser E2E, visual/content/asset audits and compatibility checks exit 0, skipped required=0 | Gate 1 immutable logs | NOT RUN |
-| C09-Q-02 | Every issue has severity/env/build/steps/expected/actual/evidence/AC; fix owner не закрывает issue; independent targeted retest + neighboring regression complete | Issue/retest manifest | NOT RUN |
-| C09-Q-03 | Four ≥12 min session traces and full cross-browser/device matrix complete; console errors/warnings and unexpected network failures=0 | Gate 5 report | NOT RUN |
-| C09-RLS-01 | Historical 0.1.0/0.1.1 artifacts unchanged; one clean 1.0.0 Build ID/commit/dist/report/ZIP SHA/evidence identity | Git/artifact/manifest audit | NOT RUN |
-| C09-RLS-02 | ZIP has one root index, relative safe paths, no docs/tests/mocks/secrets/source maps/dev provider, unpacked static smoke PASS | ZIP audit + fresh-temp HTTP smoke | NOT RUN |
-| C09-RLS-03 | The exact ZIP SHA tested in Yandex draft is promoted without rebuild to `inferno-clicker-1.0.0.zip`; checksum and release report complete | Draft/build identity + SHA comparison | NOT RUN |
-| C09-RLS-04 | Every applicable C09 row PASS on same candidate; Critical=0/High=0; QA, Reviewer and Release Agent sign; moderation/publication not performed | Final stop audit + sign-offs | NOT RUN |
+| C09-Q-01 | Clean automation, mocked SDK browser E2E, visual/content/asset audits and compatibility checks exit 0, skipped required=0 | Staging commands 1–18 immutable logs + standalone exact-source release audit | PASS |
+| C09-Q-02 | Every issue has severity/env/build/steps/expected/actual/evidence/AC; fix owner не закрывает issue; independent targeted retest + neighboring regression complete | Issue/retest manifest | PASS |
+| C09-Q-03 | Four ≥12 min session traces and full cross-browser/device matrix complete; console errors/warnings and unexpected network failures=0 | Gate 5 report | BLOCKED_EXTERNAL — Android physical device or real-device cloud exact-build run; Apple Safari executed Cycle 09 production run evidence; Host compositor calibration cannot prove one or more required FPS thresholds.; Mozilla Firefox executed Cycle 09 production run evidence; Opera executed Cycle 09 production run evidence; Yandex Browser executed Cycle 09 production run evidence; iOS physical device or real-device cloud exact-build run |
+| C09-RLS-01 | Historical 0.1.0/0.1.1 artifacts unchanged; one clean 1.0.0 Build ID/commit/dist/report/ZIP SHA/evidence identity | Git/artifact/manifest audit | READY_FOR_PACKAGE |
+| C09-RLS-02 | ZIP has one root index, relative safe paths, no docs/tests/mocks/secrets/source maps/dev provider, unpacked static smoke PASS | ZIP audit + fresh-temp HTTP smoke | READY_FOR_PACKAGE |
+| C09-RLS-03 | The exact ZIP SHA tested in Yandex draft is promoted without rebuild to `inferno-clicker-1.0.0.zip`; checksum and release report complete | Draft/build identity + SHA comparison | BLOCKED_EXTERNAL — authorized Yandex Games Console exact-RC draft/debug trace |
+| C09-RLS-04 | Every applicable C09 row PASS on same candidate; Critical=0/High=0; QA, Reviewer and Release Agent sign; moderation/publication not performed | Final stop audit + sign-offs | BLOCKED_EXTERNAL — Android physical device or real-device cloud exact-build run; Apple Safari executed Cycle 09 production run evidence; Host compositor calibration cannot prove one or more required FPS thresholds.; Mozilla Firefox executed Cycle 09 production run evidence; Opera executed Cycle 09 production run evidence; Yandex Browser executed Cycle 09 production run evidence; authorized Yandex Games Console exact-RC draft/debug trace; iOS physical device or real-device cloud exact-build run |
 
-**Current decision:** DONE = NO — YANDEX RELEASE CYCLE 09 `NOT RUN`. Исторические C07/C08 результаты не переносятся; ни один новый статус нельзя повысить без exact-candidate evidence.
+**Current decision:** DONE = NO — exact-source local RC audit PASS; `C09-RLS-01/02` are `READY_FOR_PACKAGE`. Browser/device/Yandex Console/compositor rows remain `BLOCKED_EXTERNAL` for the exact reasons above, so the candidate is not promotable and moderation/publication remain outside this local decision.
