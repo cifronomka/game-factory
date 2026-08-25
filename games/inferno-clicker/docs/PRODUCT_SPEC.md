@@ -122,7 +122,7 @@ These are presentation requirements, not new mechanics. Gameplay balance/progres
 | Superseded | Исторический Web/dev test provider удаляется из Yandex production; при SDK failure rewarded unavailable и бесплатной награды нет. | Product + Platform | superseded by Yandex Cycle 09 |
 | Решено | Первый release — один бесконечный score-run до полного угасания; после Инферно игрок продолжает удержание ради рекорда. | Product/Game Designer | принято до реализации |
 | Решено | Retention строится на личных рекордах, восьми значках, nextGoal и необязательной ежедневной цели без серии посещений, валюты и штрафа за пропуск. | Product/Game Designer | Yandex Cycle 09 |
-| Реализовано, проверка заблокирована | Adapter следует актуальному Yandex SDK-контракту; technical leaderboard name зафиксирован как `best-score`. Фактическая реклама, cloud save и leaderboard требуют тестового приложения в Yandex Console. | Platform Integration Agent + QA | до release gate |
+| Реализовано, проверка заблокирована | Adapter следует актуальному Yandex SDK-контракту; technical leaderboard name зафиксирован как `bestscore`. Фактическая реклама, cloud save и leaderboard требуют тестового приложения в Yandex Console. | Platform Integration Agent + QA | до release gate |
 | Заблокировано внешней средой | Уточнить KPI и баланс по результатам минимум 10 внутренних playtest и 30 внешних first-session playtest. | Product/Game Designer + QA | до release gate |
 
 ## Handoff

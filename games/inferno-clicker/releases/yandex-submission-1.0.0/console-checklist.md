@@ -24,7 +24,7 @@ evidence is collected. Nothing here authorizes moderation or publication.
 | Monetization | Rewarded only | NOT RUN |
 | Interstitial/sticky/IAP | Off — not implemented | NOT RUN |
 | Cloud saves | On | NOT RUN |
-| Leaderboard | `best-score`, numeric integer, descending | NOT RUN |
+| Leaderboard | `bestscore`, numeric integer, descending | NOT RUN |
 | Archive | Upload exact `inferno-clicker-1.0.0-rc.zip` SHA from the generated local RC report; final name is forbidden before draft verification | NOT RUN |
 | Allowed hosts | Only hosts actually required by Yandex SDK/game package; no third-party ad or analytics host | NOT RUN |
 | RU copy | Paste exactly from `metadata-ru.md` | NOT RUN |
@@ -50,7 +50,7 @@ evidence is collected. Nothing here authorizes moderation or publication.
 - RU-group locale→RU and another locale→EN: `NOT RUN`.
 - Real rewarded success gives one 60-second boost; close/error gives none; repeat obeys 90 active seconds: `NOT RUN`.
 - Authorized cloud merge/rate limit/reload and guest local-only flow: `NOT RUN`.
-- `best-score` improved/lower/duplicate/unavailable paths: `NOT RUN`.
+- `bestscore` improved/lower/duplicate/unavailable paths: `NOT RUN`.
 - Exact uploaded ZIP SHA equals tested and promoted artifact: `NOT RUN`.
 - Exact localized card-media files from the four hash-bound rows above were
   uploaded, saved and persisted after reload in draft `574315`: `PASS` (RU icon

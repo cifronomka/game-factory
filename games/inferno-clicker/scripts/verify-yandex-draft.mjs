@@ -187,10 +187,10 @@ function validateConfiguration(configuration, label) {
     && configuration.stickyAds === false
     && configuration.interstitialAds === false,
   `${label} must explicitly disable TV, purchases, sticky ads and interstitial ads.`);
-  invariant(configuration.leaderboard?.technicalName === 'best-score'
+  invariant(configuration.leaderboard?.technicalName === 'bestscore'
     && configuration.leaderboard?.type === 'numeric'
     && configuration.leaderboard?.order === 'DESC',
-  `${label} leaderboard must be best-score, numeric, DESC.`);
+  `${label} leaderboard must be bestscore, numeric, DESC.`);
   exactKeys(configuration.leaderboard, ['order', 'technicalName', 'type'], `${label}.leaderboard`);
   invariant(configuration.titles?.ru === 'Зажги'
     && configuration.titles?.en === 'Ignite'
@@ -627,19 +627,19 @@ function validateLeaderboardTrace(trace, minimumScore) {
     && policy.readWindowMs === 300_000
     && policy.cacheMs === 15_000,
   'Leaderboard trace does not prove the configured Yandex API limits/cache policy.');
-  invariant(setScore.technicalName === 'best-score'
+  invariant(setScore.technicalName === 'bestscore'
     && setScore.method === 'ysdk.leaderboards.setScore'
     && Number.isInteger(setScore.score)
     && setScore.score >= minimumScore
     && setScore.ok === true,
-  'Leaderboard trace does not prove a successful direct best-score numeric write.');
-  invariant(getEntries.technicalName === 'best-score'
+  'Leaderboard trace does not prove a successful direct bestscore numeric write.');
+  invariant(getEntries.technicalName === 'bestscore'
     && getEntries.method === 'ysdk.leaderboards.getEntries'
     && getEntries.includeUser === true
     && Number.isInteger(getEntries.quantityTop) && getEntries.quantityTop >= 1 && getEntries.quantityTop <= 10
     && Number.isInteger(getEntries.quantityAround) && getEntries.quantityAround >= 0 && getEntries.quantityAround <= 3
     && getEntries.ok === true,
-  'Leaderboard trace does not prove a limited direct best-score read.');
+  'Leaderboard trace does not prove a limited direct bestscore read.');
   return setScore.score;
 }
 

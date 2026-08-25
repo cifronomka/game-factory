@@ -38,7 +38,7 @@
 - Нет auto-open, urgency badge, ложной close-кнопки, наказания за отказ или рекламы поверх основного действия.
 - Cancel/error/unavailable не изменяют heat, score, stage, records, cooldown или возможность пройти игру.
 - Duplicate/late `onRewarded`, `onClose` и resume callbacks идемпотентны; одна request ID выдаёт максимум один boost.
-- Все значения leaderboard проходят один и тот же sanity check; rewarded и no-reward runs сосуществуют в `best-score`.
+- Все значения leaderboard проходят один и тот же sanity check; rewarded и no-reward runs сосуществуют в `bestscore`.
 - Production static audit должен доказать отсутствие `(тест)`, `rewardedProvider='test'`, fake-ad UI и бесплатного terminal success.
 
 ## Privacy-safe events

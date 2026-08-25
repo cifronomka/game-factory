@@ -18,7 +18,7 @@ Game core не импортирует SDK, DOM или provider-specific data. Ap
 |---|---|---|
 | Ready | `LoadingAPI.ready()` once после интерактивной готовности | local app становится интерактивным; remote status unavailable |
 | Save/load | local-first + Player data | versioned localStorage, active run не восстанавливается |
-| Leaderboard | `best-score`, integer DESC | local Best Score; remote UI нейтрально unavailable |
+| Leaderboard | `bestscore`, integer DESC | local Best Score; remote UI нейтрально unavailable |
 | Rewarded | официальный `showRewardedVideo` | offer скрыт; бесплатной награды нет |
 | Lifecycle | SDK events + browser reason-set | visibility/blur/focus reason-set |
 | Interstitial/IAP/sticky | `N/A — не реализуются` | `N/A — не реализуются` |
@@ -50,9 +50,9 @@ Yandex debug panel должен показывать корректный SDK in
 - Отказ пользователя от profile data или гостевой режим не вызывает обязательный login dialog и не ограничивает игру.
 - В Console включается cloud-save capability. Payload должен оставаться ниже 200 KB; release audit фиксирует фактический размер.
 
-## Leaderboard `best-score`
+## Leaderboard `bestscore`
 
-- В Console создать одно поле `best-score`, numeric integer, descending; имя в adapter совпадает побайтно.
+- В Console создать одно поле `bestscore`, numeric integer, descending; имя в adapter совпадает побайтно.
 - Использовать актуальные прямые методы `ysdk.leaderboards` и проверять `ysdk.isAvailableMethod` перед read/write.
 - Submit только после завершения run, только если integer `0..2_147_483_647` выше последнего подтверждённого local/submitted best. Lower/duplicate/retry не уменьшают и не дублируют запись.
 - Read/write unavailable и auth-required отображаются нейтрально; login prompt возможен только после отдельного явного действия игрока, которого в Cycle 09 нет.

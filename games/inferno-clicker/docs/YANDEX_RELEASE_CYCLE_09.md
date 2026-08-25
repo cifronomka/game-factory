@@ -6,7 +6,7 @@ Cycle 09 — активный релизный контракт для адап�
 
 Исторические artifact/report/checksum 0.1.0 и 0.1.1 не изменяются и не пересобираются. Рабочий candidate имеет версию `1.0.0`; его exact Build ID, commit, ZIP, checksum и Yandex draft ID имеют статус `NOT RUN — candidate ещё не прошёл release gate`.
 
-В scope: Desktop, Android и iOS в ориентации `Any`, мышь и touch, RU+EN, 12+, rewarded, local/cloud records, leaderboard `best-score`, визуальная/content-проверка, submission pack и проверка нового черновика. TV, IAP, sticky banner, interstitial, third-party ads, VK и RuStore — `N/A — не входят в Cycle 09`. Отправка на модерацию и публичная публикация — `N/A — требуют отдельного разрешения пользователя`.
+В scope: Desktop, Android и iOS в ориентации `Any`, мышь и touch, RU+EN, 12+, rewarded, local/cloud records, leaderboard `bestscore`, визуальная/content-проверка, submission pack и проверка нового черновика. TV, IAP, sticky banner, interstitial, third-party ads, VK и RuStore — `N/A — не входят в Cycle 09`. Отправка на модерацию и публичная публикация — `N/A — требуют отдельного разрешения пользователя`.
 
 ## Продуктовая сессия и реиграбельность
 
@@ -37,7 +37,7 @@ Cycle 09 — активный релизный контракт для адап�
 - `GameplayAPI.start/stop`, `game_api_pause/resume`, `visibilitychange`, `blur/focus`, menu, result и ad управляются единым idempotent pause-reason set. Hidden/ad время не тикает; audio достигает тишины ≤100 ms; resume происходит только после снятия всех причин.
 - Locale берётся при startup из `ysdk.environment.i18n.lang`: `ru`, `be`, `kk`, `uk`, `uz` → `ru`; остальные/unknown → `en`. Локализуются title, HUD, стадии, goals, dialogs, errors, status, ARIA и instructions. Core хранит IDs/числа и не импортирует SDK/locale bundles.
 - Local save выполняется сразу. Cloud latest-wins queue объединяет record maxima и пишет не чаще одного `Player.setData` за 5 секунд; final flush выполняется на result и best-effort при lifecycle pause/pagehide. Active run не сохраняется.
-- Public leaderboard technical name — `best-score`, integer DESC `0..2_147_483_647`. Перед вызовом используется актуальный `isAvailableMethod`; submit — только новый завершённый local best. Guest/denied player играет и сохраняется локально без навязанного login dialog.
+- Public leaderboard technical name — `bestscore`, integer DESC `0..2_147_483_647`. Перед вызовом используется актуальный `isAvailableMethod`; submit — только новый завершённый local best. Guest/denied player играет и сохраняется локально без навязанного login dialog.
 
 ## Compatibility, content и package
 

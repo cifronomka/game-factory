@@ -442,7 +442,7 @@ async function exerciseLifecycleCloudLeaderboard(browser) {
   });
   await page.waitForFunction(() => window.__YSDK_MOCK_CALLS__.setScore.length === 1);
   assert.deepEqual(await page.evaluate(() => window.__YSDK_MOCK_CALLS__.setScore), [
-    { name: 'best-score', score: 12_345 },
+    { name: 'bestscore', score: 12_345 },
   ], 'authorized startup must backfill the merged local/cloud best without a user action');
   const beforeEarlyPause = await page.evaluate(() => ({ start: window.__YSDK_MOCK_CALLS__.start, stop: window.__YSDK_MOCK_CALLS__.stop }));
   await page.evaluate(() => window.__YSDK_MOCK__.emit('game_api_pause'));
@@ -543,7 +543,7 @@ async function exerciseCloudMergeGuestAvailability(browser) {
     calls: window.__YSDK_MOCK_CALLS__,
     diagnostics: window.__INFERNO_DIAGNOSTICS__(),
   }));
-  assert.deepEqual(authorizedState.calls.setScore, [{ name: 'best-score', score: 22_222 }],
+  assert.deepEqual(authorizedState.calls.setScore, [{ name: 'bestscore', score: 22_222 }],
     'local/cloud merge must backfill the maximum Best Score');
   assert.equal(authorizedState.diagnostics.state.bestScore, 22_222);
   assert.equal(authorizedState.diagnostics.state.records.highestStageReached, 5,

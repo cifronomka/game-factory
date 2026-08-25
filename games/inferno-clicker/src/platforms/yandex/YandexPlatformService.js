@@ -6,7 +6,7 @@ import { errorMessage, fail, ok } from '../types/result.js';
 import { WebPlatformService } from '../web/WebPlatformService.js';
 import { createGlobalYandexSdkFactory } from './sdk.js';
 
-export const DEFAULT_LEADERBOARD_NAME = 'best-score';
+export const DEFAULT_LEADERBOARD_NAME = 'bestscore';
 export const DEFAULT_CLOUD_SAVE_KEY = 'infernoSaveV1';
 export const DEFAULT_CLOUD_WRITE_INTERVAL_MS = 5_000;
 export const LEADERBOARD_READ_LIMIT = 20;

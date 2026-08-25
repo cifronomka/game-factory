@@ -174,7 +174,7 @@
 | C09-Y-02 | GameplayAPI and reason-set точно отражают playing/menu/results/hidden/platform/ad; timers/audio freeze, catch-up=0 | Lifecycle matrix + draft trace | NOT RUN |
 | C09-Y-03 | Local save immediate; cloud maxima latest-wins; `Player.setData`≤1/5 s; result/lifecycle flush; active run/boost/cooldown never restored | Fake-clock adapter suite + authorized draft reload | NOT RUN |
 | C09-Y-04 | Guest/denied/error remains full local game, forced login=0, unhandled errors=0 | Guest/error draft trace | NOT RUN |
-| C09-Y-05 | `best-score` numeric DESC exists; `isAvailableMethod` guards read/write; only improved integer submit once; lower/duplicate/unavailable safe | Console config + adapter/draft trace | NOT RUN |
+| C09-Y-05 | `bestscore` numeric DESC exists; `isAvailableMethod` guards read/write; only improved integer submit once; lower/duplicate/unavailable safe | Console config + adapter/draft trace | NOT RUN |
 | C09-Y-06 | Real rewarded success/close/error path in Yandex draft obeys exact 60/90/onRewarded contract and ad pause/audio rules | Draft ad recordings + state log | NOT RUN |
 | C09-Y-07 | Console config exactly Desktop+Android+iOS, Any, 12+, RU+EN, Arcade/Casual, cloud saves+rewarded only; TV/IAP/sticky/interstitial off | Console screenshots/export | NOT RUN |
 | C09-Y-08 | Submission metadata RU/EN final; icon+cover not screenshots; ≥4 desktop 16:9 and ≥4 mobile 9:16 actual-gameplay≥70%; rights/provenance complete | Submission manifest + visual audit | NOT RUN |

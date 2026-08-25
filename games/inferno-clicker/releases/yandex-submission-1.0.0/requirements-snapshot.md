@@ -10,7 +10,7 @@ This snapshot records sources used for Cycle 09. Official pages must be rechecke
 | SDK pause/resume | https://yandex.ru/dev/games/doc/ru/sdk/sdk-events | early subscription and reason-set lifecycle |
 | Advertising | https://yandex.ru/dev/games/doc/ru/sdk/sdk-adv | voluntary rewarded, grant only onRewarded; no platform frequency cap found |
 | Player data | https://yandex.ru/dev/games/doc/ru/sdk/sdk-player | local-first/cloud merge; payload/rate limits observed |
-| Leaderboards | https://yandex.ru/dev/games/doc/ru/sdk/sdk-leaderboard | guarded direct API; `best-score` numeric DESC |
+| Leaderboards | https://yandex.ru/dev/games/doc/ru/sdk/sdk-leaderboard | guarded direct API; `bestscore` numeric DESC |
 | Language auto-detection | https://yandex.ru/dev/games/doc/ru/requirements/2/14 | environment language used at startup; RU/EN fallback mapping |
 | Content duration/replayability | https://yandex.ru/dev/games/doc/ru/requirements/2/9 | short runs supported by records/goals and 10–15+ minute session |
 | Game mechanics | https://yandex.ru/dev/games/doc/ru/requirements/2/4 | gameplay and controls fully described; ad not progression gate |

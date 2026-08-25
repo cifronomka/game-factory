@@ -153,7 +153,7 @@ The preceding C08 checklist is historical after Cycle 09 begins; unchecked C08 r
 - [ ] `1.0.0` version and exact clean Build ID recorded; historical 0.1.0/0.1.1 files/hashes unchanged.
 - [ ] Product/game/monetization/platform/architecture/art/audio/asset/QA/acceptance contracts agree on stage-3, 60-s boost, 90-active-s cooldown, repeats, goals and RU+EN.
 - [ ] Production target loads SDK before app independent of hostname; test/fake rewarded paths and native-ESM runtime dependency absent.
-- [ ] SDK init/ready/gameplay/pause, local/cloud≤1 write/5 s, guest, `best-score` and rewarded terminal matrices PASS.
+- [ ] SDK init/ready/gameplay/pause, local/cloud≤1 write/5 s, guest, `bestscore` and rewarded terminal matrices PASS.
 - [ ] Desktop official matrix + zoom and mobile/tablet portrait/landscape/rotation/input compatibility PASS.
 - [ ] All 64 frames and seven-stage runtime pass black/gray/red DPR1/2/3 audit; content scrub and low-brightness review PASS.
 - [ ] Four meaningful ≥12-minute traces meet functional/performance thresholds; Critical=0, High=0, skipped=0.

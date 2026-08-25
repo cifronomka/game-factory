@@ -21,7 +21,7 @@
 |---|---|---|
 | C09-M1 | Зафиксировать 1.0.0 contracts и baseline identity; historical artifacts immutable; все новые AC=`NOT RUN` | Cross-doc audit без конфликтов/placeholders |
 | C09-M2 | Stage-3 DOM offer, exact 60-s boost/90-active-s session cooldown/repeat; goals/nextGoal; no test provider | Unit/state/browser reward + goals matrix, new balance rebaseline |
-| C09-M3 | Explicit Yandex target, `/sdk.js` before app, locale/capabilities, ready/lifecycle, cloud queue/flush, guarded `best-score` | Mock SDK E2E success/failure/RU/EN/guest/reward/cloud/leaderboard |
+| C09-M3 | Explicit Yandex target, `/sdk.js` before app, locale/capabilities, ready/lifecycle, cloud queue/flush, guarded `bestscore` | Mock SDK E2E success/failure/RU/EN/guest/reward/cloud/leaderboard |
 | C09-M4 | Compatibility bundle/fallbacks, responsive Any orientation/safe areas/input guards; visible content scrub; frame/scene cleanup | Browser/device/zoom matrix + content/alpha/visual audit |
 | C09-M5 | Ordered QA→fix→independent retest→neighboring regression; four ≥12-min sessions; submission assets/metadata | All C09 AC except final package/draft PASS; Critical=0/High=0 |
 | C09-M6 | Reproducible Yandex build/package, fresh-unpack smoke, exact ZIP draft/debug verification and report | Same SHA throughout; every C09 AC PASS; sign-offs complete |

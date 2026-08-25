@@ -202,7 +202,7 @@ interface PlatformService {
 }
 ```
 
-`PlatformCapabilities` содержит `locale: 'ru'|'en'`, `authorized` и отдельные booleans `rewarded`, `leaderboardRead`, `leaderboardWrite`, `cloudRead`, `cloudWrite`; provider identity не передаётся в view model. `RewardedResult` различает `rewarded`, `closed`, `unavailable`, `error`; первый `rewarded` request ID выдаёт максимум одну награду. Adapter преобразует platform/browser pause/resume в idempotent reason-set: игра возобновляется, только когда закрыты все причины (`ad`, `visibility`, `platform`, `menu`, `game-ended`). Technical leaderboard name — `best-score`; read/write предваряет `isAvailableMethod`. Guest/auth-required не запускает login без отдельного user action.
+`PlatformCapabilities` содержит `locale: 'ru'|'en'`, `authorized` и отдельные booleans `rewarded`, `leaderboardRead`, `leaderboardWrite`, `cloudRead`, `cloudWrite`; provider identity не передаётся в view model. `RewardedResult` различает `rewarded`, `closed`, `unavailable`, `error`; первый `rewarded` request ID выдаёт максимум одну награду. Adapter преобразует platform/browser pause/resume в idempotent reason-set: игра возобновляется, только когда закрыты все причины (`ad`, `visibility`, `platform`, `menu`, `game-ended`). Technical leaderboard name — `bestscore`; read/write предваряет `isAvailableMethod`. Guest/auth-required не запускает login без отдельного user action.
 
 ## Asset loading
 

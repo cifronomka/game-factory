@@ -948,7 +948,7 @@ function consoleConfigurationErrors(configuration) {
   if (configuration?.tv !== false || configuration?.inAppPurchases !== false || configuration?.stickyAds !== false || configuration?.interstitialAds !== false) errors.push('TV/IAP/sticky/interstitial must be explicitly disabled');
   if (configuration?.titles?.ru !== 'Зажги' || configuration?.titles?.en !== 'Ignite'
     || configuration?.titles?.availabilityChecked !== true || configuration?.titles?.available !== true) errors.push('Console title values/availability are not proven');
-  if (configuration?.leaderboard?.technicalName !== 'best-score' || configuration?.leaderboard?.type !== 'numeric' || configuration?.leaderboard?.order !== 'DESC') errors.push('Console leaderboard configuration mismatch');
+  if (configuration?.leaderboard?.technicalName !== 'bestscore' || configuration?.leaderboard?.type !== 'numeric' || configuration?.leaderboard?.order !== 'DESC') errors.push('Console leaderboard configuration mismatch');
   return errors;
 }
 
