@@ -6,8 +6,12 @@ Historical environment check on 2026-08-23: the available browser redirected to
 Yandex ID authorization, so no Console work was completed in that session. The
 active Console workflow targets draft `574315`. On 2026-08-25 the four localized
 card-media files were uploaded, saved and verified after a page reload; their
-Console file IDs are recorded below. Other rows remain `NOT RUN` until matching
-evidence is collected. Nothing here authorizes moderation or publication.
+Console file IDs are recorded below. Later Console checks also verified the
+`bestscore` configuration, disabled sticky banners, cloud-save checkbox and all
+distribution regions as recorded below. Other rows remain `NOT RUN` until
+matching evidence is collected. The uploaded archive is not the current
+`bestscore` candidate, so this draft remains a moderation `NO-GO`. Nothing here
+authorizes moderation or publication.
 
 | Field | Exact value | Status |
 |---|---|---|
@@ -21,11 +25,14 @@ evidence is collected. Nothing here authorizes moderation or publication.
 | Orientation | Any | NOT RUN |
 | Age rating | 12+ | NOT RUN |
 | Categories | Arcade and Casual equivalents in the Console | NOT RUN |
-| Monetization | Rewarded only | NOT RUN |
-| Interstitial/sticky/IAP | Off — not implemented | NOT RUN |
-| Cloud saves | On | NOT RUN |
-| Leaderboard | `bestscore`, numeric integer, descending | NOT RUN |
-| Archive | Upload exact `inferno-clicker-1.0.0-rc.zip` SHA from the generated local RC report; final name is forbidden before draft verification | NOT RUN |
+| Monetization | Rewarded only | PENDING — developer comment says `bestscore` and rewarded-only; Ads page has no `Подключить монетизацию` button, while the application panel still says monetization is not connected. This is recorded as expected pre-publication state, not activation evidence. |
+| Sticky banners | Off in portrait, landscape and desktop | PASS — all three switches disabled and persisted |
+| Sticky banner API control | Off | PASS — disabled and persisted |
+| Interstitial/IAP | Off — not implemented | NOT RUN |
+| Cloud saves | On | PASS — checkbox enabled and persisted |
+| Leaderboard | `bestscore`, numeric integer, descending; 0 decimals; primary; RU `Лучший счёт`; EN `Best score` | PASS — created, primary checked, saved and persisted |
+| Developer comment | State `bestscore` and rewarded-only monetization | PASS — updated and persisted |
+| Archive | Replace uploaded file ID `12624047` with the exact current `bestscore` candidate, then bind its bytes/SHA to draft evidence | FAIL — file ID `12624047` is the old `best-score` build; exact replacement and debug verification are not done |
 | Allowed hosts | Only hosts actually required by Yandex SDK/game package; no third-party ad or analytics host | NOT RUN |
 | RU copy | Paste exactly from `metadata-ru.md` | NOT RUN |
 | EN copy | Paste exactly from `metadata-en.md` | NOT RUN |
@@ -38,7 +45,7 @@ evidence is collected. Nothing here authorizes moderation or publication.
 | Horizontal gameplay video (RU + EN) | RU uses exact `gameplay-video-horizontal-v1-1920x1080.mp4`: 1920×1080, 24,958,383 B, 22.486667 s, H.264 + stereo AAC 48 kHz (audio RMS `0.024112471258485778`, peak `0.2985572814941406`), SHA-256 `08ff5285a9a46c28f74cf3b1562505f21c61fe1968f7f19450dc406ec1c9e144`. EN uses `Использовать значение русского черновика`. | PASS — RU upload/save/reload and EN inheritance/save/reload; PENDING — processing/playback; NOT RUN — file ID |
 | Vertical gameplay video (RU + EN) | RU uses exact `gameplay-video-vertical-v1-1080x1920.mp4`: 1080×1920, 25,093,830 B, 22.5155 s, H.264 + stereo AAC 48 kHz (audio RMS `0.025064576492090245`, peak `0.38216733932495117`), SHA-256 `20d38ecae8aefebc9fee6b8858ebc843606764c1e73b57a4ee08ea4d3292c190`. EN uses `Использовать значение русского черновика`. | PASS — RU upload/save/reload and EN inheritance/save/reload; PENDING — processing/playback; NOT RUN — file ID |
 | Localized draft completion after video save | RU 92%; EN 92% | PASS — observed in draft `574315` at 2026-08-25 22:57:24 MSK; this is not full Console validation |
-| Countries | Platform default distribution appropriate for RU+EN; no extra exclusion requested | NOT RUN |
+| Countries | All available distribution regions | PASS — all regions checked and persisted |
 | Moderation submit | N/A — separate user authorization required | N/A — outside Cycle 09 |
 | Public release | N/A — separate user authorization required | N/A — outside Cycle 09 |
 
@@ -50,8 +57,23 @@ evidence is collected. Nothing here authorizes moderation or publication.
 - RU-group locale→RU and another locale→EN: `NOT RUN`.
 - Real rewarded success gives one 60-second boost; close/error gives none; repeat obeys 90 active seconds: `NOT RUN`.
 - Authorized cloud merge/rate limit/reload and guest local-only flow: `NOT RUN`.
-- `bestscore` improved/lower/duplicate/unavailable paths: `NOT RUN`.
-- Exact uploaded ZIP SHA equals tested and promoted artifact: `NOT RUN`.
+- `bestscore` Console object/configuration: `PASS` — created and persisted as
+  primary, numeric DESC, 0 decimals, RU `Лучший счёт`, EN `Best score`.
+- `bestscore` improved/lower/duplicate/unavailable runtime paths: `NOT RUN`.
+- Cloud saves Console checkbox: `PASS`; authorized/guest runtime merge and
+  reload behavior remain `NOT RUN`.
+- Sticky banners: `PASS` — portrait, landscape and desktop disabled; API sticky
+  control disabled. Interstitial/IAP runtime/config verification remains
+  `NOT RUN`.
+- Distribution: `PASS` — all available regions checked and persisted.
+- Ads page: no `Подключить монетизацию` button was present, while the application
+  panel still displayed monetization as not connected. Treat this as expected
+  pre-publication state only; monetization activation and real rewarded delivery
+  are not claimed and remain `PENDING`/`NOT RUN`.
+- Exact uploaded ZIP SHA equals tested and promoted artifact: `FAIL` — uploaded
+  archive file ID `12624047` is the old `best-score` build. Replace it with the
+  exact current `bestscore` candidate and complete debug-panel/runtime/SHA
+  verification before moderation.
 - Exact localized card-media files from the four hash-bound rows above were
   uploaded, saved and persisted after reload in draft `574315`: `PASS` (RU icon
   `12625231`, RU cover `12625237`, EN icon `12625244`, EN cover `12625250`).
@@ -63,5 +85,9 @@ evidence is collected. Nothing here authorizes moderation or publication.
   Сохраните черновик.` for both videos. Processing and playback verification are
   `PENDING`; player/file IDs are unavailable and therefore `NOT RUN`. This is
   not a full Console PASS and does not authorize moderation or publication.
+
+Current Console decision: `NO-GO` for moderation. The configuration facts above
+do not close the old-archive mismatch or the required SDK/Game Ready, rewarded,
+save, leaderboard and exact-ZIP debug checks.
 
 После сбора скриншотов/видео/логов оформить `yandex-console-draft` JSON по контракту `scripts/verify-yandex-draft.mjs`: exact RC bytes/build/package SHA, оба названия и `availabilityChecked/available=true`, структурированные rewarded success/close/error + 60/90 active-time/pause/audio, нулевые console/network counters и десять hash-bound artifacts. Затем выполнить `npm run verify:draft:yandex -- --evidence=<console-evidence.json>`. Команда append-only проверяет черновик без rebuild, rename, модерации или публикации.
