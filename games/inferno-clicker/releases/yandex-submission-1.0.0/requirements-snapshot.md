@@ -32,4 +32,8 @@ horizontal 22.486667 s / 24,958,383 B / SHA-256
 vertical 22.5155 s / 25,093,830 B / SHA-256
 `20d38ecae8aefebc9fee6b8858ebc843606764c1e73b57a4ee08ea4d3292c190`.
 Both contain stereo AAC at 48 kHz with non-zero RMS and sub-unity peak.
-Yandex Console upload/save/reload verification: `NOT RUN`.
+Yandex Console state at 2026-08-25 22:57:24 MSK: RU exact-file
+upload/save/reload and EN `Использовать значение русского черновика`
+save/reload are `PASS`; processing/playback are `PENDING`, and file IDs are
+`NOT RUN`. Draft completion was RU 92% and EN 92%. This does not constitute a
+full Console or pre-moderation PASS.

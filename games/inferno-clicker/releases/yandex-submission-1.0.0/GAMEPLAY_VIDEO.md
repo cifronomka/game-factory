@@ -1,8 +1,10 @@
 # Gameplay video — Yandex submission 1.0.0
 
-Local candidate status: `PASS`. Yandex Console upload/save/reload verification:
-`NOT RUN`. These files are optional promotional materials and their presence
-does not authorize submission to moderation or publication.
+Local candidate status: `PASS`. Yandex Console RU exact-file upload/save/reload
+and EN inheritance/save/reload verification: `PASS`. Processing and playback:
+`PENDING`; player/file IDs: `NOT RUN`. These files are optional promotional
+materials and their presence does not authorize submission to moderation or
+publication.
 
 ## Official constraints
 
@@ -37,7 +39,10 @@ non-advertising-video rule is treated as a release gate.
 | Audio | stereo, 48,000 Hz, 22.357 s; RMS `0.024112471258485778`; peak `0.2985572814941406` | stereo, 48,000 Hz, 22.39966666666667 s; RMS `0.025064576492090245`; peak `0.38216733932495117` |
 | SHA-256 | `08ff5285a9a46c28f74cf3b1562505f21c61fe1968f7f19450dc406ec1c9e144` | `20d38ecae8aefebc9fee6b8858ebc843606764c1e73b57a4ee08ea4d3292c190` |
 | Local status | PASS | PASS |
-| Console upload | NOT RUN | NOT RUN |
+| Console RU upload/save/reload | PASS | PASS |
+| Console EN inheritance/save/reload | PASS | PASS |
+| Console processing/playback | PENDING | PENDING |
+| Console player/file ID | NOT RUN | NOT RUN |
 
 Both files are below 28 seconds and 100 MB, use the required aspect ratios,
 and exceed the 400 px minimum height.
@@ -73,11 +78,16 @@ The capture build is `1.0.0+working.60d69ef5a069`, commit
 The capture-build manifest SHA-256 is
 `6b3475fdf9dd8d5fbf589c85a4f10184562d8be82b8efacb6219c830da3d679d`.
 
-## Console handoff
+## Console state and remaining handoff
 
-Upload the horizontal candidate to the horizontal gameplay-video field and the
-vertical candidate to the vertical gameplay-video field for both RU and EN; the
-files contain no localized text. Save draft `574315`, reload it, verify playback
-and aspect/crop in each locale, then record the four resulting Console file IDs
-in `console-checklist.md`. Leave moderation submission and public release
-untouched.
+At 2026-08-25 22:57:24 MSK the exact horizontal and vertical candidates were
+uploaded to the RU gameplay-video fields of draft `574315`, saved, and persisted
+after reload. The EN locale was set specifically for both gameplay videos to
+`Использовать значение русского черновика`; that setting was saved and persisted
+after reload. RU and EN draft completion both showed 92%.
+
+Yandex processing is still pending for both files. The UI shows: `Ваше видео
+загружено. После обработки оно появится. Сохраните черновик.` No playable player
+and no Console file IDs are available yet. After processing, verify playback,
+audio and aspect/crop in RU and EN, then record any exposed file IDs in
+`console-checklist.md`. Leave moderation submission and public release untouched.
